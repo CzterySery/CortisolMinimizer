@@ -89,6 +89,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/calc/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start
+         * @description An editable first leave period, from the same versioned pools as the calculator; no financial report.
+         */
+        post: operations["start_api_v1_calc_start_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/calc/base": {
         parameters: {
             query?: never;
@@ -1314,6 +1334,8 @@ export interface components {
             insured_until?: string | null;
             /** Base Monthly */
             base_monthly?: number | string | null;
+            /** Gross Monthly Estimate */
+            gross_monthly_estimate?: number | string | null;
             /**
              * Salary History
              * @default []
@@ -1363,6 +1385,8 @@ export interface components {
             insured_until: string | null;
             /** Base Monthly */
             base_monthly: string | null;
+            /** Gross Monthly Estimate */
+            gross_monthly_estimate: string | null;
             /**
              * Salary History
              * @default []
@@ -1499,6 +1523,8 @@ export interface components {
             rate_variant?: "standard" | "averaged";
             /** Today */
             today?: string | null;
+            /** Averaged Request On */
+            averaged_request_on?: string | null;
         };
         /** Plan */
         "Plan-Output": {
@@ -1516,6 +1542,8 @@ export interface components {
             rate_variant: "standard" | "averaged";
             /** Today */
             today: string | null;
+            /** Averaged Request On */
+            averaged_request_on: string | null;
         };
         /** PlanResult */
         PlanResult: {
@@ -2010,6 +2038,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Preview"];
+                };
+            };
+        };
+    };
+    start_api_v1_calc_start_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Plan-Input"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Plan-Output"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

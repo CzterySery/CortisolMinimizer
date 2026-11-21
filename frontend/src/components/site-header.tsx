@@ -7,6 +7,7 @@ const nav = [
   ["/applications", "Wnioski"],
   ["/help", "Pomoc"],
   ["/me", "Moje dane"],
+  ["/login", "mObywatel"],
 ] as const;
 
 export function SiteHeader() {

@@ -23,6 +23,10 @@ test("game → calculator → applications → mObywatel → cases → help → 
 
   await page.getByRole("button", { name: "Pokaż ten scenariusz w kalkulatorze" }).click();
   await expect(page).toHaveURL(/\/calculator/);
+  await expect(page.getByRole("heading", { name: "Kwoty zasiłków", exact: true })).toHaveCount(0);
+  for (let step = 0; step < 6; step++) await page.getByRole("button", { name: "Dalej", exact: true }).click();
+  await page.getByLabel("Standardowo: 100% macierzyńskiego, 70% rodzicielskiego").check();
+  await page.getByRole("button", { name: "Oblicz i pokaż wynik" }).click();
   await expect(page.getByText("Kwoty zasiłków")).toBeVisible();
   await shot(page, info, "03-calculator");
   await page.getByRole("link", { name: "Przygotuj wnioski dla tego planu" }).click();

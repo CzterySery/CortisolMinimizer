@@ -105,6 +105,7 @@ class Parent(Model):
     insured_since: date | None = None
     insured_until: date | None = None  # last day of the insurance title: contract end, JDG closed (brief H.3)
     base_monthly: Decimal | None = None   # podstawa wymiaru; derived from salary_history when absent
+    gross_monthly_estimate: Decimal | None = Field(None, gt=0)  # explicit quick employee estimate, not pay history
     salary_history: list[MonthPay] = []
     full_time: bool = True  # art. 45 floor when the base is computed from salary_history
     payer_insured_count: int = 0          # >threshold => employer pays benefits
@@ -163,6 +164,7 @@ class Plan(Model):
     blocks: list[Block] = []
     rate_variant: Literal["standard", "averaged"] = "standard"  # 100/70 vs 81.5
     today: date | None = None  # deadlines are checked against this
+    averaged_request_on: date | None = None  # actual/planned application date, not today's date
 
 
 # --- calculator output ---

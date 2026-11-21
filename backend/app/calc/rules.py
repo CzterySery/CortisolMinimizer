@@ -134,9 +134,14 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
         if not taken:
             continue
         since, until = parent.insured_since, parent.insured_until
-        if parent.base_monthly is None and not parent.salary_history and sickness_insured(parent):
+        if (parent.base_monthly is None and parent.gross_monthly_estimate is None
+                and not parent.salary_history and sickness_insured(parent)):
             add("base.missing", "warning", f"{WHO[who]}: brak podstawy wymiaru i wynagrodzeń z Z-3, więc kwoty zasiłków "
-                "są pominięte (0 zł).", "art. 36")
+                "nie mogą być oszacowane. Uzupełnij dane; brak kwoty nie oznacza zerowego dochodu.", "art. 36")
+        if parent.base_monthly is None and parent.gross_monthly_estimate is not None:
+            add("base.estimate", "warning", f"{WHO[who]}: kwoty są szacunkiem z jednej pensji brutto. ZUS co do "
+                "zasady używa średniej z 12 miesięcy, a przy krótszym ubezpieczeniu z pełnych miesięcy. "
+                "Premie, zmiany pensji i nieobecności mogą zmienić wynik.", "art. 36–38")
         # ZUS refuses a non-employee's benefit for a period after the insurance ended (sample case: JDG closed
         # after the maternity period, parental refused); employees: see the shortcut below
         ended = [b for b in taken if until and b.start > until and b.kind != "job_loss_benefit"]
@@ -336,6 +341,16 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
                 add("rehab.sick-not-exhausted", "warning", "Świadczenie rehabilitacyjne przysługuje po wyczerpaniu "
                     "zasiłku chorobowego; plan nie pokazuje pełnego okresu zasiłkowego.", "art. 18 ust. 1")
 
+    if (plan.rate_variant == "averaged" and plan.averaged_request_on
+            and plan.averaged_request_on > birth + timedelta(days=p.deadlines.averaged_request_days_after_birth)):
+        add("averaged.deadline", "error", f"Wniosek o 81,5% złożono lub zaplanowano po upływie "
+            f"{p.deadlines.averaged_request_days_after_birth} dni od porodu albo przyjęcia i spełnienia przesłanek. "
+            "Wybierz stawki standardowe.", "art. 30a ust. 1–2")
+    if any(b.kind in MATERNITY_BENEFIT - {"paternity"} and result.bases.get(b.who, 0) > 0
+           and result.bases[b.who] * p.rates.parental < p.parental_benefit_floor for b in plan.blocks):
+        add("floor.tax-not-modelled", "warning", "Przy niskiej podstawie kwotę podwyższenia do świadczenia "
+            "rodzicielskiego ustala się po zaliczce na PIT. Kalkulator nie oblicza PIT, więc podwyższenie "
+            "i dni łączenia z pracą wymagają weryfikacji u płatnika.", "art. 31 ust. 3a–3c, 4a")
     if plan.today:
         _deadlines(plan, birth, days, p, add)
     return list(issues.values())
@@ -359,7 +374,8 @@ def supplementary_weeks(plan: Plan, p: Params) -> int | None:
 def _deadlines(plan: Plan, birth: date, days, p: Params, add) -> None:
     """Application deadlines measured from `plan.today`; only for periods that haven't started yet."""
     today, d = plan.today, p.deadlines
-    if plan.rate_variant == "averaged" and today > birth + timedelta(days=d.averaged_request_days_after_birth):
+    if (plan.rate_variant == "averaged" and not plan.averaged_request_on
+            and today > birth + timedelta(days=d.averaged_request_days_after_birth)):
         add("averaged.deadline", "error", f"Wniosek o 81,5% można złożyć najpóźniej "
             f"{d.averaged_request_days_after_birth} dni po porodzie.", "art. 30a ust. 1")
     notices = {"paternity": (p.paternity.notice_days, "paternity.notice", "KP art. 182^3 § 2"),

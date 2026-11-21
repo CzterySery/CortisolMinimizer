@@ -14,6 +14,16 @@ Plansza wymaga backendu i `API_URL` dla przeliczania stanu; nie zapisuje jeszcze
 
 Pełny plan projektu, konwencje i kolejność prac: [AGENTS.md](AGENTS.md).
 
+## Kalkulator krok po kroku
+
+Kalkulator prowadzi przez sytuację rodziny, dane dziecka, ubezpieczenie i dochody rodziców, dodatkowe okoliczności, plan urlopów oraz wariant wypłaty. Pytania pojawiają się w kolejnych krokach, a wyniki, raporty i wykresy dopiero po „Oblicz i pokaż wynik”. Można wracać do wcześniejszych odpowiedzi. Scenariusz przekazany z gry lub konta przechodzi przez ten sam przegląd; nowy plan nie ma przykładowych pensji ani dat.
+
+Właściwe pytania mają rozwijane uzasadnienie z cytatem, konkretnym artykułem i stroną oryginalnego dokumentu, korzystające z tych samych źródeł co gra. Pierwszy edytowalny okres przygotowuje `POST /api/v1/calc/start`, korzystając z wersjonowanych pul backendu. `POST /api/v1/calc/plan` wywoływany jest dopiero po zatwierdzeniu ostatniego kroku. Błędy planu wstrzymują prezentację kwot; brak dochodów jest pokazywany jako brak danych, bez fikcyjnego zerowego budżetu. Termin wariantu 81,5% można sprawdzić według daty złożenia lub planowanego złożenia wniosku.
+
+Pierwszy krok ma trzy zaznaczane przyciski, a uzasadnienie prawne jest dostępne przed wyborem. Pracownik może podać jedną pensję brutto do jawnie oznaczonego szacunku; dokładna historia miesięczna pozostaje w opcjach dodatkowych. Jedna pensja nie zastępuje ustawowej średniej z okresu odniesienia. Wynik zachowuje tabelę świadczeń, kalendarz opieki, pule i dokumenty; wykres budżetu został usunięty, a obliczenia szczegółowe są zwijane. Do symulowanego logowania prowadzi widoczny link „mObywatel” w nagłówku oraz przycisk na początku kalkulatora.
+
+[Przegląd zgodności kalkulatora z materiałami ZUS i pozostałe ograniczenia](docs/calculator-review.md).
+
 ## Struktura
 
 ```text

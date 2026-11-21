@@ -64,6 +64,19 @@ def parent_base(who: str, parent: Parent, first_event: date, p: Params, explain:
         explain.append(Explain(text=f"{WHO[who]}: podstawa wymiaru zasiłku {pln(parent.base_monthly)} (podana).",
                                rule="art. 36, art. 48"))
         return parent.base_monthly
+    if parent.gross_monthly_estimate is not None:
+        if parent.employment != "employee":
+            raise ValueError("Szybki szacunek z pensji brutto dotyczy umowy o pracę. Dla JDG lub zlecenia podaj "
+                             "podstawę zasiłku albo historię podstaw składek.")
+        # Reuse contribution deductions and the full-time floor; do not invent twelve pay-history rows.
+        estimate = benefit_base(BaseRequest(employment=parent.employment, event_date=first_event,
+                                           contract_monthly=parent.gross_monthly_estimate,
+                                           full_time=parent.full_time), p).base
+        explain.append(Explain(text=f"{WHO[who]}: orientacyjna podstawa {pln(estimate)} z jednej pensji brutto "
+                                    f"{pln(parent.gross_monthly_estimate)}. To szacunek przy założeniu podobnego "
+                                    "wynagrodzenia w okresie odniesienia, bez odtwarzania historii wypłat.",
+                               rule="założenie szacunku; art. 36–38"))
+        return estimate
     if not parent.salary_history:
         # case files rarely state every base: count 0 zł and let rules.py warn (base.missing) instead of failing
         explain.append(Explain(text=f"{WHO[who]}: brak podstawy wymiaru i wynagrodzeń, więc kwoty liczone jako 0 zł.",
@@ -176,7 +189,7 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
             r = rate(who, b, d, rehab_day)
             daily = money(base[who] * r / 30)  # art. 36 ust. 3: one day = 1/30 of the monthly base
             # art. 31 ust. 3a floor for insured parents; shortcut: not applied on part-time days (art. 31 ust. 4a)
-            if b.kind in MATERNITY_BENEFIT and base[who] > 0 and not b.work_fraction:
+            if b.kind in MATERNITY_BENEFIT - {"paternity"} and base[who] > 0 and not b.work_fraction:
                 daily = max(daily, floor_day)
             amount[who][d] = money(daily * (ONE - b.work_fraction))
             seen.setdefault(id(b), (b, Counter()))[1][(r, amount[who][d])] += 1
@@ -198,11 +211,13 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
             rule="art. 31 ust. 3, 3f" if averaged_kept else "art. 31 ust. 3g"))
     top_up = Decimal(0)
     if averaged and not averaged_kept and base.get(applicant, Decimal(0)) > 0:
-        maternity_days = sum(1 for b in days[applicant].values() if b.kind == "maternity")
-        diff = money(base[applicant] * p.rates.maternity / 30) - money(base[applicant] * p.rates.averaged / 30)
-        top_up = money(diff * maternity_days)
-        explain.append(Explain(text=f"Jednorazowe wyrównanie macierzyńskiego do 100% (na wniosek): {maternity_days} dni × "
-                                    f"{pln(diff)} = {pln(top_up)}.", rule="art. 31 ust. 4"))
+        # Compare with what was actually computed, including the floor; never top up unpaid/invalid days.
+        standard_day = max(money(base[applicant] * p.rates.maternity / 30), floor_day)
+        top_up = money(sum((max(Decimal(0), standard_day - amount[applicant][d])
+                            for d, b in days[applicant].items()
+                            if b.kind == "maternity" and d in amount[applicant]), Decimal(0)))
+        explain.append(Explain(text=f"Jednorazowe wyrównanie macierzyńskiego do 100% (na wniosek), po uwzględnieniu "
+                                    f"wyliczonego podwyższenia: {pln(top_up)}.", rule="art. 31 ust. 4"))
 
     target = money(p.game.budget_target_ratio * sum(base.values()))
     explain.append(Explain(text=f"Cel budżetu: {percent(p.game.budget_target_ratio)} dochodu rodziny bez urlopów, "

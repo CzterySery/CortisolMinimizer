@@ -38,6 +38,9 @@ export function GameBoard(props: GameBoardProps) {
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const [playingId, setPlayingId] = useState<string | null>(null);
+  const [tableInView, setTableInView] = useState(false);
+  const [slotsReady, setSlotsReady] = useState(false);
+  const [handInView, setHandInView] = useState(false);
   const boardRef = useRef<HTMLElement>(null);
   const deckRef = useRef<HTMLButtonElement>(null);
   const playAnimation = useRef<Animation | null>(null);
@@ -48,7 +51,65 @@ export function GameBoard(props: GameBoardProps) {
   const stage = stages.find((item) => item.id === currentRound) ?? stages.at(-1);
   const stageId = stage?.id;
 
+  // Observe when the round-track slots and the hand enter the viewport
   useEffect(() => {
+    const board = boardRef.current;
+    if (!board || typeof IntersectionObserver === "undefined") return;
+    const roundsEl = board.querySelector<HTMLElement>(".rounds-section");
+    const handEl = board.querySelector<HTMLElement>(".hand-section");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          if (entry.target === roundsEl) setTableInView(true);
+          if (entry.target === handEl) setHandInView(true);
+        }
+      },
+      { threshold: 0.22 },
+    );
+    if (roundsEl) observer.observe(roundsEl);
+    if (handEl) observer.observe(handEl);
+    return () => observer.disconnect();
+  }, []);
+
+  // Dynamically animate the 5 table card slots when the table scrolls into view,
+  // then unlock the card deal a moment later so slots appear first and cards reveal right after.
+  useEffect(() => {
+    if (!tableInView) return;
+    const animations: Animation[] = [];
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduced) {
+      boardRef.current?.querySelectorAll<HTMLElement>(".round-track > li").forEach((slotItem, index) => {
+        animations.push(
+          slotItem.animate(
+            [
+              { opacity: 0, transform: "translateY(38px) scale(0.84) rotate(-2.5deg)" },
+              { opacity: 1, transform: "translateY(-5px) scale(1.03) rotate(0.5deg)", offset: 0.72 },
+              { opacity: 1, transform: "translateY(0) scale(1) rotate(0deg)" },
+            ],
+            {
+              duration: 540,
+              delay: index * 105,
+              fill: "both",
+              easing: "cubic-bezier(.2,.8,.25,1)",
+            },
+          ),
+        );
+      });
+    }
+    const timer = window.setTimeout(() => {
+      setSlotsReady(true);
+    }, reduced ? 0 : 620);
+    return () => {
+      window.clearTimeout(timer);
+      animations.forEach((a) => a.cancel());
+    };
+  }, [tableInView]);
+
+  // Deal cards from the deck stack only after the table slots have dynamically appeared AND the hand is in view
+  const canRevealHand = slotsReady && handInView;
+  useEffect(() => {
+    if (!canRevealHand) return;
     const animations: Animation[] = [];
     const deck = deckRef.current;
     if (deck && !complete && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -56,26 +117,27 @@ export function GameBoard(props: GameBoardProps) {
       deck.querySelectorAll("span").forEach((layer, index) => {
         animations.push(layer.animate([
           { translate: "0 0", rotate: "0deg" },
-          { translate: `${(index - 1) * 12}px -12px`, rotate: `${(index - 1) * 9}deg` },
+          { translate: `${(index - 1) * 14}px -14px`, rotate: `${(index - 1) * 11}deg` },
           { translate: "0 0", rotate: "0deg" },
-        ], { duration: 420, delay: index * 35, easing: "ease-out" }));
+        ], { duration: 460, delay: index * 45, easing: "ease-out" }));
       });
       boardRef.current?.querySelectorAll<HTMLElement>(".hand-card").forEach((card, index) => {
         const target = card.getBoundingClientRect();
         const dx = origin.left + origin.width / 2 - target.left - target.width / 2;
         const dy = origin.top + origin.height / 2 - target.top - target.height / 2;
         animations.push(card.animate([
-          { transform: `translate(${dx}px, ${dy}px) rotate(-12deg) scale(.18)`, opacity: 0 },
-          { opacity: 1, offset: .3 },
+          { transform: `translate(${dx}px, ${dy}px) rotate(-14deg) scale(.18)`, opacity: 0 },
+          { opacity: 1, offset: .28 },
+          { transform: "translate(0, -6px) rotate(0deg) scale(1.02)", opacity: 1, offset: .82 },
           { transform: "translate(0, 0) rotate(0deg) scale(1)", opacity: 1 },
-        ], { duration: 520, delay: 150 + index * 95, fill: "backwards", easing: "cubic-bezier(.18,.7,.25,1)" }));
+        ], { duration: 580, delay: 160 + index * 115, fill: "backwards", easing: "cubic-bezier(.18,.75,.25,1)" }));
       });
     }
     return () => {
       animations.forEach((animation) => animation.cancel());
       playAnimation.current?.cancel();
     };
-  }, [props.dealKey, stageId, complete]);
+  }, [props.dealKey, stageId, complete, canRevealHand, hand.length]);
 
   if (!stage) throw new Error("Brak rundy.");
 
@@ -125,7 +187,7 @@ export function GameBoard(props: GameBoardProps) {
     : "Kliknij kartę lub przeciągnij ją na stół.";
 
   return (
-    <main className={`game-layout ${mode === "preview" ? "preview-board" : ""}`} ref={boardRef}>
+    <main className={`game-layout ${mode === "preview" ? "preview-board" : ""} ${tableInView ? "table-visible" : "table-pending"} ${canRevealHand ? "hand-visible" : "hand-pending"}`} ref={boardRef}>
       <div className="main-board">
         <section className="board-context" aria-labelledby="story-title">
           <p className="eyebrow">{complete ? "Wasz plan jest na stole" : `Runda 0${stage.id} / 0${totalRounds} · ${stage.title}`}</p>

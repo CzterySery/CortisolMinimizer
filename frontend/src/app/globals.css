@@ -363,53 +363,64 @@ dialog::backdrop { background: #18312788; }
 
 /* ---- 3D Quad-Mesh Scrollytelling Landing Hero ---- */
 .home-game-anchor { scroll-margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--line); }
-.scroll-hero { position: relative; height: 280vh; min-height: 1680px; margin: 0 0 28px; }
-.scroll-hero-sticky { position: sticky; top: 16px; min-height: calc(100dvh - 32px); display: flex; align-items: center; padding: 18px 0; }
-.scroll-hero-grid { width: 100%; display: grid; grid-template-columns: minmax(0, 1.02fr) minmax(0, 1.15fr); gap: 38px; align-items: center; }
-.scroll-hero-copy { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-.scroll-hero-pill { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; padding: 7px 13px; border: 1px solid #d5dfd0; border-radius: 999px; background: #f6f9f2; font-size: 10px; font-weight: 600; letter-spacing: 1.4px; color: #486651; }
-.scroll-hero-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 3px #dce7d5; }
-.scroll-hero-eyebrow { margin: 2px 0 0; color: var(--muted-strong); }
-.scroll-hero-title { font: 400 clamp(32px, 3.8vw, 52px)/1.1 Georgia, 'Times New Roman', serif; letter-spacing: -1.6px; margin: 0; color: var(--ink); animation: hero-fade 320ms ease-out; }
-.scroll-hero-title span { display: block; color: #6e8869; font-style: italic; }
-.scroll-hero-description { margin: 0; font-size: 14px; line-height: 1.78; color: var(--muted-strong); max-width: 520px; }
-.scroll-hero-callout { padding: 14px 16px; border: 1px solid #dce5d7; border-left: 3px solid var(--green); border-radius: 10px; background: var(--paper); display: flex; flex-direction: column; gap: 5px; max-width: 520px; }
-.scroll-hero-callout strong { font: 400 16px/1.35 Georgia, serif; color: var(--ink); }
-.scroll-hero-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; max-width: 520px; }
-.scroll-stage-tab { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--muted-strong); font: inherit; text-align: left; cursor: pointer; transition: border-color 180ms, background 180ms, transform 180ms; }
-.scroll-stage-tab:hover { border-color: #b9c8b1; background: #f9fbf6; }
-.scroll-stage-tab.is-active { border-color: var(--green); background: #eef4e8; color: var(--ink); box-shadow: inset 0 0 0 1px var(--green); }
-.scroll-stage-num { font-size: 9px; font-weight: 700; letter-spacing: 1.3px; color: var(--green); }
-.scroll-stage-name { font-size: 12px; font-weight: 600; line-height: 1.3; }
-.scroll-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding-top: 4px; }
-.scroll-hero-hint { font-size: 11px; color: var(--muted-strong); }
-.scroll-hero-viewport { position: relative; min-width: 0; height: clamp(390px, 66vh, 610px); border: 1px solid #d8e1d3; border-radius: 18px; background: linear-gradient(165deg, #fbfcfa 0%, #f1f5ec 52%, #e9efe3 100%); box-shadow: inset 0 1px 0 #fff, 0 18px 46px #243c340d; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
-.scroll-hero-canvas { width: 100%; height: 100%; display: block; }
-.scroll-mesh-hud { position: absolute; top: 14px; left: 16px; right: 16px; display: flex; justify-content: space-between; gap: 10px; pointer-events: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; letter-spacing: 1.1px; color: #536858; background: rgba(255, 255, 255, 0.72); backdrop-filter: blur(6px); padding: 7px 11px; border-radius: 8px; border: 1px solid #dce4d7; z-index: 2; }
-.scroll-mesh-footer { position: absolute; bottom: 14px; left: 16px; right: 16px; display: flex; flex-direction: column; gap: 8px; pointer-events: none; background: rgba(255, 255, 255, 0.78); backdrop-filter: blur(6px); padding: 10px 12px; border-radius: 10px; border: 1px solid #dce4d7; z-index: 2; }
-.scroll-progress-bar { height: 4px; border-radius: 4px; background: #e2e8dd; overflow: hidden; }
-.scroll-progress-bar span { display: block; height: 100%; background: var(--green); transition: width 120ms linear; }
-.scroll-mesh-legend { display: flex; justify-content: space-between; gap: 8px; font-size: 10px; color: var(--muted-strong); }
-.scroll-mesh-legend span.is-current { color: var(--ink); font-weight: 700; }
-@keyframes hero-fade { from { opacity: .45; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-@media (max-width: 960px) {
-  .scroll-hero { height: 250vh; min-height: 1500px; }
-  .scroll-hero-sticky { position: sticky; top: 8px; }
-  .scroll-hero-grid { grid-template-columns: minmax(0, 1fr); gap: 18px; }
-  .scroll-hero-viewport { order: -1; height: clamp(280px, 42vh, 380px); }
-  .scroll-hero-title { font-size: clamp(26px, 6vw, 36px); }
-  .scroll-hero-description { font-size: 13px; }
+.scroll-hero { position: relative; height: 280vh; min-height: 1680px; margin: 0 0 24px; background: #fff; }
+.scroll-hero-sticky { position: sticky; top: 0; height: calc(100dvh - 108px); min-height: 460px; display: flex; align-items: stretch; padding: 0; background: #fff; }
+.scroll-hero-viewport { position: relative; width: 100%; height: 100%; border: 0; border-radius: 0; background: #fff; box-shadow: none; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.scroll-hero-canvas, .scroll-hero-svg { width: 100%; height: 100%; display: block; background: #fff; }
+.table-pending .round-track > li { opacity: 0; transform: translateY(28px) scale(0.92); }
+.hand-pending .hand-card { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .table-pending .round-track > li, .hand-pending .hand-card { opacity: 1; transform: none; }
+}
+@media (max-width: 800px) {
+  .scroll-hero-sticky { height: calc(100dvh - 88px); }
 }
 @media (max-width: 560px) {
-  .scroll-hero { height: 230vh; min-height: 1360px; }
-  .scroll-hero-viewport { height: 270px; border-radius: 14px; }
-  .scroll-mesh-hud { font-size: 8px; padding: 5px 8px; top: 8px; left: 8px; right: 8px; }
-  .scroll-mesh-footer { bottom: 8px; left: 8px; right: 8px; padding: 8px; }
-  .scroll-mesh-legend { font-size: 9px; flex-wrap: wrap; }
-  .scroll-hero-nav { grid-template-columns: 1fr; gap: 6px; }
-  .scroll-stage-tab { flex-direction: row; align-items: center; gap: 8px; padding: 8px 10px; }
+  .scroll-hero { height: 240vh; min-height: 1400px; }
+  .scroll-hero-sticky { padding: 0; min-height: 360px; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .scroll-hero-title { animation: none; }
-  .scroll-progress-bar span, .scroll-stage-tab { transition: none; }
+/* Calculator: one focused step, with reports only after explicit calculation. */
+.calculator-page { max-width: 1060px; }
+.calculator-steps { margin: 0 0 30px; }
+.calculator-steps ol { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 0; padding: 0; list-style: none; }
+.calculator-steps li > span, .calculator-steps button { display: flex; align-items: center; gap: 7px; font: inherit; font-size: 12px; color: var(--muted); }
+.calculator-steps button { background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.calculator-steps b, .calculator-steps button span { display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid currentColor; border-radius: 50%; font-weight: 500; }
+.calculator-steps [aria-current="step"] > span { color: var(--ink); font-weight: 700; }
+.calculator-steps [aria-current="step"] b { background: #e2eadb; }
+.calculator-step { background: rgba(255,255,255,.65); border: 1px solid #d4dccf; border-radius: 18px; padding: clamp(20px,4vw,40px); }
+.calculator-step > h2 { margin: 8px 0 28px; font-size: clamp(24px,4vw,36px); font-weight: 500; }
+.calculator-step > h2:focus { outline: none; }
+.calculator-step .plan-grid { align-items: start; }
+.calculator-step .plan-grid > :first-child,
+.calculator-step .plan-grid > .plan-documents,
+.calculator-step .plan-grid > .plan-issues,
+.calculator-step .plan-grid > details { grid-column: 1 / -1; }
+.calculator-step form, .calculator-step .stack, .calculator-step .form-grid > *, .calculator-step .plan-grid > * { min-width: 0; }
+.calculator-step .form-section { margin: 0; }
+.calculator-step .field { max-width: 100%; }
+.calculator-step select, .calculator-step input, .calculator-step textarea { max-width: 100%; }
+.calculator-navigation { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; border-top: 1px solid #dce2d8; padding-top: 24px; margin-top: 12px; }
+.calculator-navigation .button-primary:only-child { margin-left: auto; }
+.choice-options { display: grid; gap: 14px; border: 0; padding: 0; margin: 0; }
+.choice-options legend { font-weight: 600; padding: 0; margin-bottom: 15px; }
+.legal-basis, .calculator-assumptions { color: var(--muted-strong); font-size: 13px; line-height: 1.65; }
+.legal-basis summary, .calculator-assumptions summary { cursor: pointer; text-underline-offset: 3px; }
+.legal-basis section { border-left: 2px solid #b0bda5; padding: 0 0 0 16px; margin: 16px 0; }
+.legal-basis blockquote { margin: 8px 0; white-space: normal; }
+.legal-basis a { overflow-wrap: anywhere; }
+.legal-basis section > div { margin-top: 16px; }
+.leave-period { border-bottom: 1px solid #dce2d8; padding-bottom: 18px; margin-bottom: 20px; }
+@media (max-width: 560px) {
+  .calculator-steps ol { gap: 8px; }
+  .calculator-steps li > span, .calculator-steps button { font-size: 11px; }
+  .calculator-steps b, .calculator-steps button span { width: 20px; height: 20px; }
+  .calculator-navigation .button { flex: 1; }
 }
+.situation-choices .choice { min-height: 130px; transition: border-color 160ms, background 160ms; }
+.situation-choices .choice[aria-pressed="true"] { background: #edf3e8; border: 2px solid var(--green); box-shadow: inset 0 0 0 1px var(--green); }
+.calculator-login { border-top: 1px solid var(--line); padding-top: 16px; color: var(--muted-strong); font-size: 13px; }
+.calculator-login p { margin: 0 0 12px; }
+.income-history-choice { font-size: 13px; color: var(--muted-strong); }
+.income-history-choice summary, .plan-grid > details > summary { cursor: pointer; }
+@media (max-width: 560px) { .situation-choices { grid-template-columns: minmax(0, 1fr); } .situation-choices .choice { min-height: 100px; } }

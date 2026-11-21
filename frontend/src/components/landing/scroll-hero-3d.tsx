@@ -2,51 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 
-interface Vec3 {
-  x: number;
-  y: number;
-  z: number;
-}
-
-interface QuadFace {
-  v: [Vec3, Vec3, Vec3, Vec3];
-  normal: Vec3;
-  center: Vec3;
-  tint: "clay" | "sage" | "warm" | "cradle" | "outline";
-  group: "woman" | "man" | "carrier" | "child" | "plinth";
-}
-
-interface MeshGroup {
-  quads: QuadFace[];
-}
-
-function sub(a: Vec3, b: Vec3): Vec3 {
-  return { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z };
-}
-
-function cross(a: Vec3, b: Vec3): Vec3 {
-  return {
-    x: a.y * b.z - a.z * b.y,
-    y: a.z * b.x - a.x * b.z,
-    z: a.x * b.y - a.y * b.x,
-  };
-}
-
-function normalize(v: Vec3): Vec3 {
-  const len = Math.hypot(v.x, v.y, v.z) || 1;
-  return { x: v.x / len, y: v.y / len, z: v.z / len };
-}
-
-function dot(a: Vec3, b: Vec3): number {
-  return a.x * b.x + a.y * b.y + a.z * b.z;
+function clamp(v: number, min = 0, max = 1): number {
+  return Math.min(max, Math.max(min, v));
 }
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
-}
-
-function clamp(v: number, min = 0, max = 1): number {
-  return Math.min(max, Math.max(min, v));
 }
 
 function smoothstep(edge0: number, edge1: number, x: number): number {
@@ -54,844 +15,679 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
   return t * t * (3 - 2 * t);
 }
 
-// Build a clean quad-mesh lofted tube along a spine with elliptical cross-sections.
-// Produces authentic 100% quad topology like a subdivided base-mesh sculpture.
-interface LoftRing {
-  x: number;
-  y: number;
-  z: number;
-  rx: number;
-  rz: number;
-  tiltX?: number;
-  tiltZ?: number;
-  bulgeFront?: number;
-}
+// ============================================================================
+// EDITORIAL 2D VECTOR LINE-ART SCROLL ANIMATION (Left -> Right Progression)
+// Style matched to user's reference image:
+// - Clean crisp dark ink outlines (#1c1d1f, 2.2px, round caps/joins)
+// - Pure white skin & hair volumes with black hair-tie/brow/eye details
+// - Flat solid accent fills: sage/teal-green (#527561 / #397a98), warm cream (#f3eae0),
+//   charcoal darks (#1c1d1f), soft olive (#a6b585)
+// - Progression strictly from LEFT to RIGHT as the user scrolls:
+//   1. Left (x: 110..330): Expecting Couple (Man + Pregnant Woman with high bun)
+//   2. Center-Left (x: 430..610): Baby in ergonomic carrier/cradle (nosidełko)
+//   3. Center (x: 690..870): Baby crawling on hands and knees to the right (raczkowanie)
+//   4. Center-Right (x: 940..1120): Toddler taking first steps to the right
+//   5. Far-Right (x: 1180..1380): Grown child striding confidently forward
+// ============================================================================
 
-function buildLoftedQuadMesh(
-  rings: LoftRing[],
-  segments: number,
-  group: QuadFace["group"],
-  tint: QuadFace["tint"],
-  capEnds = true,
-): QuadFace[] {
-  const quads: QuadFace[] = [];
-  const ringVerts: Vec3[][] = rings.map((r) => {
-    const pts: Vec3[] = [];
-    for (let s = 0; s < segments; s++) {
-      const a = (s / segments) * Math.PI * 2;
-      const cosA = Math.cos(a);
-      const sinA = Math.sin(a);
-      // Front is +z. If bulgeFront is set, push positive z outward smoothly
-      const frontFactor = sinA > 0 && r.bulgeFront ? Math.pow(sinA, 1.5) * r.bulgeFront : 0;
-      const lx = cosA * (r.rx + frontFactor * 0.22);
-      const lz = sinA * r.rz + frontFactor;
-      const ly = (r.tiltX ? lx * r.tiltX : 0) + (r.tiltZ ? lz * r.tiltZ : 0);
-      pts.push({
-        x: r.x + lx,
-        y: r.y + ly,
-        z: r.z + lz,
-      });
-    }
-    return pts;
-  });
-
-  for (let i = 0; i < ringVerts.length - 1; i++) {
-    const curr = ringVerts[i];
-    const next = ringVerts[i + 1];
-    for (let s = 0; s < segments; s++) {
-      const sNext = (s + 1) % segments;
-      const v0 = curr[s];
-      const v1 = curr[sNext];
-      const v2 = next[sNext];
-      const v3 = next[s];
-      quads.push(makeQuad(v0, v1, v2, v3, group, tint));
-    }
-  }
-
-  // Quad caps at ends when segments === 8
-  if (capEnds && segments === 8 && ringVerts.length >= 2) {
-    const bot = ringVerts[0];
-    quads.push(makeQuad(bot[0], bot[7], bot[4], bot[3], group, tint));
-    quads.push(makeQuad(bot[0], bot[3], bot[2], bot[1], group, tint));
-    quads.push(makeQuad(bot[4], bot[7], bot[6], bot[5], group, tint));
-    const top = ringVerts[ringVerts.length - 1];
-    quads.push(makeQuad(top[0], top[1], top[2], top[3], group, tint));
-    quads.push(makeQuad(top[0], top[3], top[4], top[7], group, tint));
-    quads.push(makeQuad(top[4], top[5], top[6], top[7], group, tint));
-  }
-
-  return quads;
-}
-
-function makeQuad(
-  v0: Vec3,
-  v1: Vec3,
-  v2: Vec3,
-  v3: Vec3,
-  group: QuadFace["group"],
-  tint: QuadFace["tint"],
-): QuadFace {
-  const center = {
-    x: (v0.x + v1.x + v2.x + v3.x) * 0.25,
-    y: (v0.y + v1.y + v2.y + v3.y) * 0.25,
-    z: (v0.z + v1.z + v2.z + v3.z) * 0.25,
-  };
-  const e1 = sub(v1, v0);
-  const e2 = sub(v3, v0);
-  const normal = normalize(cross(e1, e2));
-  return { v: [v0, v1, v2, v3], normal, center, tint, group };
-}
-
-interface HumanoidSpec {
-  offsetX: number;
-  offsetY: number;
-  offsetZ: number;
-  scale: number;
-  pregnant?: number; // 0..1
-  headScale?: number; // 1 for adult, 1.35 for toddler/baby
-  shoulderWidth: number;
-  hipWidth: number;
-  armPose: "couple-left" | "couple-right" | "child-open" | "baby-tucked";
-  group: QuadFace["group"];
-  tint: QuadFace["tint"];
-}
-
-function buildQuadHumanoid(spec: HumanoidSpec): QuadFace[] {
-  const {
-    offsetX,
-    offsetY,
-    offsetZ,
-    scale,
-    pregnant = 0,
-    headScale = 1,
-    shoulderWidth,
-    hipWidth,
-    armPose,
-    group,
-    tint,
-  } = spec;
-  const quads: QuadFace[] = [];
-  const segs = 8;
-
-  // Torso + Pelvis + Neck + Cranium (continuous quad topology flow)
-  const torsoRings: LoftRing[] = [
-    // Pelvis base
-    { x: 0, y: 0.92, z: 0, rx: hipWidth * 0.72, rz: 0.16 },
-    { x: 0, y: 1.05, z: 0.01, rx: hipWidth, rz: 0.21, bulgeFront: pregnant * 0.16 },
-    // Waist / Abdomen (pregnancy belly curves out smoothly in quads)
-    { x: 0, y: 1.24, z: 0.02, rx: hipWidth * 0.88 + pregnant * 0.07, rz: 0.20, bulgeFront: pregnant * 0.34 },
-    { x: 0, y: 1.44, z: 0.02, rx: hipWidth * 0.86 + pregnant * 0.05, rz: 0.20, bulgeFront: pregnant * 0.26 },
-    // Ribcage / Chest
-    { x: 0, y: 1.66, z: 0.01, rx: shoulderWidth * 0.86, rz: 0.22, bulgeFront: pregnant * 0.08 + 0.04 },
-    // Shoulders
-    { x: 0, y: 1.86, z: 0, rx: shoulderWidth, rz: 0.20 },
-    { x: 0, y: 1.97, z: 0, rx: 0.17, rz: 0.15 },
-    // Neck
-    { x: 0, y: 2.08, z: 0.01, rx: 0.125, rz: 0.125 },
-    // Jaw / Head base
-    { x: 0, y: 2.17, z: 0.03, rx: 0.19 * headScale, rz: 0.22 * headScale, bulgeFront: 0.04 * headScale },
-    // Face mid (cheekbones / nose ridge)
-    { x: 0, y: 2.34 * (0.94 + headScale * 0.06), z: 0.03, rx: 0.23 * headScale, rz: 0.26 * headScale, bulgeFront: 0.05 * headScale },
-    // Forehead
-    { x: 0, y: 2.52 * (0.91 + headScale * 0.09), z: 0.01, rx: 0.21 * headScale, rz: 0.24 * headScale },
-    // Crown
-    { x: 0, y: 2.65 * (0.89 + headScale * 0.11), z: -0.01, rx: 0.12 * headScale, rz: 0.14 * headScale },
-  ];
-  quads.push(...buildLoftedQuadMesh(torsoRings, segs, group, tint, true));
-
-  // Left & Right Legs (5 quad loops each: thigh, knee, calf, ankle, foot)
-  for (const side of [-1, 1] as const) {
-    const hipX = side * hipWidth * 0.56;
-    const ankleX = side * hipWidth * 0.52;
-    const legRings: LoftRing[] = [
-      { x: hipX, y: 0.96, z: 0, rx: 0.155, rz: 0.165 },
-      { x: hipX * 0.98, y: 0.72, z: 0.02, rx: 0.14, rz: 0.15 },
-      { x: hipX * 0.95, y: 0.50, z: 0.03, rx: 0.115, rz: 0.125 }, // knee
-      { x: ankleX, y: 0.28, z: -0.01, rx: 0.12, rz: 0.13 }, // calf
-      { x: ankleX, y: 0.09, z: 0, rx: 0.085, rz: 0.095 }, // ankle
-      { x: ankleX, y: 0.01, z: 0.07, rx: 0.095, rz: 0.16, bulgeFront: 0.06 }, // foot
-    ];
-    quads.push(...buildLoftedQuadMesh(legRings, segs, group, tint, true));
-  }
-
-  // Left & Right Arms (posed naturally per character role)
-  for (const side of [-1, 1] as const) {
-    const shX = side * (shoulderWidth + 0.03);
-    let elbow: Vec3;
-    let wrist: Vec3;
-    let hand: Vec3;
-
-    if (armPose === "couple-left") {
-      // Pregnant woman: outer arm cradles belly, inner arm reaches toward partner
-      if (side === -1) {
-        elbow = { x: shX - 0.16, y: 1.48, z: 0.10 };
-        wrist = { x: -0.14, y: 1.24, z: 0.34 };
-        hand = { x: -0.04, y: 1.21, z: 0.38 };
-      } else {
-        elbow = { x: shX + 0.14, y: 1.48, z: 0.06 };
-        wrist = { x: shX + 0.22, y: 1.22, z: 0.14 };
-        hand = { x: shX + 0.26, y: 1.15, z: 0.16 };
-      }
-    } else if (armPose === "couple-right") {
-      // Partner: inner arm warm around/near partner, outer arm relaxed
-      if (side === -1) {
-        elbow = { x: shX - 0.14, y: 1.48, z: 0.08 };
-        wrist = { x: shX - 0.22, y: 1.22, z: 0.15 };
-        hand = { x: shX - 0.26, y: 1.15, z: 0.17 };
-      } else {
-        elbow = { x: shX + 0.18, y: 1.50, z: 0.03 };
-        wrist = { x: shX + 0.14, y: 1.16, z: 0.09 };
-        hand = { x: shX + 0.11, y: 1.04, z: 0.11 };
-      }
-    } else if (armPose === "child-open") {
-      // Growing child: expressive, slightly open curious stance
-      elbow = { x: shX + side * 0.20, y: 1.54, z: 0.06 };
-      wrist = { x: shX + side * 0.28, y: 1.28, z: 0.16 };
-      hand = { x: shX + side * 0.31, y: 1.18, z: 0.20 };
-    } else {
-      // Baby tucked
-      elbow = { x: shX + side * 0.10, y: 1.52, z: 0.14 };
-      wrist = { x: side * 0.16, y: 1.38, z: 0.28 };
-      hand = { x: side * 0.10, y: 1.35, z: 0.31 };
-    }
-
-    const armRings: LoftRing[] = [
-      { x: shX, y: 1.84, z: 0, rx: 0.115, rz: 0.115 },
-      { x: elbow.x, y: elbow.y, z: elbow.z, rx: 0.095, rz: 0.095 },
-      { x: wrist.x, y: wrist.y, z: wrist.z, rx: 0.075, rz: 0.08 },
-      { x: hand.x, y: hand.y, z: hand.z, rx: 0.085, rz: 0.095 },
-    ];
-    quads.push(...buildLoftedQuadMesh(armRings, segs, group, tint, true));
-  }
-
-  // Transform all vertices by scale and offset
-  return quads.map((q) => {
-    const tv = q.v.map((pt) => ({
-      x: pt.x * scale + offsetX,
-      y: pt.y * scale + offsetY,
-      z: pt.z * scale + offsetZ,
-    })) as [Vec3, Vec3, Vec3, Vec3];
-    return makeQuad(tv[0], tv[1], tv[2], tv[3], q.group, q.tint);
-  });
-}
-
-// Build Stage 2: Baby in an ergonomic 3D quad-mesh carrier (nosidełko / fotelik-kołyska)
-function buildBabyInCarrier(): QuadFace[] {
-  const quads: QuadFace[] = [];
-
-  // Ergonomic bassinet / carrier shell (ribbed quad mesh cradle)
-  const shellRings: LoftRing[] = [
-    { x: 0, y: 0.12, z: -0.05, rx: 0.36, rz: 0.44 },
-    { x: 0, y: 0.24, z: -0.03, rx: 0.64, rz: 0.78 },
-    { x: 0, y: 0.48, z: 0.0, rx: 0.78, rz: 0.96 },
-    { x: 0, y: 0.76, z: 0.02, rx: 0.82, rz: 1.02, tiltZ: -0.14 },
-    { x: 0, y: 0.96, z: -0.12, rx: 0.68, rz: 0.74, tiltZ: -0.25 },
-  ];
-  quads.push(...buildLoftedQuadMesh(shellRings, 12, "carrier", "cradle", false));
-
-  // Canopy hood over the top of the carrier (structured quad arch)
-  const hoodRings: LoftRing[] = [
-    { x: -0.74, y: 0.82, z: -0.08, rx: 0.06, rz: 0.36 },
-    { x: -0.48, y: 1.28, z: -0.14, rx: 0.06, rz: 0.42 },
-    { x: 0, y: 1.48, z: -0.16, rx: 0.06, rz: 0.45 },
-    { x: 0.48, y: 1.28, z: -0.14, rx: 0.06, rz: 0.42 },
-    { x: 0.74, y: 0.82, z: -0.08, rx: 0.06, rz: 0.36 },
-  ];
-  quads.push(...buildLoftedQuadMesh(hoodRings, 8, "carrier", "sage", true));
-
-  // Carry handle arch (distinctive nosidełko handle curving over the cradle)
-  const handleRings: LoftRing[] = [
-    { x: -0.80, y: 0.68, z: 0.08, rx: 0.055, rz: 0.055 },
-    { x: -0.68, y: 1.26, z: 0.12, rx: 0.055, rz: 0.055 },
-    { x: -0.34, y: 1.68, z: 0.15, rx: 0.06, rz: 0.06 },
-    { x: 0, y: 1.78, z: 0.16, rx: 0.068, rz: 0.068 },
-    { x: 0.34, y: 1.68, z: 0.15, rx: 0.06, rz: 0.06 },
-    { x: 0.68, y: 1.26, z: 0.12, rx: 0.055, rz: 0.055 },
-    { x: 0.80, y: 0.68, z: 0.08, rx: 0.055, rz: 0.055 },
-  ];
-  quads.push(...buildLoftedQuadMesh(handleRings, 8, "carrier", "warm", true));
-
-  // Swaddled infant nestled inside the carrier (quad mesh head + swaddled torso + tucked limbs)
-  const babyBodyRings: LoftRing[] = [
-    { x: 0, y: 0.38, z: 0.38, rx: 0.22, rz: 0.20 },
-    { x: 0, y: 0.46, z: 0.24, rx: 0.34, rz: 0.26, bulgeFront: 0.08 },
-    { x: 0, y: 0.58, z: 0.08, rx: 0.38, rz: 0.28, bulgeFront: 0.10 },
-    { x: 0, y: 0.72, z: -0.06, rx: 0.33, rz: 0.25 },
-    { x: 0, y: 0.82, z: -0.14, rx: 0.18, rz: 0.18 },
-    // Baby head resting on pillow cushion
-    { x: 0, y: 0.94, z: -0.18, rx: 0.28, rz: 0.28, bulgeFront: 0.06 },
-    { x: 0, y: 1.12, z: -0.20, rx: 0.31, rz: 0.31, bulgeFront: 0.08 },
-    { x: 0, y: 1.28, z: -0.22, rx: 0.22, rz: 0.24 },
-  ];
-  quads.push(...buildLoftedQuadMesh(babyBodyRings, 8, "carrier", "clay", true));
-
-  // Little baby hands resting on chest
-  for (const side of [-1, 1] as const) {
-    const babyArm: LoftRing[] = [
-      { x: side * 0.32, y: 0.74, z: -0.02, rx: 0.09, rz: 0.09 },
-      { x: side * 0.28, y: 0.68, z: 0.16, rx: 0.08, rz: 0.08 },
-      { x: side * 0.15, y: 0.66, z: 0.26, rx: 0.085, rz: 0.085 },
-    ];
-    quads.push(...buildLoftedQuadMesh(babyArm, 8, "carrier", "clay", true));
-  }
-
-  return quads;
-}
-
-// Low-poly architectural plinth / stage ring under the characters
-function buildPlinth(): QuadFace[] {
-  const rings: LoftRing[] = [
-    { x: 0, y: -0.14, z: 0, rx: 1.62, rz: 1.32 },
-    { x: 0, y: -0.02, z: 0, rx: 1.72, rz: 1.40 },
-    { x: 0, y: 0.0, z: 0, rx: 1.48, rz: 1.18 },
-    { x: 0, y: 0.01, z: 0, rx: 0.42, rz: 0.34 },
-  ];
-  return buildLoftedQuadMesh(rings, 16, "plinth", "cradle", false);
-}
-
-interface StageCopy {
-  id: string;
-  roundBadge: string;
-  eyebrow: string;
-  title: string;
-  accent: string;
-  description: string;
-  statLabel: string;
-  statValue: string;
-  meshTag: string;
-}
-
-const STAGES: StageCopy[] = [
-  {
-    id: "stage-expecting",
-    roundBadge: "ROZDZIAŁ I · CIĄŻA I PRZYGOTOWANIA",
-    eyebrow: "01 / 03 · DWOJE DOROSŁYCH",
-    title: "Zaczyna się od Was",
-    accent: "i wspólnego spokoju.",
-    description:
-      "Kobieta w ciąży i partner stoją przed pierwszymi decyzjami: kiedy przejść na zwolnienie lub wcześniejszy macierzyński, kto jest płatnikiem zasiłku i jak zabezpieczyć domowy budżet.",
-    statLabel: "Podstawa wymiaru i ochrona",
-    statValue: "100% zasiłku chorobowego w ciąży · 20 tyg. macierzyńskiego",
-    meshTag: "DUAL HUMANOID BASE MESH · 100% QUADS",
-  },
-  {
-    id: "stage-carrier",
-    roundBadge: "ROZDZIAŁ II · PORÓD I PIERWSZE MIESIĄCE",
-    eyebrow: "02 / 03 · DZIECKO W NOSIDEŁKU",
-    title: "Nowy człowiek",
-    accent: "w centrum uwagi.",
-    description:
-      "Świat skupia się wokół nosidełka. To czas na 2 tygodnie urlopu ojcowskiego, wybór stawki 100%/70% lub uśrednionego 81,5% za cały rok oraz pierwsze formalności bez wychodzenia z domu.",
-    statLabel: "Wspólny start po narodzinach",
-    statValue: "14 dni ojcowskiego · wybór wariantu 81,5% lub 100%/70%",
-    meshTag: "INFANT CARRIER TOPOLOGY · SUBDIVIDED QUADS",
-  },
-  {
-    id: "stage-growing",
-    roundBadge: "ROZDZIAŁ III · PIERWSZY ROK I KOLEJNE LATA",
-    eyebrow: "03 / 03 · DZIECKO ROŚNIE",
-    title: "Od pierwszych kroków",
-    accent: "aż po samodzielność.",
-    description:
-      "Dziecko rośnie na Waszych oczach — od malucha po starszaka. Wykorzystujecie 41 tygodni urlopu rodzicielskiego (w tym 9 tygodni nieprzenoszalnych dla drugiego rodzica) i łączycie urlop z pracą na część etatu.",
-    statLabel: "Długofalowy plan rodziny",
-    statValue: "41 tyg. rodzicielskiego · 9 tyg. wyłącznej puli · łączenie z etatem",
-    meshTag: "DYNAMIC GROWTH MORPH · SCALED QUAD RIG",
-  },
-];
+const INK = "#1c1d1f";
+const WHITE = "#ffffff";
+const CREAM = "#f3eae0";
+const ACCENT = "#527561"; // OtwarteKarty signature sage green (harmonizing with reference's flat jacket fill)
+const ACCENT_BLUE = "#3b7a9c"; // Reference editorial blue-teal accent
+const ACCENT_LIGHT = "#dce5d7";
 
 export function ScrollHero3D() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [activeStage, setActiveStage] = useState(0);
-  const [progressText, setProgressText] = useState(0);
-  const progressRef = useRef(0);
-  const smoothProgressRef = useRef(0);
-  const pointerRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
-  const meshesRef = useRef<MeshGroup | null>(null);
+  const [progress, setProgress] = useState(0);
+  const targetRef = useRef(0);
+  const currentRef = useRef(0);
 
-  // Build deterministic 3D quad meshes once
-  useEffect(() => {
-    const woman = buildQuadHumanoid({
-      offsetX: -0.68,
-      offsetY: 0,
-      offsetZ: 0.04,
-      scale: 0.94,
-      pregnant: 1,
-      headScale: 1.02,
-      shoulderWidth: 0.37,
-      hipWidth: 0.36,
-      armPose: "couple-left",
-      group: "woman",
-      tint: "clay",
-    });
-
-    const man = buildQuadHumanoid({
-      offsetX: 0.68,
-      offsetY: 0,
-      offsetZ: -0.04,
-      scale: 1.02,
-      pregnant: 0,
-      headScale: 0.98,
-      shoulderWidth: 0.44,
-      hipWidth: 0.33,
-      armPose: "couple-right",
-      group: "man",
-      tint: "sage",
-    });
-
-    const carrier = buildBabyInCarrier();
-
-    // Base child mesh (centered at origin, we will dynamically morph its proportions from toddler to big kid!)
-    const child = buildQuadHumanoid({
-      offsetX: 0,
-      offsetY: 0,
-      offsetZ: 0,
-      scale: 1.0,
-      pregnant: 0,
-      headScale: 1.08,
-      shoulderWidth: 0.40,
-      hipWidth: 0.33,
-      armPose: "child-open",
-      group: "child",
-      tint: "clay",
-    });
-
-    const plinth = buildPlinth();
-
-    meshesRef.current = {
-      quads: [...plinth, ...woman, ...man, ...carrier, ...child],
-    };
-  }, []);
-
-  // Scroll listener and animation loop
   useEffect(() => {
     const container = containerRef.current;
-    const canvas = canvasRef.current;
-    if (!container || !canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    if (!container) return;
 
     let rafId = 0;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    function updateScrollProgress() {
+    function onScroll() {
       if (!container) return;
       const rect = container.getBoundingClientRect();
       const scrollable = Math.max(1, rect.height - window.innerHeight);
       const raw = clamp(-rect.top / scrollable, 0, 1);
-      progressRef.current = raw;
+      targetRef.current = raw;
       if (reducedMotion) {
-        smoothProgressRef.current = raw;
+        currentRef.current = raw;
+        setProgress(raw);
       }
-      const nextStage = raw < 0.34 ? 0 : raw < 0.67 ? 1 : 2;
-      setActiveStage((prev) => (prev === nextStage ? prev : nextStage));
-      setProgressText(Math.round(raw * 100));
     }
 
-    updateScrollProgress();
-    window.addEventListener("scroll", updateScrollProgress, { passive: true });
-    window.addEventListener("resize", updateScrollProgress, { passive: true });
-
-    // Palette definitions matching OtwarteKarty design system + architectural quad-mesh studio look
-    const palettes: Record<
-      QuadFace["tint"],
-      { base: [number, number, number]; warm: [number, number, number]; wire: string }
-    > = {
-      clay: { base: [223, 228, 220], warm: [246, 241, 232], wire: "rgba(36, 60, 52, 0.36)" },
-      sage: { base: [193, 209, 189], warm: [226, 236, 220], wire: "rgba(36, 60, 52, 0.38)" },
-      warm: { base: [216, 194, 179], warm: [242, 228, 217], wire: "rgba(74, 58, 48, 0.35)" },
-      cradle: { base: [208, 216, 206], warm: [238, 242, 235], wire: "rgba(36, 60, 52, 0.30)" },
-      outline: { base: [180, 192, 180], warm: [210, 220, 210], wire: "rgba(36, 60, 52, 0.45)" },
-    };
-
-    const lightDir1 = normalize({ x: 0.55, y: 0.72, z: 0.65 });
-    const lightDir2 = normalize({ x: -0.65, y: 0.35, z: -0.45 });
-
-    function renderFrame(time: number) {
-      if (!canvas || !ctx || !meshesRef.current) return;
-
-      // Smoothly damp scroll and pointer
-      const targetP = progressRef.current;
-      smoothProgressRef.current = reducedMotion
-        ? targetP
-        : lerp(smoothProgressRef.current, targetP, 0.11);
-      const p = smoothProgressRef.current;
-
-      pointerRef.current.x = lerp(pointerRef.current.x, pointerRef.current.targetX, 0.08);
-      pointerRef.current.y = lerp(pointerRef.current.y, pointerRef.current.targetY, 0.08);
-
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const rect = canvas.getBoundingClientRect();
-      const width = Math.max(1, Math.floor(rect.width * dpr));
-      const height = Math.max(1, Math.floor(rect.height * dpr));
-      if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
-        canvas.height = height;
+    function tick() {
+      const next = lerp(currentRef.current, targetRef.current, 0.14);
+      if (Math.abs(next - currentRef.current) > 0.0004 || Math.abs(targetRef.current - currentRef.current) > 0.0004) {
+        currentRef.current = next;
+        setProgress(next);
       }
-
-      ctx.save();
-      ctx.scale(dpr, dpr);
-      const w = rect.width;
-      const h = rect.height;
-      ctx.clearRect(0, 0, w, h);
-
-      // Phase weights:
-      // Stage 0 (p: 0.00 -> 0.32): Couple (Pregnant Woman + Partner)
-      // Transition 0->1 (p: 0.27 -> 0.42): Couple converges into center -> Baby in Carrier emerges
-      // Stage 1 (p: 0.38 -> 0.63): Baby in Carrier rotates & rocks gently
-      // Transition 1->2 (p: 0.58 -> 0.72): Carrier opens/dissolves -> Growing Child emerges
-      // Stage 2 (p: 0.68 -> 1.00): Child grows continuously from small toddler (0.50 scale) to tall grown youth (1.08 scale)
-
-      const coupleAlpha = 1 - smoothstep(0.28, 0.41, p);
-      const coupleConverge = smoothstep(0.24, 0.41, p);
-
-      const carrierEnter = smoothstep(0.29, 0.43, p);
-      const carrierExit = 1 - smoothstep(0.58, 0.71, p);
-      const carrierAlpha = carrierEnter * carrierExit;
-
-      const childAlpha = smoothstep(0.60, 0.73, p);
-      // Growth factor within Stage 3: 0 = toddler (1 yr), 1 = tall grown child / youth
-      const childGrowth = smoothstep(0.64, 0.97, p);
-
-      // Global camera rotation driven by scroll + subtle idle breathing + pointer parallax
-      const idleAngle = reducedMotion ? 0 : Math.sin(time * 0.0007) * 0.08;
-      const yaw =
-        lerp(-0.28, 0.52, p) +
-        idleAngle +
-        pointerRef.current.x * 0.32;
-      const pitch =
-        lerp(0.14, 0.08, p) +
-        pointerRef.current.y * 0.16;
-
-      const cosY = Math.cos(yaw);
-      const sinY = Math.sin(yaw);
-      const cosP = Math.cos(pitch);
-      const sinP = Math.sin(pitch);
-
-      // Draw subtle architectural 3D studio grid lines / aura behind mesh
-      const cx = w * 0.5;
-      const cy = h * 0.56;
-      const fovScale = Math.min(w, h) * 0.36;
-
-      const bgGrad = ctx.createRadialGradient(cx, cy - h * 0.08, 12, cx, cy, Math.max(w, h) * 0.55);
-      bgGrad.addColorStop(0, "rgba(235, 243, 230, 0.85)");
-      bgGrad.addColorStop(0.55, "rgba(246, 248, 243, 0.45)");
-      bgGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, w, h);
-
-      // Transform a 3D point depending on its group & current scroll morph
-      function transformVertex(pt: Vec3, group: QuadFace["group"]): { pos: Vec3; alpha: number } | null {
-        let x = pt.x;
-        let y = pt.y;
-        let z = pt.z;
-        let alpha = 1;
-
-        if (group === "woman" || group === "man") {
-          if (coupleAlpha <= 0.01) return null;
-          alpha = coupleAlpha;
-          // As couple transitions into baby carrier, they step closer together and morph downward into the cradle center
-          const sign = group === "woman" ? -1 : 1;
-          x = lerp(x, sign * 0.12, coupleConverge);
-          y = lerp(y, y * 0.52 + 0.25, coupleConverge);
-          z = lerp(z, z * 0.6, coupleConverge);
-        } else if (group === "carrier") {
-          if (carrierAlpha <= 0.01) return null;
-          alpha = carrierAlpha;
-          const enterScale = lerp(0.55, 1.0, carrierEnter);
-          const exitMorph = 1 - carrierExit;
-          const rockAngle = reducedMotion ? 0 : Math.sin(time * 0.0018) * 0.045;
-          const cosR = Math.cos(rockAngle);
-          const sinR = Math.sin(rockAngle);
-          const ry = y * cosR - z * sinR;
-          const rz = y * sinR + z * cosR;
-          x = x * enterScale * lerp(1, 0.65, exitMorph);
-          y = ry * enterScale + lerp(0.18, 0.06, carrierEnter) + exitMorph * 0.35;
-          z = rz * enterScale;
-        } else if (group === "child") {
-          if (childAlpha <= 0.01) return null;
-          alpha = childAlpha;
-          // Allometric human growth morph!
-          // Toddler (childGrowth=0): shorter legs, fuller head proportion, overall height ~0.52
-          // Older child / teen (childGrowth=1): long legs, balanced head, overall height ~1.06
-          const heightScale = lerp(0.50, 1.07, childGrowth);
-          const widthScale = lerp(0.58, 1.02, childGrowth);
-          // Allometric head scaling: when y > 2.05 (head region), toddler has relatively bigger head
-          const isHead = pt.y > 2.05;
-          const headBoost = isHead ? lerp(1.28, 0.98, childGrowth) : 1.0;
-          const headCenterY = 2.35;
-
-          const localX = isHead ? pt.x * headBoost : pt.x;
-          const localZ = isHead ? pt.z * headBoost : pt.z;
-          const localY = isHead
-            ? headCenterY + (pt.y - headCenterY) * headBoost
-            : pt.y;
-
-          // Emerge smoothly from carrier level
-          const emergeLift = lerp(-0.12, 0, smoothstep(0.60, 0.74, p));
-          x = localX * widthScale;
-          y = localY * heightScale + emergeLift;
-          z = localZ * widthScale;
-        } else if (group === "plinth") {
-          alpha = 0.9;
-        }
-
-        // Center vertically around y = 1.22 so model sits nicely in viewport
-        const cy3d = y - 1.22;
-
-        // Rotate around Y (yaw), then X (pitch)
-        const rx = x * cosY - z * sinY;
-        const rz1 = x * sinY + z * cosY;
-        const ry = cy3d * cosP - rz1 * sinP;
-        const rz = cy3d * sinP + rz1 * cosP;
-
-        return { pos: { x: rx, y: ry, z: rz }, alpha };
-      }
-
-      interface ProjectedQuad {
-        pts: [{ x: number; y: number }, { x: number; y: number }, { x: number; y: number }, { x: number; y: number }];
-        depth: number;
-        fill: string;
-        stroke: string;
-        alpha: number;
-      }
-
-      const drawList: ProjectedQuad[] = [];
-      const cameraDist = 4.5;
-
-      for (const q of meshesRef.current.quads) {
-        const t0 = transformVertex(q.v[0], q.group);
-        if (!t0) continue;
-        const t1 = transformVertex(q.v[1], q.group)!;
-        const t2 = transformVertex(q.v[2], q.group)!;
-        const t3 = transformVertex(q.v[3], q.group)!;
-
-        // Compute world-space normal of transformed quad
-        const e1 = sub(t1.pos, t0.pos);
-        const e2 = sub(t3.pos, t0.pos);
-        const n = normalize(cross(e1, e2));
-
-        // Average depth
-        const avgZ = (t0.pos.z + t1.pos.z + t2.pos.z + t3.pos.z) * 0.25;
-
-        // Perspective projection
-        const proj = (v: Vec3) => {
-          const persp = cameraDist / Math.max(1.2, cameraDist - v.z);
-          return {
-            x: cx + v.x * fovScale * persp,
-            y: cy - v.y * fovScale * persp,
-          };
-        };
-
-        const p0 = proj(t0.pos);
-        const p1 = proj(t1.pos);
-        const p2 = proj(t2.pos);
-        const p3 = proj(t3.pos);
-
-        // Two-light studio clay/mesh shading with Fresnel rim
-        const ndotl1 = Math.max(0, dot(n, lightDir1));
-        const ndotl2 = Math.max(0, dot(n, lightDir2));
-        const rim = Math.pow(1 - Math.abs(n.z), 2.2) * 0.28;
-        const lighting = clamp(0.32 + ndotl1 * 0.56 + ndotl2 * 0.22 + rim, 0.18, 1.08);
-
-        const pal = palettes[q.tint];
-        const r = Math.round(lerp(pal.base[0] * 0.72, pal.warm[0], lighting));
-        const g = Math.round(lerp(pal.base[1] * 0.74, pal.warm[1], lighting));
-        const b = Math.round(lerp(pal.base[2] * 0.72, pal.warm[2], lighting));
-
-        drawList.push({
-          pts: [p0, p1, p2, p3],
-          depth: avgZ,
-          fill: `rgb(${r}, ${g}, ${b})`,
-          stroke: pal.wire,
-          alpha: t0.alpha,
-        });
-      }
-
-      // Painter's algorithm sort (back to front)
-      drawList.sort((a, b) => a.depth - b.depth);
-
-      // Draw dynamic measurement scale rings during Stage 3 (growth visualization)
-      if (childAlpha > 0.05) {
-        const meterLevels = [
-          { y: -1.18, label: "50 cm · narodziny" },
-          { y: -0.45, label: "80 cm · 1. rok" },
-          { y: 0.35, label: "110 cm · przedszkole" },
-          { y: 1.15, label: "145 cm · kolejne lata" },
-        ];
-        ctx.save();
-        ctx.globalAlpha = childAlpha * 0.55;
-        ctx.strokeStyle = "#8fa780";
-        ctx.fillStyle = "#527561";
-        ctx.font = "600 10px Arial, sans-serif";
-        for (const lvl of meterLevels) {
-          const persp = cameraDist / cameraDist;
-          const py = cy - lvl.y * fovScale * persp;
-          ctx.beginPath();
-          ctx.setLineDash([4, 6]);
-          ctx.moveTo(cx - fovScale * 0.95, py);
-          ctx.lineTo(cx + fovScale * 0.95, py);
-          ctx.stroke();
-          ctx.setLineDash([]);
-          ctx.fillText(lvl.label, cx + fovScale * 0.52, py - 5);
-        }
-        ctx.restore();
-      }
-
-      // Render all quad faces with crisp quad wireframe edges (inspired by 100% QUADS base mesh reference)
-      ctx.lineJoin = "round";
-      ctx.lineWidth = 1.05;
-      for (const item of drawList) {
-        ctx.globalAlpha = item.alpha;
-        ctx.beginPath();
-        ctx.moveTo(item.pts[0].x, item.pts[0].y);
-        ctx.lineTo(item.pts[1].x, item.pts[1].y);
-        ctx.lineTo(item.pts[2].x, item.pts[2].y);
-        ctx.lineTo(item.pts[3].x, item.pts[3].y);
-        ctx.closePath();
-        ctx.fillStyle = item.fill;
-        ctx.fill();
-        ctx.strokeStyle = item.stroke;
-        ctx.stroke();
-      }
-
-      ctx.restore();
-
       if (!reducedMotion) {
-        rafId = window.requestAnimationFrame(renderFrame);
+        rafId = window.requestAnimationFrame(tick);
       }
     }
 
-    rafId = window.requestAnimationFrame(renderFrame);
+    onScroll();
+    if (!reducedMotion) {
+      rafId = window.requestAnimationFrame(tick);
+    }
 
-    // If reduced motion, re-render whenever scroll occurs
-    const onScrollReduced = () => {
-      if (reducedMotion) {
-        window.requestAnimationFrame(renderFrame);
-      }
-    };
-    window.addEventListener("scroll", onScrollReduced, { passive: true });
-
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
     return () => {
       window.cancelAnimationFrame(rafId);
-      window.removeEventListener("scroll", updateScrollProgress);
-      window.removeEventListener("resize", updateScrollProgress);
-      window.removeEventListener("scroll", onScrollReduced);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
   }, []);
 
-  function scrollToGame() {
-    const target = document.getElementById("gra-otwartekarty");
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
+  // Scroll timings (0.0 -> 1.0, strictly left-to-right story):
+  const p = progress;
 
-  function scrollToStage(index: number) {
-    const container = containerRef.current;
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    const topDoc = window.scrollY + rect.top;
-    const scrollable = Math.max(1, rect.height - window.innerHeight);
-    const ratios = [0.06, 0.48, 0.90];
-    window.scrollTo({
-      top: topDoc + scrollable * (ratios[index] ?? 0),
-      behavior: "smooth",
-    });
-  }
+  // Stage 1 (Always visible at left, subtle breathing/weight shift as scroll begins)
+  const parentsEnter = 1;
+  const parentsPregnant = 1 - smoothstep(0.14, 0.28, p); // belly gently softens after carrier appears
 
-  const stage = STAGES[activeStage] ?? STAGES[0];
+  // Stage 2: Baby in Carrier (Nosidełko) appears to the right of parents and stays longer in focus (p: 0.05 -> 0.48)
+  const carrierEnter = smoothstep(0.04, 0.18, p);
+  const carrierRock = Math.sin(p * Math.PI * 10) * 4.2 * (1 - smoothstep(0.50, 0.64, p));
+  const babyInCarrierAlpha = 1 - smoothstep(0.42, 0.52, p);
+
+  // Stage 3: Crawling Baby (Raczkowanie) emerges from carrier moving right (p: 0.42 -> 0.68)
+  const crawlEnter = smoothstep(0.40, 0.50, p);
+  const crawlMove = smoothstep(0.42, 0.68, p);
+  const crawlFade = 1 - smoothstep(0.64, 0.74, p);
+  const crawlAlpha = crawlEnter * crawlFade;
+  const crawlX = lerp(635, 815, crawlMove);
+  const crawlCycle = Math.sin(crawlMove * Math.PI * 5);
+
+  // Stage 4 -> 5: Child stands up, walks right, and grows from toddler to tall child (p: 0.64 -> 0.98)
+  const walkEnter = smoothstep(0.63, 0.73, p);
+  const walkMove = smoothstep(0.65, 0.97, p);
+  // Continuous left-to-right travel from x = 885 to x = 1275
+  const childX = lerp(885, 1275, walkMove);
+  // Continuous growth scale from toddler (0.56) to tall older child (0.96)
+  const childScale = lerp(0.56, 0.96, walkMove);
+  // Walking stride cycle as child moves right
+  const isWalking = p > 0.65 && p < 0.96 ? 1 : 0;
+  const stride = Math.sin(walkMove * Math.PI * 7) * isWalking;
+
+  // Ground line progressive draw from left to right
+  const groundWidth = lerp(390, 1410, smoothstep(0.0, 0.95, p));
 
   return (
     <section
       className="scroll-hero"
       ref={containerRef}
-      aria-label="Wprowadzenie: od ciąży przez pierwsze miesiące po kolejne lata dziecka"
-      onPointerMove={(e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const nx = ((e.clientX - rect.left) / Math.max(1, rect.width) - 0.5) * 2;
-        const ny = ((e.clientY - rect.top) / Math.max(1, rect.height) - 0.5) * 2;
-        pointerRef.current.targetX = clamp(nx, -1, 1);
-        pointerRef.current.targetY = clamp(ny, -1, 1);
-      }}
-      onPointerLeave={() => {
-        pointerRef.current.targetX = 0;
-        pointerRef.current.targetY = 0;
-      }}
+      aria-label="Ilustracja 2D: od rodziców w ciąży, przez niemowlę w nosidełku i raczkowanie, aż po rosnące dziecko idące w prawo"
     >
       <div className="scroll-hero-sticky">
-        <div className="scroll-hero-grid">
-          {/* Left column: editorial story & stage milestones synchronized with scroll */}
-          <div className="scroll-hero-copy">
-            <div className="scroll-hero-pill">
-              <span className="scroll-hero-dot" aria-hidden="true" />
-              <span>{stage.roundBadge}</span>
-            </div>
+        <div className="scroll-hero-viewport">
+          <svg
+            className="scroll-hero-svg"
+            viewBox="0 0 1480 680"
+            preserveAspectRatio="xMidYMid meet"
+            role="img"
+            aria-label="Animacja wzrostu dziecka od lewej do prawej: rodzice, nosidełko, raczkowanie i dorastające dziecko"
+          >
+            <defs>
+              <style>{`
+                .ink { stroke: ${INK}; stroke-width: 2.3px; stroke-linecap: round; stroke-linejoin: round; }
+                .ink-thin { stroke: ${INK}; stroke-width: 1.7px; stroke-linecap: round; stroke-linejoin: round; }
+                .fill-white { fill: ${WHITE}; }
+                .fill-cream { fill: ${CREAM}; }
+                .fill-dark { fill: ${INK}; }
+                .fill-sage { fill: ${ACCENT}; }
+                .fill-blue { fill: ${ACCENT_BLUE}; }
+                .fill-soft { fill: ${ACCENT_LIGHT}; }
+              `}</style>
+            </defs>
 
-            <p className="eyebrow scroll-hero-eyebrow">{stage.eyebrow}</p>
-
-            <h2 className="scroll-hero-title" key={stage.id}>
-              {stage.title} <span>{stage.accent}</span>
-            </h2>
-
-            <p className="scroll-hero-description">{stage.description}</p>
-
-            <div className="scroll-hero-callout">
-              <span className="eyebrow">{stage.statLabel}</span>
-              <strong>{stage.statValue}</strong>
-            </div>
-
-            <div className="scroll-hero-nav" role="tablist" aria-label="Etapy historii rodziny">
-              {STAGES.map((item, idx) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={activeStage === idx}
-                  className={`scroll-stage-tab ${activeStage === idx ? "is-active" : ""}`}
-                  onClick={() => scrollToStage(idx)}
-                >
-                  <span className="scroll-stage-num">0{idx + 1}</span>
-                  <span className="scroll-stage-name">
-                    {idx === 0 ? "Ciąża (Dorośli)" : idx === 1 ? "W nosidełku" : "Dziecko rośnie"}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            <div className="scroll-hero-actions">
-              <button type="button" className="button button-primary" onClick={scrollToGame}>
-                Przejdź do stołu z kartami ↓
-              </button>
-              <span className="scroll-hero-hint">
-                Przewijaj w dół, aby zobaczyć transformację ({progressText}%)
-              </span>
-            </div>
-          </div>
-
-          {/* Right column: interactive 3D low-poly quad mesh viewport */}
-          <div className="scroll-hero-viewport">
-            <div className="scroll-mesh-hud" aria-hidden="true">
-              <span>{stage.meshTag}</span>
-              <span>SCROLL MORPH · {progressText}%</span>
-            </div>
-            <canvas
-              ref={canvasRef}
-              className="scroll-hero-canvas"
-              aria-label="Trójwymiarowa siatka postaci: para oczekująca dziecka, niemowlę w nosidełku i rosnące dziecko"
+            {/* Minimalist continuous editorial floor line drawing from left to right */}
+            <line
+              x1="50"
+              y1="576"
+              x2={groundWidth}
+              y2="576"
+              className="ink"
             />
-            <div className="scroll-mesh-footer" aria-hidden="true">
-              <div className="scroll-progress-bar">
-                <span style={{ width: `${Math.max(6, progressText)}%` }} />
-              </div>
-              <div className="scroll-mesh-legend">
-                <span className={activeStage === 0 ? "is-current" : ""}>I. Kobieta w ciąży i mężczyzna</span>
-                <span className={activeStage === 1 ? "is-current" : ""}>II. Dziecko w nosidełku</span>
-                <span className={activeStage === 2 ? "is-current" : ""}>III. Wzrost dziecka</span>
-              </div>
-            </div>
-          </div>
+
+            {/* ================================================================= */}
+            {/* 1. LEFT: EXPECTING PARENTS (Man & Pregnant Woman facing right)    */}
+            {/* ================================================================= */}
+            <g
+              transform="translate(135, 0)"
+              opacity={parentsEnter}
+            >
+              {/* --- PARTNER (MAN) standing on the left, facing slightly right --- */}
+              <g transform="translate(0, 0)">
+                {/* Back leg (right leg) */}
+                <path
+                  d="M 78 362 L 94 470 L 98 552 H 72 L 64 470 L 54 362 Z"
+                  className="fill-dark ink"
+                />
+                {/* Back shoe */}
+                <path
+                  d="M 72 552 L 70 576 H 122 C 122 563 111 555 98 552 Z"
+                  className="fill-cream ink"
+                />
+                <line x1="70" y1="571" x2="122" y2="571" className="ink-thin" />
+
+                {/* Front leg (left leg) */}
+                <path
+                  d="M 42 362 L 46 472 L 48 552 H 22 L 18 472 L 16 362 Z"
+                  className="fill-dark ink"
+                />
+                {/* Front shoe */}
+                <path
+                  d="M 22 552 L 20 576 H 74 C 74 563 62 555 48 552 Z"
+                  className="fill-cream ink"
+                />
+                <line x1="20" y1="571" x2="74" y2="571" className="ink-thin" />
+
+                {/* Back arm (reaching affectionately toward partner) */}
+                <path
+                  d="M 86 226 C 112 242 132 272 154 294 L 146 310 C 120 292 102 268 78 250 Z"
+                  className="fill-cream ink"
+                />
+
+                {/* Torso / Shirt & Pullover */}
+                <path
+                  d="M 16 218 C 16 204 32 196 54 196 C 78 196 94 205 98 222 L 92 364 H 16 Z"
+                  className="fill-cream ink"
+                />
+                {/* Collar & V-neck detail */}
+                <path
+                  d="M 38 194 L 56 224 L 74 194"
+                  fill="none"
+                  className="ink"
+                />
+                <path
+                  d="M 42 186 L 34 204 L 54 214 L 72 204 L 66 186 Z"
+                  className="fill-white ink"
+                />
+
+                {/* Neck & Head (clean white fill + minimalist facial lines like reference) */}
+                <path
+                  d="M 44 166 V 196 H 66 V 166 Z"
+                  className="fill-white ink"
+                />
+                {/* Head oval facing 3/4 right */}
+                <path
+                  d="M 34 122 C 34 98 50 86 70 86 C 90 86 100 102 98 128 C 96 154 84 172 66 172 C 48 172 34 156 34 122 Z"
+                  className="fill-white ink"
+                />
+                {/* Minimalist hair cap (dark ink fill or clean white with line art) */}
+                <path
+                  d="M 34 126 C 31 102 46 80 72 80 C 92 80 104 92 102 108 C 92 100 78 98 62 102 C 50 105 44 114 42 126 Z"
+                  className="fill-dark ink"
+                />
+                {/* Ear */}
+                <path
+                  d="M 42 124 C 35 122 33 134 40 138"
+                   className="fill-white ink"
+                />
+                {/* Minimalist face: eyebrows, dot eyes, L-nose, gentle smile */}
+                <path d="M 68 117 Q 74 114 79 117" fill="none" className="ink" />
+                <path d="M 86 118 Q 91 116 95 119" fill="none" className="ink" />
+                <circle cx="74" cy="124" r="2.1" className="fill-dark" />
+                <circle cx="90" cy="125" r="2.1" className="fill-dark" />
+                <path d="M 84 125 L 87 139 L 81 141" fill="none" className="ink-thin" />
+                <path d="M 73 150 Q 80 154 86 150" fill="none" className="ink-thin" />
+
+                {/* Front arm (left arm, relaxed at side / pocket) */}
+                <path
+                  d="M 22 214 C 6 244 4 282 14 326 L 30 324 C 24 286 24 252 36 226 Z"
+                  className="fill-cream ink"
+                />
+                {/* Hand at hip/pocket */}
+                <path
+                  d="M 14 326 C 14 338 22 344 30 340 C 34 337 33 329 30 324 Z"
+                  className="fill-white ink"
+                />
+              </g>
+
+              {/* --- PREGNANT WOMAN standing beside him, facing 3/4 right (styled directly after reference!) --- */}
+              <g transform="translate(128, 12)">
+                {/* Back leg */}
+                <path
+                  d="M 66 376 L 82 480 L 86 544 H 66 L 54 480 L 46 376 Z"
+                  className="fill-white ink"
+                />
+                {/* Back flat shoe (cream with toe line, exact match to reference) */}
+                <path
+                  d="M 65 544 L 62 564 H 116 C 116 552 104 546 86 544 Z"
+                  className="fill-cream ink"
+                />
+                <path d="M 64 550 Q 82 556 96 550" fill="none" className="ink-thin" />
+                <path d="M 101 548 V 564" fill="none" className="ink-thin" />
+
+                {/* Front leg */}
+                <path
+                  d="M 38 376 L 44 482 L 46 544 H 26 L 18 482 L 18 376 Z"
+                  className="fill-white ink"
+                />
+                {/* Front flat shoe */}
+                <path
+                  d="M 25 544 L 22 564 H 78 C 78 552 65 546 46 544 Z"
+                  className="fill-cream ink"
+                />
+                <path d="M 24 550 Q 42 556 58 550" fill="none" className="ink-thin" />
+                <path d="M 63 548 V 564" fill="none" className="ink-thin" />
+
+                {/* Dark skirt / maternity dress lower half */}
+                <path
+                  d="M 14 326 L 8 398 H 88 L 86 326 Z"
+                  className="fill-dark ink"
+                />
+
+                {/* Cream blouse collar at neck */}
+                <path
+                  d="M 34 196 L 26 218 L 52 232 L 74 216 L 66 196 Z"
+                  className="fill-cream ink"
+                />
+
+                {/* Teal-blue / Sage jacket & pregnant belly profile (morphs belly curvature via parentsPregnant) */}
+                <path
+                  d={`M 16 214 C 24 202 40 200 54 200 C 68 200 80 208 86 224 C ${lerp(
+                    96,
+                    132,
+                    parentsPregnant,
+                  )} ${lerp(262, 266, parentsPregnant)} ${lerp(
+                    98,
+                    136,
+                    parentsPregnant,
+                  )} ${lerp(312, 318, parentsPregnant)} 88 344 L 12 344 C 8 296 10 246 16 214 Z`}
+                  className="fill-blue ink"
+                />
+                {/* Jacket lapel lines (exact editorial style from reference) */}
+                <path
+                  d="M 30 206 L 24 242 L 62 274 L 68 236 L 62 206"
+                  fill="none"
+                  className="ink"
+                />
+
+                {/* Neck */}
+                <path
+                  d="M 40 174 V 204 H 60 V 174 Z"
+                  className="fill-white ink"
+                />
+
+                {/* High bun with dark hair-tie (signature hairstyle from user's reference image!) */}
+                <circle cx="25" cy="76" r="19" className="fill-white ink" />
+                <path d="M 15 68 C 19 60 28 60 33 65" fill="none" className="ink-thin" />
+                {/* Dark scrunchie / hair band */}
+                <path
+                  d="M 27 94 C 31 87 40 85 46 90 C 42 97 33 99 27 94 Z"
+                  className="fill-dark ink"
+                />
+
+                {/* Woman's Head & Hair silhouette */}
+                <path
+                  d="M 28 130 C 28 104 44 92 64 92 C 84 92 92 108 90 134 C 88 158 76 178 58 178 C 40 178 28 160 28 130 Z"
+                  className="fill-white ink"
+                />
+                {/* Swept side-part hair volume */}
+                <path
+                  d="M 38 158 C 22 146 20 114 34 96 C 48 82 78 84 96 104 C 98 110 92 114 84 112 C 70 108 56 106 46 116 C 45 124 42 142 38 158 Z"
+                  className="fill-white ink"
+                />
+                {/* Ear */}
+                <path
+                  d="M 38 128 C 31 126 30 138 37 142"
+                  className="fill-white ink"
+                />
+                {/* Minimalist face details matching reference */}
+                <path d="M 60 124 Q 66 121 71 124" fill="none" className="ink" />
+                <path d="M 78 125 Q 83 123 87 126" fill="none" className="ink" />
+                <circle cx="66" cy="131" r="2.0" className="fill-dark" />
+                <circle cx="81" cy="132" r="2.0" className="fill-dark" />
+                <path d="M 75 132 L 78 145 L 72 147" fill="none" className="ink-thin" />
+                <path d="M 66 156 Q 72 159 77 156" fill="none" className="ink-thin" />
+
+                {/* Woman's Front Arm & Hand gently cradling her pregnant belly */}
+                <path
+                  d={`M 24 224 C 14 256 22 292 ${lerp(46, 72, parentsPregnant)} ${lerp(
+                    312,
+                    318,
+                    parentsPregnant,
+                  )} L ${lerp(54, 80, parentsPregnant)} ${lerp(
+                    298,
+                    302,
+                    parentsPregnant,
+                  )} C 38 282 34 254 42 228 Z`}
+                  className="fill-blue ink"
+                />
+                {/* Expressive line-art hand resting on belly */}
+                <path
+                  d={`M ${lerp(50, 76, parentsPregnant)} ${lerp(
+                    300,
+                    304,
+                    parentsPregnant,
+                  )} C ${lerp(64, 92, parentsPregnant)} ${lerp(
+                    298,
+                    302,
+                    parentsPregnant,
+                  )} ${lerp(72, 102, parentsPregnant)} ${lerp(
+                    308,
+                    312,
+                    parentsPregnant,
+                  )} ${lerp(66, 94, parentsPregnant)} ${lerp(
+                    318,
+                    322,
+                    parentsPregnant,
+                  )} C ${lerp(58, 84, parentsPregnant)} ${lerp(
+                    320,
+                    324,
+                    parentsPregnant,
+                  )} ${lerp(48, 72, parentsPregnant)} ${lerp(
+                    316,
+                    320,
+                    parentsPregnant,
+                  )} ${lerp(50, 76, parentsPregnant)} ${lerp(
+                    300,
+                    304,
+                    parentsPregnant,
+                  )} Z`}
+                  className="fill-white ink"
+                />
+              </g>
+            </g>
+
+            {/* ================================================================= */}
+            {/* 2. CENTER-LEFT: BABY IN CARRIER (NOSIDEŁKO)                       */}
+            {/* ================================================================= */}
+            {carrierEnter > 0.01 && (
+              <g
+                transform={`translate(${lerp(415, 455, carrierEnter)}, ${lerp(
+                  18,
+                  0,
+                  carrierEnter,
+                )}) rotate(${carrierRock}, 95, 540)`}
+                opacity={carrierEnter}
+              >
+                {/* Ergonomic curved crescent carrier shell resting on floor at y=576 */}
+                <path
+                  d="M 12 492 C 18 552 62 576 116 576 C 172 576 212 546 224 484 L 194 468 C 176 510 144 526 110 526 C 74 526 46 508 36 476 Z"
+                  className="fill-cream ink"
+                />
+                {/* Soft inner mattress rim */}
+                <path
+                  d="M 32 478 C 52 518 164 522 198 468"
+                  fill="none"
+                  className="ink"
+                />
+                {/* Carrier sun-canopy hood on the left end of the cradle */}
+                <path
+                  d="M 12 492 C 4 442 32 406 76 412 L 62 486 Z"
+                  className="fill-blue ink"
+                />
+                <path d="M 28 432 L 62 486" fill="none" className="ink-thin" />
+
+                {/* Swaddled Infant inside the carrier (fades out as baby crawls out to the right!) */}
+                {babyInCarrierAlpha > 0.01 && (
+                  <g opacity={babyInCarrierAlpha}>
+                    {/* Swaddled body */}
+                    <path
+                      d="M 78 494 C 78 472 104 464 138 470 C 164 475 182 488 178 506 C 154 520 98 518 78 494 Z"
+                      className="fill-white ink"
+                    />
+                    {/* Baby Head peeking up on the right side of the cradle */}
+                    <circle cx="158" cy="456" r="24" className="fill-white ink" />
+                    {/* Little baby hair curl */}
+                    <path
+                      d="M 152 432 C 158 424 168 426 166 434"
+                      fill="none"
+                      className="ink"
+                    />
+                    {/* Baby eyes & smile */}
+                    <circle cx="156" cy="454" r="1.8" className="fill-dark" />
+                    <circle cx="168" cy="456" r="1.8" className="fill-dark" />
+                    <path
+                      d="M 158 465 Q 163 469 168 465"
+                      fill="none"
+                      className="ink-thin"
+                    />
+                    {/* Little waving baby hand */}
+                    <circle cx="128" cy="466" r="8" className="fill-white ink" />
+                  </g>
+                )}
+
+                {/* Carrier arched handle with dark grip at top */}
+                <path
+                  d="M 48 498 C 44 398 184 398 182 498"
+                  fill="none"
+                  className="ink"
+                  style={{ strokeWidth: "4.5px" }}
+                />
+                <path
+                  d="M 96 422 H 134"
+                  fill="none"
+                  stroke={INK}
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                />
+                {/* Handle pivot joint circle */}
+                <circle cx="48" cy="498" r="7" className="fill-dark ink" />
+                <circle cx="182" cy="498" r="7" className="fill-dark ink" />
+              </g>
+            )}
+
+            {/* ================================================================= */}
+            {/* 3. CENTER: CRAWLING BABY (RACZKOWANIE) moving left -> right       */}
+            {/* ================================================================= */}
+            {crawlAlpha > 0.01 && (
+              <g
+                transform={`translate(${crawlX}, 0)`}
+                opacity={crawlAlpha}
+              >
+                {/* Back knee & lower leg crawling */}
+                <path
+                  d={`M ${24 - crawlCycle * 10} 534 L ${12 - crawlCycle * 14} 568 L ${-14 - crawlCycle * 14} 574`}
+                  fill="none"
+                  className="ink"
+                  style={{ strokeWidth: "14px" }}
+                />
+                <path
+                  d={`M ${24 - crawlCycle * 10} 534 L ${12 - crawlCycle * 14} 568 L ${-14 - crawlCycle * 14} 574`}
+                  fill="none"
+                  stroke={WHITE}
+                  strokeWidth="10"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                {/* Back arm supporting torso */}
+                <path
+                  d={`M 82 518 L ${96 + crawlCycle * 14} 570`}
+                  fill="none"
+                  className="ink"
+                  style={{ strokeWidth: "13px" }}
+                />
+                <path
+                  d={`M 82 518 L ${96 + crawlCycle * 14} 570`}
+                  fill="none"
+                  stroke={WHITE}
+                  strokeWidth="9"
+                  strokeLinecap="round"
+                />
+
+                {/* Baby romper / onesie torso (horizontal crawling posture) */}
+                <path
+                  d="M 14 522 C 10 498 34 486 64 488 C 90 490 104 504 100 526 C 94 542 26 544 14 522 Z"
+                  className="fill-blue ink"
+                />
+                {/* Diaper / shorts back detail */}
+                <path
+                  d="M 12 520 C 10 500 26 490 42 492 L 38 536 C 22 536 14 530 12 520 Z"
+                  className="fill-cream ink"
+                />
+
+                {/* Front knee & foot crawling */}
+                <path
+                  d={`M 28 526 L ${28 + crawlCycle * 14} 568 L ${2 + crawlCycle * 14} 574`}
+                  fill="none"
+                  className="ink"
+                  style={{ strokeWidth: "15px" }}
+                />
+                <path
+                  d={`M 28 526 L ${28 + crawlCycle * 14} 568 L ${2 + crawlCycle * 14} 574`}
+                  fill="none"
+                  stroke={WHITE}
+                  strokeWidth="11"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                {/* Front arm reaching right */}
+                <path
+                  d={`M 86 518 L ${80 - crawlCycle * 14} 570 L ${92 - crawlCycle * 14} 573`}
+                  fill="none"
+                  className="ink"
+                  style={{ strokeWidth: "14px" }}
+                />
+                <path
+                  d={`M 86 518 L ${80 - crawlCycle * 14} 570 L ${92 - crawlCycle * 14} 573`}
+                  fill="none"
+                  stroke={WHITE}
+                  strokeWidth="10"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                {/* Crawling Baby Head looking eagerly to the right */}
+                <circle cx="112" cy="482" r="27" className="fill-white ink" />
+                {/* Cute tuft of hair */}
+                <path
+                  d="M 102 456 C 108 444 122 446 120 457"
+                  fill="none"
+                  className="ink"
+                />
+                {/* Ear */}
+                <path
+                  d="M 98 482 C 93 480 92 489 97 492"
+                  className="fill-white ink"
+                />
+                {/* Face looking right */}
+                <circle cx="118" cy="478" r="2.0" className="fill-dark" />
+                <circle cx="130" cy="480" r="2.0" className="fill-dark" />
+                <path d="M 126 481 L 129 488 L 124 489" fill="none" className="ink-thin" />
+                <path d="M 118 495 Q 124 499 129 495" fill="none" className="ink-thin" />
+              </g>
+            )}
+
+            {/* ================================================================= */}
+            {/* 4 -> 5. RIGHT: WALKING & GROWING CHILD (Toddler -> Big Kid)       */}
+            {/* Moves strictly left-to-right while scaling smoothly from 0.56->0.96*/}
+            {/* ================================================================= */}
+            {walkEnter > 0.01 && (
+              <g
+                transform={`translate(${childX}, 576) scale(${childScale}) translate(0, -576)`}
+                opacity={walkEnter}
+              >
+                {/* Back leg swinging with walking stride */}
+                <g transform={`rotate(${-stride * 16}, 54, 410)`}>
+                  <path
+                    d="M 44 404 L 56 546 H 76 L 68 404 Z"
+                    className="fill-dark ink"
+                  />
+                  {/* Back shoe */}
+                  <path
+                    d="M 55 546 L 53 576 H 104 C 104 562 92 550 76 546 Z"
+                    className="fill-cream ink"
+                  />
+                  <line x1="53" y1="570" x2="104" y2="570" className="ink-thin" />
+                </g>
+
+                {/* Front leg swinging with walking stride */}
+                <g transform={`rotate(${stride * 18}, 42, 410)`}>
+                  <path
+                    d="M 24 404 L 28 546 H 48 L 48 404 Z"
+                    className="fill-dark ink"
+                  />
+                  {/* Front shoe */}
+                  <path
+                    d="M 27 546 L 25 576 H 78 C 78 562 64 550 48 546 Z"
+                    className="fill-cream ink"
+                  />
+                  <line x1="25" y1="570" x2="78" y2="570" className="ink-thin" />
+                </g>
+
+                {/* Back arm swinging forward as child walks right */}
+                <g transform={`rotate(${stride * 20}, 62, 276)`}>
+                  <path
+                    d="M 54 272 C 74 302 88 332 102 358 L 88 368 C 72 342 58 314 44 286 Z"
+                    className="fill-blue ink"
+                  />
+                  <circle cx="96" cy="366" r="10" className="fill-white ink" />
+                </g>
+
+                {/* Child's Jacket / Top (matching mother's editorial blue-teal & cream palette) */}
+                <path
+                  d="M 18 268 C 18 252 34 244 52 244 C 70 244 84 254 86 272 L 80 412 H 18 Z"
+                  className="fill-blue ink"
+                />
+                {/* Cream collar & vertical jacket detail */}
+                <path
+                  d="M 36 244 L 30 264 L 54 276 L 72 262 L 66 244 Z"
+                  className="fill-cream ink"
+                />
+                <line x1="54" y1="276" x2="54" y2="412" className="ink" />
+
+                {/* Neck */}
+                <path
+                  d="M 42 222 V 248 H 60 V 222 Z"
+                  className="fill-white ink"
+                />
+
+                {/* Child's Head (allometrically slightly larger when toddler, balanced when older) */}
+                <g
+                  transform={`translate(52, 185) scale(${lerp(
+                    1.16,
+                    0.96,
+                    walkMove,
+                  )}) translate(-52, -185)`}
+                >
+                  <path
+                    d="M 24 176 C 24 148 40 134 62 134 C 84 134 94 150 92 178 C 90 204 76 224 56 224 C 38 224 24 206 24 176 Z"
+                    className="fill-white ink"
+                  />
+                  {/* Playful editorial hair with top wave */}
+                  <path
+                    d="M 26 184 C 18 162 28 132 56 128 C 78 125 98 136 98 152 C 86 146 72 144 56 148 C 42 152 34 166 26 184 Z"
+                    className="fill-dark ink"
+                  />
+                  {/* Ear */}
+                  <path
+                    d="M 34 176 C 27 174 26 186 33 190"
+                    className="fill-white ink"
+                  />
+                  {/* Eyes, eyebrows, L-nose, happy smile facing right */}
+                  <path d="M 58 166 Q 64 163 69 166" fill="none" className="ink" />
+                  <path d="M 76 167 Q 81 165 85 168" fill="none" className="ink" />
+                  <circle cx="64" cy="174" r="2.2" className="fill-dark" />
+                  <circle cx="80" cy="175" r="2.2" className="fill-dark" />
+                  <path d="M 74 175 L 77 188 L 71 190" fill="none" className="ink-thin" />
+                  <path d="M 63 199 Q 70 204 77 199" fill="none" className="ink" />
+                </g>
+
+                {/* Front arm swinging naturally */}
+                <g transform={`rotate(${-stride * 20}, 34, 276)`}>
+                  <path
+                    d="M 24 270 C 12 300 10 334 18 366 L 34 364 C 28 334 30 304 40 278 Z"
+                    className="fill-blue ink"
+                  />
+                  <circle cx="26" cy="372" r="10" className="fill-white ink" />
+                </g>
+              </g>
+            )}
+          </svg>
         </div>
       </div>
     </section>
