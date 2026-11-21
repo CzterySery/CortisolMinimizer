@@ -24,6 +24,14 @@ class Rates(BaseModel):
     parental: Decimal
     averaged: Decimal
     care: Decimal
+    rehab_first_period: Decimal  # art. 19 ust. 1: first three months
+    rehab: Decimal
+    rehab_pregnancy: Decimal
+
+
+class Rehab(BaseModel):
+    first_period_days: int  # "pierwsze trzy miesiące" counted as 3 x 30 days
+    max_months: int  # art. 18 ust. 2
 
 
 class Sick(BaseModel):
@@ -119,6 +127,7 @@ class Params(BaseModel):
     debt_threshold_pct_min_wage: Decimal
     rates: Rates
     sick: Sick
+    rehab: Rehab
     maternity: Maternity
     parental: Parental
     paternity: Paternity

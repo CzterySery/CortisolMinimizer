@@ -1251,6 +1251,7 @@ export interface components {
             debt_threshold_pct_min_wage: number | string;
             rates: components["schemas"]["Rates-Input"];
             sick: components["schemas"]["Sick"];
+            rehab: components["schemas"]["Rehab"];
             maternity: components["schemas"]["Maternity"];
             parental: components["schemas"]["Parental-Input"];
             paternity: components["schemas"]["Paternity"];
@@ -1281,6 +1282,7 @@ export interface components {
             debt_threshold_pct_min_wage: string;
             rates: components["schemas"]["Rates-Output"];
             sick: components["schemas"]["Sick"];
+            rehab: components["schemas"]["Rehab"];
             maternity: components["schemas"]["Maternity"];
             parental: components["schemas"]["Parental-Output"];
             paternity: components["schemas"]["Paternity"];
@@ -1310,6 +1312,11 @@ export interface components {
              * @default []
              */
             salary_history?: components["schemas"]["MonthPay-Input"][];
+            /**
+             * Full Time
+             * @default true
+             */
+            full_time?: boolean;
             /**
              * Payer Insured Count
              * @default 0
@@ -1352,6 +1359,11 @@ export interface components {
              * @default []
              */
             salary_history: components["schemas"]["MonthPay-Output"][];
+            /**
+             * Full Time
+             * @default true
+             */
+            full_time: boolean;
             /**
              * Payer Insured Count
              * @default 0
@@ -1599,6 +1611,12 @@ export interface components {
             averaged: number | string;
             /** Care */
             care: number | string;
+            /** Rehab First Period */
+            rehab_first_period: number | string;
+            /** Rehab */
+            rehab: number | string;
+            /** Rehab Pregnancy */
+            rehab_pregnancy: number | string;
         };
         /** Rates */
         "Rates-Output": {
@@ -1620,6 +1638,19 @@ export interface components {
             averaged: string;
             /** Care */
             care: string;
+            /** Rehab First Period */
+            rehab_first_period: string;
+            /** Rehab */
+            rehab: string;
+            /** Rehab Pregnancy */
+            rehab_pregnancy: string;
+        };
+        /** Rehab */
+        Rehab: {
+            /** First Period Days */
+            first_period_days: number;
+            /** Max Months */
+            max_months: number;
         };
         /** Requirement */
         Requirement: {

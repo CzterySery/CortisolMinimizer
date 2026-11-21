@@ -16,7 +16,14 @@
     "job_loss": "1.00",
     "parental": "0.70",
     "averaged": "0.815",
-    "care": "0.80"
+    "care": "0.80",
+    "rehab_first_period": "0.90",
+    "rehab": "0.75",
+    "rehab_pregnancy": "1.00"
+  },
+  "rehab": {
+    "first_period_days": 90,
+    "max_months": 12
   },
   "sick": {
     "employer_days": 33,

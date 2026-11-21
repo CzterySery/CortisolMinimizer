@@ -54,7 +54,9 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 - Post-update checks: 7 unit tests passed; 3 PostgreSQL integration tests skipped because `TEST_DATABASE_URL` was not set. Frontend typecheck and full deck/source authoring validation passed. The local Python environment now includes the migration's already-declared `psycopg[binary]` dependency.
 - Verification of this work: authoring validation passes for all 30 cards, 31 rules and 334 local links, including exact PDF quote pages and source hashes; new scripts pass ruff; backend 8/8 tests pass; frontend typecheck, lint and production build pass. Initial runs found missing local `python-multipart` and `openapi-fetch`; installing the already-declared dependencies resolved the checks. No application dependency contracts were expanded.
 
-**Step 2a (benefit base) is done; 2b (plan ledger) and 2c (legal rules) are next.** Step 2 was split so each part gets reviewed on its own.
+**Steps 2a (benefit base) and 2b (plan ledger) are done; 2c (legal rules) is next.** Step 2 was split so each part gets reviewed on its own.
+- `backend/app/calc/plan.py` + `POST /api/v1/calc/plan`: money per month (salary + benefit per parent), care calendar, remaining pools, article-cited `explain`, `top_up`. `issues` and `documents` stay empty until 2c / step 3. The `/calculator` page now gets real results.
+- Tests: 30 unit (10 in `test_plan.py` with hand-computed amounts) + 4 integration, ruff clean; live-checked.
 - `backend/app/calc/base.py` + `POST /api/v1/calc/base`: per-parent podstawa wymiaru with article-cited `steps`. Matches the grounded `base` rule in `shared/legal-rules.json` (art. 3 pkt 3–4, 36–42, 45, 47, 48–50).
 - Tests: 19 unit (11 in `test_base.py`, no DB) + 4 Postgres integration, ruff clean. Live-checked against the dev DB.
 
@@ -117,10 +119,10 @@ backend/
     repositories.py    # catalog JSON + PostgreSQL (config versions, games, submissions)
     params.py          # Params model + active(on)
     api/               # catalog.py calc.py game.py cases.py gov_mock.py info.py admin.py  (todo(step) => 501)
-    calc/              # base.py ✅  plan.py rules.py paperwork.py (steps 2b, 2c, 3)
+    calc/              # base.py ✅  plan.py ✅  rules.py paperwork.py (steps 2c, 3)
     game/              # engine.py effects.py combos.py          (step 4, not created yet)
     data/              # params.json links.json (+ scenarios.json personas.json charities.json samples.json later)
-  tests/               # test_api.py, test_base.py (unit, no DB), test_repositories.py (integration, Postgres)
+  tests/               # test_api.py, test_base.py, test_plan.py (unit, no DB), test_repositories.py (integration, Postgres)
   Dockerfile (context: repo root)   .env.example
 frontend/
   src/app/             # page.tsx (/ preview board), game/[id], game/[id]/summary, calculator, cases, applications,
@@ -141,7 +143,7 @@ docker-compose.yml     .dockerignore                     Documents/
 
 ### 1. Params (`data/params.json`, Pydantic `Params`, versioned in the `config` table)
 - `contribution_deduction 0.1371` (flat, non-employees and the art. 45 floor), `employee_contributions` 9.76% / 1.5% / 2.45% (employees: each withheld amount rounded on its own, art. 3 pkt 3), `min_wage 4806` (floor 4147.10), `voluntary_base_cap 20321.30` (**after** the deduction: 23 550 × 0.8629, applied to the final non-employee base), `parental_benefit_floor 1000` (art. 31 ust. 3a)
-- **rates:** sick 0.80, sick_pregnancy 1.00, maternity / supplementary / paternity / job_loss 1.00, parental 0.70, averaged 0.815, care 0.80
+- **rates:** sick 0.80, sick_pregnancy 1.00, maternity / supplementary / paternity / job_loss 1.00, parental 0.70, averaged 0.815, care 0.80, rehab 0.90 for the first `rehab.first_period_days` (90) then 0.75, rehab_pregnancy 1.00 (art. 19 ust. 1); `rehab.max_months` 12 (art. 18 ust. 2)
 - **sick:** employer pays 33 days (14 at age 50+). Benefit period 182 days, 270 in pregnancy, 91 after insurance ends. Waiting period 30 days (mandatory insurance) / 90 (voluntary). 60-day break rule.
 - **maternity:** weeks by number of children `[20,31,33,35,37]`. Up to 6 weeks before the birth. The mother uses the first 14 weeks herself (8 with an incapacity ruling). Stillbirth 8 weeks; at least 7 days after a death. Adoption minimum 9 weeks.
 - **parental:** 41/43 weeks, Za życiem 65/67, 9 weeks exclusive to each parent, max 5 parts, until the end of the year the child turns 6. Part-time work ≤0.5, extension caps 82/86.
@@ -158,7 +160,11 @@ docker-compose.yml     .dockerignore                     Documents/
   - Bonuses: `quarterly_bonus` / `annual_bonus` in the window, net of contributions, ÷12 (art. 42 ust. 2–3).
   - Full-time employees get the floor `min_wage × (1 − 0.1371)` (art. 45 ust. 1, confirmed by the Poradnik). Non-employees: flat 13.71% (art. 3 pkt 4), no floor, capped at `voluntary_base_cap`.
   - Rounding: topped-up pay and each contribution to grosze; the average is rounded once at the end. `POST /calc/base` loads the params in force on `event_date`; `ValueError`/`LookupError` → 422.
-- **plan.py** builds a per-day ledger per parent, then aggregates it into `PlanResult`: `months[]`, `calendar[]`, `pools`, `documents[]`, `issues[]`, `explain[]`, `top_up`.
+- **plan.py** ✅ `compute_plan(Plan, Params) -> PlanResult`: prices every leave day per parent, then aggregates by calendar month.
+  - Base per parent: `base_monthly`, else `benefit_base()` from `salary_history` at the parent's first block (`Parent.full_time` feeds the floor); `employment == "none"` → no salary, no benefits. A block for a missing father or a parent without base/history → 422.
+  - Day amount = `money(base × rate / 30)` × (1 − `work_fraction`). Salary = base × (days without leave, vacation counts as working, part-time counts `work_fraction`) / days in month. Overlapping blocks of one parent: the later start wins (2c flags it).
+  - Pools: maternity weeks by children, parental 41/43 or Za życiem 65/67 weeks, exclusive 9 weeks per parent, paternity 14 days; part-time days use (1 − f) of a day; parts = number of parental blocks; care = 60 minus the busiest calendar year. Negative values mean overuse (2c turns them into errors).
+  - `below_target`: month total < `game.budget_target_ratio` × sum of bases.
   - Rate variants: `standard` (100/70) or `averaged` (81.5%, but the other parent's 9 exclusive weeks stay at 70%).
   - Under `averaged`, if no parental day is used in year 1: parental drops to 70% (3g) and a `top_up` wyrównanie is computed (ust. 4).
   - Floor at 1000 zł/month, pro rata.
@@ -215,7 +221,7 @@ docker-compose.yml     .dockerignore                     Documents/
 | Area | Endpoints | State |
 |---|---|---|
 | Catalog | `GET /health`, `/cards`, `/rounds`, `/rounds/{id}`, `/game/preview` | ✅ |
-| Calculator | `POST /calc/base` ✅, `POST /calc/plan` | partial (plan: step 2b) |
+| Calculator | `POST /calc/base` ✅, `POST /calc/plan` ✅ (no `issues`/`documents` yet) | ✅ (2c, 3 extend it) |
 | Game | `GET /game/scenarios`, `POST /game`, `GET /game/{id}`, `POST /game/{id}/preview`, `POST /game/{id}/play`, `GET /game/{id}/summary` | 501 (step 4) |
 | Cases | `GET /cases/samples`, `POST /cases/parse` (PDF → `ParseResult`), `POST /cases/evaluate` (`CaseInput` → `CaseVerdict`) | 501 (step 7) |
 | Gov mocks | `GET /auth/personas`, `POST /auth/mobywatel`, `GET /zus/me/{insurance,ezla,debt-certificate}` (Bearer), `POST /pue/messages`, `POST /applications`, `POST /usc/birth-certificate` | 501 (step 5) |
@@ -268,7 +274,7 @@ Backend and frontend run in parallel once the contract exists. FE steps that dep
 |---|---|---|
 | 1 ✅ | Skeleton + contract + params + store + admin params + catalog (merged with the team's API) | Skeleton merged onto the team's board: routes, proxy, typed client, hooks, plan views, forms, admin |
 | 2a ✅ | `calc/base.py` + `POST /calc/base` + `test_base.py` | — |
-| 2b | `calc/plan.py` (ledger, durations, rates, months, pools) + `POST /calc/plan` + tests | Calculator: salary history, hospitalization, adoption fields; presets; 422 → field errors *(needs BE2b)* |
+| 2b ✅ | `calc/plan.py` (ledger, durations, rates, months, pools) + `POST /calc/plan` + tests | Calculator: salary history, hospitalization, adoption fields; presets; 422 → field errors *(unblocked)* |
 | 2c | `calc/rules.py` (legal validation → `issues`) + tests | — |
 | 3 | `paperwork.py` (payer, documents, deadlines, risks) | Plan views: kind colours + legend, care gaps, issue styling |
 | 4 | Game: card mechanics in `shared/cards.json`, scenarios.json, deal/preview/play/combos/stats, coverage test | Board on real data (`/` creates a game when the API is up), disabled cards, summary *(needs BE4)* |
@@ -278,9 +284,8 @@ Backend and frontend run in parallel once the contract exists. FE steps that dep
 | 8 | Deploy the backend container + Postgres (managed, or the compose `db` with a real `POSTGRES_PASSWORD`) | Deploy the frontend container (`API_URL` at runtime); contrast fix; Playwright happy path + mobile/desktop screenshots (needed for the submission); 3-min video |
 
 ## Verification
-- **Backend:** `uv run pytest` (unit, no DB: catalog, board preview, health, links, admin auth/validation, 501 stubs), the integration run above (seeding, versions, effective dates, admin round trip on Postgres) and `uv run ruff check app tests`. `test_base.py` covers the window, per-contribution rounding, exclusion/top-up incl. art. 38 ust. 3, shorter insurance, first month, the full-time floor, bonuses and the non-employee cap. Planned unit tests:
-  - `test_plan`: durations, rates, the 9-week exclusive part at 70%, top-up, floor, part-time, sick-pay split, supplementary table
-  - `test_rules`
+- **Backend:** `uv run pytest` (unit, no DB: catalog, board preview, health, links, admin auth/validation, 501 stubs), the integration run above (seeding, versions, effective dates, admin round trip on Postgres) and `uv run ruff check app tests`. `test_base.py` covers the window, per-contribution rounding, exclusion/top-up incl. art. 38 ust. 3, shorter insurance, first month, the full-time floor, bonuses and the non-employee cap. `test_plan.py` covers month-by-month maternity, the averaged rate with the father's exclusive weeks at 70%, art. 31 ust. 3g + top-up, the floor (insured, full-leave days only), part-time, sick rates and the employer/ZUS split, rehab 90→75%, care, vacation, paternity, pool sizes and input errors. Planned unit tests:
+  - `test_rules`: each error, plus the supplementary entitlement table (block length vs. weeks from the hospitalization facts)
   - `test_game`: every scenario always gets a full hand, never produces an invalid plan, uses every card, and combos score once
 - **Frontend:** `npm run typecheck && npm run lint && npm run build`. Then run both servers (`API_URL` set) and walk `/` → `/game/{id}` → summary → `/applications`, and `/calculator`, at 375px and 1280px.
 - **Proxy:** `curl localhost:3000/api/v1/health` must return the backend's body. Without `API_URL` it must return 503 while `/` still renders.
@@ -292,5 +297,6 @@ Backend and frontend run in parallel once the contract exists. FE steps that dep
 - **Szczęście:** authored game score, not a health metric. Shared time and fulfilled care goals are separate derived inputs to Aura Farming. Mode formulas are proposed in `docs/card-grounding.md` and need playtesting.
 - **Father's rate for non-exclusive parental leave under the mother's 81.5% application** (art. 30a ust. 3). Assumed 81.5%.
 - **Care allowance rules:** local guide pages PDF 37–40 and official Sejm articles 32–35 are linked in `Documents/legal/README.md`; implement the family-wide annual limit and event/household checks before activation.
+- **Plan ledger shortcuts (marked `shortcut:` in `plan.py`, confirm with the samples):** a father taking over maternity is paid 100% even under the mother's 81.5% application; the art. 31 ust. 3a floor isn't applied on part-time days; salary in a month with leave is prorated by calendar days (payroll uses 1/30 per absence day); employer sick-pay counter assumes no earlier sick days that year; one base per parent for the whole plan (art. 43 recompute after a ≥1-month break not done); rehab base not indexed quarterly (art. 19 ust. 2); one params version (in force on the birth date) for the whole plan.
 - **Benefit base, to confirm with the Z-3 samples (step 7 golden tests):** whether part-time employees get a proportional minimum (sources only state the full-time floor; none applied today); which pay components are topped up (today the whole month's pay is, but overtime, night pay and commissions shouldn't be); bonus attribution by payment month vs. period earned, and ÷12 when insured < 12 months; pension/disability contributions stop above the annual 30× cap (not modelled, affects high earners); art. 43 base continuity between benefits and the art. 46 cap after insurance ends belong to the plan layer.
 - **Part-time extension caps for Za życiem:** supplied KP art. 182¹f § 1¹ explicitly gives 130/134; extend parameter contract before implementing those scenarios.

@@ -105,6 +105,7 @@ class Parent(Model):
     insured_since: date | None = None
     base_monthly: Decimal | None = None   # podstawa wymiaru; derived from salary_history when absent
     salary_history: list[MonthPay] = []
+    full_time: bool = True  # art. 45 floor when the base is computed from salary_history
     payer_insured_count: int = 0          # >threshold => employer pays benefits
     age: int = 30
     vacation_days_left: int = 26

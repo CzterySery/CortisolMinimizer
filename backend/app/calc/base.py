@@ -18,7 +18,8 @@ def pln(x: Decimal) -> str:
 
 
 def percent(rate: Decimal) -> str:
-    return f"{rate * 100:.2f}%".replace(".", ",")
+    """0.815 -> '81,5%', 1.00 -> '100%'."""
+    return f"{(rate * 100).normalize():f}%".replace(".", ",")
 
 
 def net(gross: Decimal, employee: bool, p: Params) -> Decimal:

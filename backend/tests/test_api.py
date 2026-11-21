@@ -61,3 +61,15 @@ def test_calc_base(client, monkeypatch):
     result = client.post("/api/v1/calc/base", json=body).json()
     assert result["base"] == "5177.40" and result["steps"][-1]["rule"] == "art. 36"
     assert client.post("/api/v1/calc/base", json={**body, "months": []}).status_code == 422
+
+
+def test_calc_plan(client, monkeypatch):
+    seed = params.Params.model_validate_json((repositories.DATA / "params.json").read_text(encoding="utf-8"))
+    monkeypatch.setattr(params, "active", lambda on=None: seed)
+    family = {"mother": {"employment": "employee", "base_monthly": "6000"}, "due_date": "2027-03-01"}
+    body = {"family": family, "blocks": [{"who": "mother", "kind": "maternity", "start": "2027-03-01", "days": 140}]}
+    result = client.post("/api/v1/calc/plan", json=body).json()
+    assert result["months"][0] == {"month": "2027-03", "salary": {"mother": "0.00"}, "benefit": {"mother": "6200.00"},
+                                   "total": "6200.00", "below_target": False}
+    father_block = {"who": "father", "kind": "paternity", "start": "2027-03-01", "days": 7}
+    assert client.post("/api/v1/calc/plan", json={**body, "blocks": [father_block]}).status_code == 422
