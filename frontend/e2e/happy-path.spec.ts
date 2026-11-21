@@ -5,7 +5,7 @@ import { expect, test, type Page, type TestInfo } from "@playwright/test";
 async function shot(page: Page, info: TestInfo, step: string) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth), `${step}: horizontal overflow`)
     .toBeLessThanOrEqual(page.viewportSize()!.width);
-  await page.screenshot({ path: `../docs/screenshots/${info.project.name}-${step}.png`, fullPage: true });
+  await page.screenshot({ path: `${process.env.SCREENSHOTS_DIR ?? "../docs/screenshots"}/${info.project.name}-${step}.png`, fullPage: true });
 }
 
 test("game → calculator → applications → mObywatel → cases → help → admin", async ({ page }, info) => {

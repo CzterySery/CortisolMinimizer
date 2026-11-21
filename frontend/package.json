@@ -6,8 +6,8 @@
     "node": ">=20.9.0"
   },
   "scripts": {
-    "predev": "node ../scripts/prepare-legal-assets.mjs",
-    "prebuild": "node ../scripts/prepare-legal-assets.mjs",
+    "predev": "node ../scripts/prepare-legal-assets.mjs && node ../scripts/check-zus-forms.mjs",
+    "prebuild": "node ../scripts/prepare-legal-assets.mjs && node ../scripts/check-zus-forms.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

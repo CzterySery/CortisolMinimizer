@@ -1,0 +1,10 @@
+{
+  "zam": {
+    "maternity": {"name":"topmostSubform[0].Page2[0].Okres[0]","phrase":"urlopu macierzyńskiego"},
+    "parental": {"name":"topmostSubform[0].Page2[0].Okres2[0]","phrase":"urlopu rodzicielskiego"},
+    "supplementary": {"name":"topmostSubform[0].Page2[0].Okres3[0]","phrase":"uzupełniającego"},
+    "paternity": {"name":"topmostSubform[0].Page2[0].Okres4[0]","phrase":"urlopu ojcowskiego"}
+  },
+  "zas53": {"sick":{"name":"topmostSubform[0].Page2[0].Tekst[0]","phrase":"datę lub daty"}},
+  "z15": {"care":{"name":"topmostSubform[0].Page2[0].Tekst1a[0]","phrase":"będziesz sprawował opiekę"}}
+}

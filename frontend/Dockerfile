@@ -12,6 +12,7 @@ COPY shared /repo/shared
 COPY backend/app/data/params.json /repo/backend/app/data/params.json
 COPY Documents /repo/Documents
 COPY scripts/prepare-legal-assets.mjs /repo/scripts/prepare-legal-assets.mjs
+COPY scripts/check-zus-forms.mjs /repo/scripts/check-zus-forms.mjs
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run test:cards
 # API_URL stays unset here: "/" prerenders from the local catalog and the build never needs the backend.
