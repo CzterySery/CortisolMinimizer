@@ -1,0 +1,18 @@
+# Both images build from the repo root: backend and frontend read shared/cards.json.
+services:
+  backend:
+    build: { context: ., dockerfile: backend/Dockerfile }
+    ports: ["8000:8000"]
+    environment:
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-dev}
+    volumes: [db:/data]
+
+  frontend:
+    build: { context: ., dockerfile: frontend/Dockerfile }
+    ports: ["3000:3000"]
+    environment:
+      API_URL: http://backend:8000  # server-side only (Next proxy); runtime, so no rebuild per environment
+    depends_on: [backend]
+
+volumes:
+  db:

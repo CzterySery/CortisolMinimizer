@@ -1,48 +1,60 @@
 # Zasiłkowy Poker
 
-Szkielet gry edukacyjnej na hackathon ZUS: **Python + FastAPI** oraz **React + Next.js (App Router) + TypeScript**. Jasna plansza nawiązuje do szkicu: statystyki po lewej, pięć miejsc na decyzje na górze, talia w lewym dolnym rogu i trzy karty w ręce. Na telefonie karty układają się pionowo.
+Gra edukacyjna na hackathon ZUS (HackNation 2026): **Python + FastAPI** oraz **React + Next.js (App Router) + TypeScript**. Jasna plansza nawiązuje do szkicu: statystyki po lewej, pięć miejsc na decyzje na górze, talia w lewym dolnym rogu i trzy karty w ręce. Na telefonie karty układają się pionowo.
 
-Interaktywny podgląd obejmuje pięć rund. Karty wysuwają się po najechaniu myszką; przeciągnij jedną na podświetlone miejsce na stole lub użyj przycisku „Połóż na stole” (również na telefonie i klawiaturą). Po położeniu karty pojawia się ręka kolejnej rundy. Po pięciu decyzjach stół jest kompletny. „Rozdaj od nowa” czyści układ. Upuszczenie karty poza aktywnym miejscem nie zmienia stołu.
+Strona główna to interaktywny podgląd pięciu rund. Karty wysuwają się po najechaniu myszką; przeciągnij jedną na podświetlone miejsce na stole lub użyj przycisku „Połóż na stole” (również na telefonie i klawiaturą). Po położeniu karty pojawia się ręka kolejnej rundy. Po pięciu decyzjach stół jest kompletny. „Rozdaj od nowa” czyści układ.
 
-To lokalna interakcja frontendu: bez przeliczania statystyk, losowania, sesji i zapisu gry. Odświeżenie strony resetuje układ. Wartości statystyk są puste; dekoracyjne paski nie przedstawiają wyliczonego stanu. Nazwa gry jest robocza.
+Podgląd działa lokalnie, bez backendu: nie przelicza statystyk i nie zapisuje gry. Pełna gra (`/game/{id}`), kalkulator, sprawdzanie spraw, wnioski i panel administracyjny korzystają z API. Ich szkielet jest gotowy, a endpointy, których jeszcze nie zbudowano, zwracają `501` z numerem kroku planu. Nazwa gry jest robocza.
+
+**AI:** aplikacja nie korzysta z AI. Kwoty i uprawnienia liczy deterministyczny kod, a stawki i limity są w `backend/app/data/params.json` (edytowalne w panelu administracyjnym).
+
+Pełny plan projektu, konwencje i kolejność prac: [AGENTS.md](AGENTS.md).
 
 ## Struktura
 
 ```text
 backend/
   app/
-    main.py             # aplikacja i CORS
-    api.py              # wyłącznie endpointy GET
-    schemas.py          # modele kart, rund, statystyk i źródeł
-    repositories.py     # odczyt JSON; punkt integracji z przyszłą bazą
-  pyproject.toml
+    main.py             # aplikacja, CORS, routery pod /api/v1
+    schemas.py          # kontrakt API (karty, rundy, statystyki, plan, gra, sprawy, mocki)
+    repositories.py     # katalog kart (JSON) + SQLite: wersjonowane parametry, gry, wnioski
+    params.py           # model parametrów prawnych
+    api/                # catalog, calc, game, cases, gov_mock, info, admin
+    data/               # params.json, links.json
+  tests/
 frontend/
   src/
-    app/                # strona, layout, CSS, loading i obsługa błędów
-    components/game/    # plansza, statystyki, etapy, karta
-    lib/game.ts         # adapter danych: lokalny podgląd lub API
-    types/game.ts       # typy kontraktu API
-shared/cards.json       # wspólne dane dla obu aplikacji
-scripts/sync_cards.py    # eksport 15 kart z cards.md
+    app/                # strony: gra, kalkulator, sprawy, wnioski, pomoc, mObywatel, admin; proxy /api/v1
+    components/         # game/ (plansza), plan/ (wyniki), forms/, nagłówek i stopka
+    hooks/              # use-game, use-plan
+    lib/                # klient API (typy generowane z OpenAPI), formatowanie, etykiety, sesja
+    types/game.ts       # aliasy typów gry z wygenerowanego kontraktu
+shared/cards.json       # wspólny katalog kart dla obu aplikacji
+scripts/sync_cards.py   # eksport 15 kart z cards.md
 ```
 
 ## Uruchomienie
 
-Wymagane Python 3.11+ i Node.js 20.9+ z npm. Frontend może działać bez backendu.
+Wymagane Python 3.11+ i Node.js 20.9+ z npm.
 
-Backend — z katalogu głównego repozytorium:
+Backend, z katalogu `backend/` (wariant z [uv](https://docs.astral.sh/uv/)):
 
 ```sh
-python3 -m venv .venv
-source .venv/bin/activate
+uv sync --extra dev
+ADMIN_TOKEN=dev uv run uvicorn app.main:app --reload --port 8000
+```
+
+Bez uv, z katalogu głównego:
+
+```sh
+python3 -m venv .venv && source .venv/bin/activate
 pip install -e './backend[dev]'
-cd backend
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+cd backend && ADMIN_TOKEN=dev uvicorn app.main:app --reload --port 8000
 ```
 
 Dokumentacja API: http://127.0.0.1:8000/docs
 
-Frontend — w drugim terminalu:
+Frontend, w drugim terminalu:
 
 ```sh
 cd frontend
@@ -50,23 +62,33 @@ npm install
 npm run dev
 ```
 
-Plansza: http://localhost:3000. Bez konfiguracji odczytuje [lokalny katalog](shared/cards.json). Aby pobierać podgląd z FastAPI, utwórz `frontend/.env.local`:
+Plansza: http://localhost:3000. Bez konfiguracji działa tylko podgląd z [lokalnego katalogu](shared/cards.json). Żeby pozostałe strony rozmawiały z FastAPI, utwórz `frontend/.env.local`:
 
 ```dotenv
 API_URL=http://127.0.0.1:8000
 ```
 
-Uruchom ponownie serwer Next.js. Żądanie do API wykonuje serwer Next.js; adres nie jest udostępniany przeglądarce. Błąd skonfigurowanego API wyświetla ekran ponowienia, bez ukrywania awarii lokalnymi danymi.
+Przeglądarka woła zawsze `/api/v1/...` na serwerze Next.js, który przekazuje żądanie pod `API_URL`. Adres backendu nie trafia do przeglądarki, a zmienna jest czytana w czasie działania. Bez `API_URL` te żądania zwracają `503`.
+
+Oba serwisy w kontenerach, z katalogu głównego:
+
+```sh
+docker compose up --build
+```
 
 ## API
+
+Wszystkie endpointy są pod `/api/v1`, a pełna lista jest w `/docs`. Działają już:
 
 | Metoda | Ścieżka | Dane |
 | --- | --- | --- |
 | GET | `/api/v1/health` | status serwera |
-| GET | `/api/v1/cards` | wszystkie 15 kart |
-| GET | `/api/v1/rounds` | katalog pięciu rund |
-| GET | `/api/v1/rounds/{id}` | trzy karty wskazanej rundy lub 404 |
-| GET | `/api/v1/game/preview` | statyczny widok rundy 1 z pustymi statystykami |
+| GET | `/api/v1/cards`, `/api/v1/rounds`, `/api/v1/rounds/{id}` | katalog kart i rund |
+| GET | `/api/v1/game/preview` | statyczny podgląd planszy z pustymi statystykami |
+| GET | `/api/v1/info/links` | oficjalne źródła (ZUS, MRPiPS, PIP) |
+| GET/PUT | `/api/v1/admin/params` (+ `/versions`) | parametry prawne, każda zmiana to nowa wersja (nagłówek `Authorization: Bearer $ADMIN_TOKEN`) |
+
+Pozostałe (kalkulator, gra z sesją, sprawy, symulacje mObywatel/PUE/wniosków, talia w panelu) mają gotowy kontrakt i zwracają `501` do czasu implementacji.
 
 ## Karty i późniejsza baza
 
@@ -76,17 +98,17 @@ Treść pochodzi z [cards.md](cards.md). [cards_inspo.md](cards_inspo.md) pozost
 python3 scripts/sync_cards.py
 ```
 
-Eksport nadpisuje katalog i zeruje listy źródeł; używaj go na etapie prototypu, zanim źródła będą uzupełniane. Każda karta ma stabilny identyfikator (`1A`–`5C`), `round_id`, tytuł, opis i `sources`. Docelowe źródło ma `id`, `title`, `url` i opcjonalny `locator` (np. artykuł lub strona). Źródła są obecnie puste; nie przypisujemy automatycznie podstaw prawnych. Frontend ma miejsce na ich wyświetlenie.
+Eksport nadpisuje katalog i zeruje listy źródeł; używaj go na etapie prototypu, zanim źródła i mechanika kart będą uzupełniane. Każda karta ma stabilny identyfikator (`1A`–`5C`), `round_id`, tytuł, opis i `sources`. Docelowe źródło ma `id`, `title`, `url` i opcjonalny `locator` (np. artykuł lub strona). Mechanika gry (`tags`, `requires`, `effects`, `chips`, `combos`) ma domyślnie puste wartości.
 
-Przyszła baza może zawierać tabele `rounds`, `cards`, `sources` i tabelę łączącą `card_sources`. Zastąp odczyt w [repositories.py](backend/app/repositories.py), zachowując kontrakt API. Nie dodano jeszcze ORM ani migracji. Backend domyślnie wymaga katalogu `shared` obok `backend`; przy przenoszeniu samego backendu ustaw `CARDS_DATA_PATH` na pełną ścieżkę pliku JSON. Opcjonalne zmienne backendu opisuje [przykład konfiguracji](backend/.env.example); trzeba je wyeksportować w terminalu.
+Trwałe dane są w [repositories.py](backend/app/repositories.py): katalog kart z JSON oraz SQLite (`DB_PATH`, domyślnie `backend/zp.db`). Backend domyślnie wymaga katalogu `shared` obok `backend`; przy przenoszeniu samego backendu ustaw `CARDS_DATA_PATH` na pełną ścieżkę pliku JSON. Opcjonalne zmienne opisuje [przykład konfiguracji](backend/.env.example).
 
 ## Sprawdzanie
 
 ```sh
-cd frontend
-npm run typecheck
-npm run lint
-npm run build
+cd backend && uv run pytest && uv run ruff check app tests
+cd frontend && npm run typecheck && npm run lint && npm run build
 ```
 
-Konfiguracja stosuje wymagania [Next.js](https://nextjs.org/docs/app/getting-started/installation) oraz standardowy układ aplikacji [FastAPI](https://fastapi.tiangolo.com/tutorial/first-steps/).
+Po zmianie modeli w `backend/app/schemas.py` (przy działającym backendzie) wygeneruj typy frontendu: `cd frontend && npm run gen:api`.
+
+Przykładowe sprawy ZUS są wyłącznie do użytku HackNation i **nie mogą trafić do repozytorium** (`.gitignore` obejmuje `Documents/Przykładowe sprawy/`).
