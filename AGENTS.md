@@ -75,6 +75,7 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 - **Language:** code and comments in English, UI in Polish. Every calculated amount carries an `Explain{text, rule}` citing the article.
 - **Never commit ZUS sample-case documents.** They are for HackNation only (`.gitignore` covers `Documents/Przykładowe sprawy/`). Tests store only the numbers.
 - Shortcuts with a known limit are marked in code as `# shortcut: <limit>, <when to upgrade>`.
+- **Git:** commit directly on `main` (hackathon team, no feature branches). Small logical commits; never commit secrets, `*.db` or ZUS sample cases. Push only when asked.
 
 ## Repo layout
 ```
