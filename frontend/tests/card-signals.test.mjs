@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import { getCardSignals } from "../src/lib/card-signals.ts";
 import { gameProfiles, gameScores } from "../src/lib/game-result.ts";
 import { ensurePlayable } from "../src/lib/deal.ts";
+import { getDecisionTreeRound, buildCalculatorHandoffPlan } from "../src/lib/decision-tree.ts";
 
 test("an exhausted parental pool cannot leave a new or restored hand unplayable", () => {
   const pool = ["5A", "5B", "5C", "5D", "5E", "5F"].map((id) => ({ id }));
@@ -78,4 +79,64 @@ test("hover previews accumulate on the played balance without committing or usin
   assert.ok(preview.knowledge > before.knowledge);
   assert.deepEqual(gameScores(played), before);
   assert.deepEqual(gameScores([]), { money: 50, time: 50, knowledge: 50 });
+});
+
+test("decision tree produces 3 mutually exclusive choices per round and branches by situation and parental pool", () => {
+  const stages = [1, 2, 3, 4, 5].map((id) => ({
+    id,
+    title: `Runda ${id}`,
+    description: "",
+    cards: deck.cards.filter((c) => c.round_id === id).map((d) => ({
+      id: d.id, round_id: d.round_id, title: d.title, description: d.description,
+      tags: d.tags, requires: [], effects: [], chips: 0, combos: [], sources: [], design: d,
+    })),
+  }));
+
+  const r1 = getDecisionTreeRound(0, [], stages);
+  assert.equal(r1.cards.length, 3);
+  assert.deepEqual(r1.activeNodes.map((n) => n.branchTag), ["birth", "adoption", "foster"]);
+  assert.deepEqual(r1.activeNodes.map((n) => n.strategyBadge), ["", "", ""]);
+
+  const r2Birth = getDecisionTreeRound(1, ["1A"], stages);
+  const r2Adoption = getDecisionTreeRound(1, ["1B"], stages);
+  const r2Foster = getDecisionTreeRound(1, ["1D"], stages);
+  assert.equal(r2Birth.cards.length, 3);
+  assert.equal(r2Adoption.cards.length, 3);
+  assert.equal(r2Foster.cards.length, 3);
+  assert.notEqual(r2Birth.cards[0].title, r2Adoption.cards[0].title);
+  assert.notEqual(r2Adoption.cards[0].title, r2Foster.cards[0].title);
+
+  const r5WithReserve = getDecisionTreeRound(4, ["1A", "2C", "3B", "4D"], stages);
+  const r5Exhausted = getDecisionTreeRound(4, ["1A", "2C", "3B", "4A"], stages);
+  assert.equal(r5WithReserve.cards.length, 3);
+  assert.equal(r5Exhausted.cards.length, 3);
+  assert.deepEqual(r5Exhausted.cards.map((c) => c.id), ["5D", "5E", "5F"]);
+
+  // Rounds 3 and 4 also adapt by situation (foster vs adoption vs birth) and tag strategies
+  const r3Birth = getDecisionTreeRound(2, ["1A", "2A"], stages);
+  const r3Foster = getDecisionTreeRound(2, ["1D", "2B"], stages);
+  assert.notEqual(r3Birth.cards[0].title, r3Foster.cards[0].title);
+  assert.deepEqual(r3Foster.activeNodes.map((n) => n.strategyId), ["kortyzol", "zasilki", "aura"]);
+
+  const r4Birth = getDecisionTreeRound(3, ["1A", "2A", "3B"], stages);
+  const r4Foster = getDecisionTreeRound(3, ["1D", "2B", "3B"], stages);
+  assert.notEqual(r4Birth.cards[0].title, r4Foster.cards[0].title);
+
+  // Handoff plan transfers situation, school deferral, za_zyciem and rate_variant
+  const basePlan = {
+    family: {
+      mother: { employment: "employee", base_monthly: "6000" },
+      father: { employment: "employee", base_monthly: "8000" },
+      due_date: "2027-03-01",
+      birth_date: null,
+      children: 1,
+    },
+    blocks: [],
+    rate_variant: "standard",
+  };
+  const fosterPlan = buildCalculatorHandoffPlan(basePlan, ["1D", "2B", "3B", "4D", "5A"]);
+  assert.equal(fosterPlan.family.adoption?.kind, "foster");
+  assert.equal(fosterPlan.family.adoption?.school_deferred, true);
+  assert.equal(fosterPlan.rate_variant, "averaged");
+  assert.equal(fosterPlan.averaged_request_on, "2027-03-01");
 });

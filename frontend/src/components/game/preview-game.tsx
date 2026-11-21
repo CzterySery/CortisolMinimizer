@@ -6,9 +6,11 @@ import type { Card, GamePreview } from "@/types/game";
 import { api, type S } from "@/lib/api";
 import { planHandoff, savedGame } from "@/lib/session";
 import { getCardSignals } from "@/lib/card-signals";
-import { gameProfiles, gameScores } from "@/lib/game-result";
+import { gameScores } from "@/lib/game-result";
 import { ensurePlayable } from "@/lib/deal";
+import { getDecisionNodeForCard, getDecisionTreeRound, buildCalculatorHandoffPlan } from "@/lib/decision-tree";
 import { GameBoard } from "./game-board";
+import { KnowledgeExplorer } from "./knowledge-explorer";
 
 type Simulation = S["GameSimulation"];
 type Scenario = NonNullable<S["SimulationRequest"]["scenario_id"]>;
@@ -16,13 +18,29 @@ const scenarioLabels: Record<Scenario, string> = {
   standard: "Wspólny początek", hospital: "Powrót ze szpitala", "za-zyciem": "Dodatkowe wsparcie",
 };
 
-function draw(pool: Card[], count: number): Card[] {
-  const cards = [...pool];
-  for (let i = cards.length - 1; i > 0; i--) {
-    const j = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296 * (i + 1));
-    [cards[i], cards[j]] = [cards[j], cards[i]];
+function decoratePlayedCard(base: Card, roundIndex: number, playedIds: string[]): Card {
+  const node = getDecisionNodeForCard(roundIndex, base.id, playedIds);
+  if (!node) return base;
+  return {
+    ...base,
+    title: node.title,
+    description: node.description,
+    tags: [node.badge, node.strategyBadge, node.branchTag, node.strategyId],
+    design: base.design
+      ? ({ ...base.design, title: node.title, description: node.description } as Card["design"])
+      : undefined,
+  };
+}
+
+function decisionTreeProfiles(balance: { money: number; time: number }) {
+  const diff = balance.time - balance.money;
+  if (Math.abs(diff) <= 6) {
+    return [{ id: "aura", title: "✨ Aura Farming (Świadomy Balans Czasu i Budżetu)" }];
   }
-  return cards.slice(0, count);
+  if (diff > 6) {
+    return [{ id: "time", title: "🧘 Kortyzol Minimizer (Maksimum czasu z dzieckiem)" }];
+  }
+  return [{ id: "money", title: "💰 Zasiłki Maxing (Maksimum wsparcia budżetu)" }];
 }
 
 // Authoritative replay: send every selected decision; the server recomputes a single plan.
@@ -47,21 +65,29 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
   const hoveredSignal = focused && signalCard ? getCardSignals(signalCard) : undefined;
   const visualBalance = gameScores(hoveredSignal ? [...playedSignals, hoveredSignal] : playedSignals);
 
+  const playedIds = played.map((c) => c.id);
+  const currentTreeRound = getDecisionTreeRound(
+    played.length,
+    playedIds,
+    preview.rounds,
+    simulation ? new Set(simulation.candidates.filter((c) => c.available).map((c) => c.id)) : undefined,
+  );
+
   async function load(selected: string[], scenarioId: Scenario) {
     const response = await api.POST("/api/v1/game/simulate", { body: { selected, scenario_id: scenarioId } });
     if (!response.data) throw new Error(typeof response.error?.detail === "string" ? response.error.detail : "Nie udało się przeliczyć planu. Spróbuj ponownie.");
     return response.data;
   }
 
-  const installHand = useCallback((data: Simulation, index: number) => {
+  const installHand = useCallback((data: Simulation, index: number, currentIds: string[] = []) => {
+    if (index >= preview.total_rounds) {
+      setHand([]);
+      return;
+    }
     const pool = preview.rounds[index]?.cards ?? [];
     const available = new Set(data.candidates.filter((card) => card.available).map((card) => card.id));
-    // The first round contains available cards only; later hands retain unavailable
-    // alternatives for inspection but always include a playable route.
-    const options = index === 0
-      ? pool.filter((card) => data.candidates.some((item) => item.id === card.id && item.available))
-      : pool;
-    const next = ensurePlayable(draw(options, preview.hand_size), draw(pool, pool.length), available);
+    const treeRound = getDecisionTreeRound(index, currentIds, preview.rounds, available);
+    const next = ensurePlayable(treeRound.cards, pool, available);
     setHand(next);
   }, [preview]);
 
@@ -71,7 +97,7 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
     try {
       const data = await load([], nextScenario);
       if (current !== generation.current) return;
-      setScenario(nextScenario); setSimulation(data); setBaseline(data.statistics); setPlayed([]); installHand(data, 0);
+      setScenario(nextScenario); setSimulation(data); setBaseline(data.statistics); setPlayed([]); installHand(data, 0, []);
       setReady(true);
       setDealKey((key) => key + 1);
     } catch (cause) {
@@ -95,13 +121,11 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
     const selected = stored?.selected ?? [];
     load(selected, scenarioId).then((data) => { if (!cancelled) {
       setScenario(scenarioId); setSimulation(data); setBaseline(data.statistics);
-      setPlayed(selected.map((id, index) => preview.rounds[index].cards.find((card) => card.id === id)!));
-      if (stored) setHand(ensurePlayable(
-        stored.hand.map((id) => preview.rounds[selected.length].cards.find((card) => card.id === id)!),
-        preview.rounds[selected.length]?.cards ?? [],
-        new Set(data.candidates.filter((card) => card.available).map((card) => card.id)),
-      ));
-      else installHand(data, 0);
+      setPlayed(selected.map((id, index) => {
+        const base = preview.rounds[index].cards.find((card) => card.id === id)!;
+        return decoratePlayedCard(base, index, selected);
+      }));
+      installHand(data, selected.length, selected);
       setReady(true); setBusy(false);
     } })
       .catch(() => { if (!cancelled) { setError("Nie można połączyć się z kalkulatorem. Użyj przycisku Nowe rozdanie."); setBusy(false); } });
@@ -119,10 +143,12 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
     const current = generation.current;
     playing.current = true; setBusy(true); setError(undefined);
     try {
-      const nextPlayed = [...played, card];
-      const data = await load(nextPlayed.map((item) => item.id), scenario);
+      const nextIds = [...played.map((item) => item.id), card.id];
+      const decorated = decoratePlayedCard(card, played.length, nextIds);
+      const nextPlayed = [...played, decorated];
+      const data = await load(nextIds, scenario);
       if (current !== generation.current) return;
-      setSimulation(data); setPlayed(nextPlayed); setFocusedId(null); installHand(data, nextPlayed.length);
+      setSimulation(data); setPlayed(nextPlayed); setFocusedId(null); installHand(data, nextPlayed.length, nextIds);
     } catch (cause) {
       if (current === generation.current) setError(cause instanceof Error ? cause.message : "Nie udało się zagrać karty.");
       throw cause;
@@ -134,25 +160,36 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
     return candidate && !candidate.available ? [[card.id, candidate.issues.find((item) => item.severity === "error")?.text ?? "Brak uprawnienia w tej historii."]] : [];
   }));
 
+  const finalProfiles = decisionTreeProfiles(visualBalance);
+
   return <>
     <GameBoard mode="preview" stages={preview.rounds} currentRound={round?.id ?? null}
       totalRounds={preview.total_rounds} handSize={preview.hand_size}
       statistics={simulation?.statistics ?? preview.statistics} baseline={baseline} projected={focused?.statistics}
       simulation={{ signals: getCardSignals(signalCard), title: signalCard?.title, hovering: !!focused, balance: visualBalance }}
       played={played} hand={hand} dealKey={dealKey} busy={busy} unavailable={unavailable}
+      decisionPrompt={{
+        question: currentTreeRound.question,
+        subtitle: currentTreeRound.subtitle,
+        path: played.map((c) => c.title),
+      }}
       onFocusCard={setFocusedId} onUnfocusCard={(id) => setFocusedId((current) => current === id ? null : current)}
       onPlay={play} onReset={() => void restart()}
       finishedHand={simulation && <section className="game-result" aria-labelledby="game-result-title" role="status">
-          <p className="eyebrow">Twój profil · {gameProfiles(playedSignals).length > 1 ? "Remis" : "Koniec gry"}</p>
-          <h2 id="game-result-title">{gameProfiles(playedSignals).map((profile) => profile.title).join(" + ")}</h2>
-          <p>Twój styl wynika z zagranych kart: czasu na opiekę, wsparcia finansowego i zdobytej wiedzy.</p>
+          <p className="eyebrow">Twój profil z drzewa decyzji · Koniec gry</p>
+          <h2 id="game-result-title">{finalProfiles.map((profile) => profile.title).join(" + ")}</h2>
+          <p>Wasza ścieżka: {played.map((c) => c.title).join(" → ")}.</p>
           <div className="actions">
-          <button className="button button-primary" onClick={() => { planHandoff.put(simulation.plan); router.push("/calculator"); }}>Pokaż ten scenariusz w kalkulatorze</button>
+          <button className="button button-primary" onClick={() => {
+            planHandoff.put(buildCalculatorHandoffPlan(simulation.plan, playedIds));
+            router.push("/calculator");
+          }}>Pokaż ten scenariusz w kalkulatorze</button>
           </div>
         </section>}
       belowHand={<>
         {error && <p className="game-error" role="alert">{error}</p>}
         {busy && <p className="sr-only" role="status">Przeliczam wspólny plan rodziny.</p>}
+        <KnowledgeExplorer stages={preview.rounds} playedIds={playedIds} />
       </>} />
   </>;
 }

@@ -13,10 +13,11 @@ export function Statistics({ statistics, simulation, deckSlot }: {
   simulation?: { signals?: CardSignals; title?: string; hovering: boolean; balance?: Record<"money" | "time" | "knowledge", number> };
   deckSlot?: ReactNode;
 }) {
+  const visibleStats = statistics.filter((stat) => stat.id !== "knowledge");
   return (
     <aside className="statistics" aria-labelledby="statistics-title">
-      <p className="eyebrow" id="statistics-title">Wasz plan</p>
-      {statistics.map((stat) => {
+      <p className="eyebrow" id="statistics-title">Bilans wyborów</p>
+      {visibleStats.map((stat) => {
         const signal = simulation?.signals?.[stat.id];
         const width = simulation?.balance?.[stat.id] ?? 50;
         return (
