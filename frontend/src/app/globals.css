@@ -163,7 +163,6 @@ cite { font-style: normal; color: var(--muted-strong); font-size: 11px; }
 .page input:focus-visible, .page select:focus-visible, .page textarea:focus-visible { outline: 3px solid #527561; outline-offset: 2px; }
 .block-row { display: grid; grid-template-columns: 90px minmax(0, 1.6fr) minmax(0, 1fr) 80px auto; gap: 8px; }
 .dropzone { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 34px 20px; border: 2px dashed #c1d0b4; border-radius: 13px; background: #f8faf5; font-size: 14px; text-align: center; cursor: pointer; }
-.code-editor { min-height: 420px; font-family: ui-monospace, Menlo, monospace !important; font-size: 12px !important; }
 
 /* plan views */
 .budget-chart { overflow-x: auto; }

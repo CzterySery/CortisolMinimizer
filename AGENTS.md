@@ -72,7 +72,14 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 - Post-update checks: 7 unit tests passed; 3 PostgreSQL integration tests skipped because `TEST_DATABASE_URL` was not set. Frontend typecheck and full deck/source authoring validation passed. The local Python environment now includes the migration's already-declared `psycopg[binary]` dependency.
 - Verification of this work: authoring validation passes for all 30 cards, 31 rules and 334 local links, including exact PDF quote pages and source hashes; new scripts pass ruff; backend 8/8 tests pass; frontend typecheck, lint and production build pass. Initial runs found missing local `python-multipart` and `openapi-fetch`; installing the already-declared dependencies resolved the checks. No application dependency contracts were expanded.
 
-**Step 5 (simulated gov services) is done. Step 6 (admin deck + submissions) is next.**
+**Step 6 (admin) is done. Step 7 (jury cases) is next.**
+- `GET /admin/submissions` lists everything sent through the simulated channels (`repositories.list_submissions()` without a persona). `/admin/submissions` shows kind, content, recipient, persona, status and date.
+- `/admin` is now a typed parameters form: groups with Polish labels and units, fractions shown as percentages, version history, "Zapisz nową wersję" (still validated by `Params` on the backend). Labels live in `FIELDS` in `admin/page.tsx`; a new backend field shows under its key until it gets a label.
+- **No runtime deck editor (decided):** the deck is authored in `scripts/build_deck_design.py`, whose `--check` verifies every legal quote against the source PDFs, and the board reads `deck-design.json` at build time. A browser JSON editor would bypass that validation and not reach the board. The brief only requires editable legal parameters. Removed `GET/PUT /admin/deck`, `/admin/deck` and the unused `JsonEditor`.
+- The teammate's `540ff05` made 1D (rehab) playable; the coverage test's gated set is now 1F, 2F, 3F.
+- Tests: 111 unit + 5 integration; frontend typecheck, lint and build pass; live-checked.
+
+**Step 5 (simulated gov services) is done.**
 - `backend/app/api/gov_mock.py`: `GET /auth/personas`, `POST /auth/mobywatel` (token = persona id + HMAC with `SESSION_SECRET`, random per process if unset), `GET /zus/me` → `ZusAccount{persona, insurance, ezla, debt, applications, plan}` (replaces the three `/zus/me/*` stubs), `POST /applications` and `POST /usc/birth-certificate` (stored in `submissions`, Bearer optional), `POST /pue/messages` (canned replies from `data/pue.json`, numbers filled from the params in force, question logged).
 - Three fictional personas in `data/personas.json`, each a brief case: **anna** (UoP at a 12-person firm so ZUS pays, e-ZLA with code B, e-ZLA and Z-3 already filed), **magda** (JDG with a 150 zł debt that blocks benefits, base raised in pregnancy, partner on zlecenie without voluntary sickness), **ola** (fixed-term UoP ending before the birth, single mother, ZAM to ZUS after the contract). `test_gov.py` pins each persona's issue codes and checks that every filed form is among its plan's documents.
 - Charities (`data/charities.json`): six foundations checked on their own websites on 2026-11-21, each with its KRS number: Wcześniak Rodzice-Rodzicom, Warszawskie Hospicjum dla Dzieci, Gajusz (perinatal hospice), Nagle Sami (helpline 800 108 108), Fundacja Ernesta (miscarriage/stillbirth), Zdążyć z Pomocą. Rodzić po Ludzku was left out: its site shows no loss support. Add an organisation only after checking its site and KRS.
@@ -168,10 +175,10 @@ backend/
   Dockerfile (context: repo root)   .env.example
 frontend/
   src/app/             # page.tsx (/ preview board), game/[id], game/[id]/summary, calculator, cases, applications,
-                       # help, login, me, admin/{,deck,submissions}, api/v1/[...path]/route.ts (proxy), globals.css
+                       # help, login, me, admin/{,submissions}, api/v1/[...path]/route.ts (proxy), globals.css
   src/components/      # game/ (game-board, preview-game, round-track, decision-card, statistics, card-artwork, deck-library),
                        # plan/ (plan-timeline, budget-chart, care-calendar, pools-meter, docs-checklist),
-                       # forms/ (family-form, blocks-editor), site-header, site-footer, page-header, api-result, json-editor
+                       # forms/ (family-form, blocks-editor), site-header, site-footer, page-header, api-result
   src/hooks/           # use-plan.ts
   src/lib/             # api.ts (openapi-fetch client), schema.d.ts (generated), game.ts (board preview loader),
                        # format.ts, labels.ts, session.ts
@@ -229,10 +236,10 @@ docker-compose.yml     .dockerignore                     Documents/
 
 ### 3. Game engine (`game/engine.py`) ✅
 The teammate's stateless replay engine (see `docs/game-engine.md` for card-by-card scope). Sessions, combos and end bonuses from the original plan were dropped.
-- **Deck:** `shared/deck-design.json` (30 cards, six per round, declarative `effects`), built by `scripts/build_deck_design.py`. The legacy 15-card catalog (`shared/cards.json`, `/cards`, `/rounds`, `/game/preview`) only supplies round titles to the board; decide its fate with the admin deck (step 6).
+- **Deck:** `shared/deck-design.json` (30 cards, six per round, declarative `effects`), built by `scripts/build_deck_design.py`. The legacy 15-card catalog (`shared/cards.json`, `/cards`, `/rounds`, `/game/preview`) only supplies round titles to the board. The deck is not editable at runtime (see step 6).
 - **`POST /game/simulate {scenario_id, selected[]}`** replays every selected card id from round 1 into one `Plan` and returns `GameSimulation{scenario, plan, result, statistics, candidates[], reservations, horizon}`. Each candidate of the next round is tried on top: `available` + issues + projected statistics + pools. Nothing is stored, so the server stays authoritative without sessions, and a refresh restarts the game.
 - **Effects** resolve symbolic anchors (`after:maternity`, `need:adaptation`, `choice.*`, `params.*`, `derived.*`) against the scenario's sample choices; legal limits come only from `Params`, and every result goes through `compute_plan` (fixed horizon) + `rules.check`. A legal error makes a card unavailable with the reason; it stays visible in the hand.
-- **Scenarios** (`backend/app/data/scenarios.json`): one sample UoP family in three stories (standard, preterm hospitalization + e-ZLA, Za życiem) plus sample choices. **Gated cards** (always unavailable, with a reason): 1D rehab, 1F/2F adoption/foster, 3F end of insurance, because no story has those facts.
+- **Scenarios** (`backend/app/data/scenarios.json`): one sample UoP family in three stories (standard, preterm hospitalization + e-ZLA, Za życiem) plus sample choices. **Gated cards** (always unavailable, with a reason): 1F/2F adoption/foster, 3F end of insurance, because no story has those facts (1D rehab was enabled by the teammate in `540ff05`).
 - **Deal** is client-side (`preview-game.tsx`): three of the round's six, swapping one in if none is playable. The coverage test plus a one-off exhaustive search (all ~4 350 paths, ~100 s) show every reachable state has a playable card, so the swap always succeeds.
 - **Statistics:** `money` = lowest monthly income over the horizon vs. the parents' bases, `time` = covered care-need days (a day counts once, part-time counts its free fraction), `happiness` = the mean of both ratios × 100. No combos.
 - **The game never produces applications.** `simulate` leaves `documents` empty; paperwork belongs to the user's own plan (`/calculator` → `/applications`), because a real parent has usually filed some of it with ZUS already. The finished game offers "Przelicz ten plan w kalkulatorze" (`planHandoff`), where the sample family can be replaced with the user's own data.
@@ -246,7 +253,7 @@ The teammate's stateless replay engine (see `docs/game-engine.md` for card-by-ca
 | Cases | `GET /cases/samples`, `POST /cases/parse` (PDF → `ParseResult`), `POST /cases/evaluate` (`CaseInput` → `CaseVerdict`) | 501 (step 7) |
 | Gov mocks | `GET /auth/personas`, `POST /auth/mobywatel`, `GET /zus/me` (Bearer), `POST /pue/messages`, `POST /applications`, `POST /usc/birth-certificate` (Bearer optional) | ✅ |
 | Info | `GET /info/links`, `GET /info/charities` (verified, with KRS) | ✅ |
-| Admin (Bearer `ADMIN_TOKEN`) | `GET/PUT /admin/params`, `GET /admin/params/versions` ✅; `GET/PUT /admin/deck`, `GET /admin/submissions` | partial (step 6) |
+| Admin (Bearer `ADMIN_TOKEN`) | `GET/PUT /admin/params`, `GET /admin/params/versions`, `GET /admin/submissions` | ✅ |
 
 ### 5. Case PDFs
 - **parse:** `pdfplumber` text → detect the form (Z-3 / Z-3a / ZAM / ZAS-53 / insurance confirmation) by header → regex the labelled fields into `CaseInput`. No text (a scan) → `needs_manual_entry`, and the UI falls back to `FamilyForm`. Add pdfplumber and write the regexes once the samples arrive.
@@ -272,7 +279,7 @@ The teammate's stateless replay engine (see `docs/game-engine.md` for card-by-ca
 | `/applications` | The user's own documents (never the game's), already-filed ones ticked from eZUS, the rest filled in and "sent" | `myPlan` → `POST /calc/plan` → `DocsChecklist`; `GET /zus/me`; `POST /applications`, `POST /usc/birth-certificate` |
 | `/login` → `/me` | Simulated mObywatel login → the eZUS account: insurance, debt certificate, e-ZLA, filed documents; buttons to the calculator (`planHandoff`) and applications (`myPlan`) | `userToken` in sessionStorage, `GET /zus/me` |
 | `/help` | Verified charities, official links, simulated PUE question (answer + links) | `info/*`, `pue/messages` |
-| `/admin`, `/admin/deck`, `/admin/submissions` | Params and deck JSON editors (new version per save), submitted applications | `admin/layout.tsx` holds the token + sub-nav, `JsonEditor` |
+| `/admin`, `/admin/submissions` | Typed params form (groups, units, versions; new version per save), everything sent through the simulated channels | `admin/layout.tsx` holds the token + sub-nav |
 
 ### Board (team UI) and how the skeleton plugs in
 - **Layout:**
@@ -297,7 +304,7 @@ Backend and frontend run in parallel once the contract exists. FE steps that dep
 | 3 ✅ | `paperwork.py` (payer, documents, deadlines) + brief-H risks in `rules.py` | Plan views: kind colours + legend, care gaps, issue styling |
 | 4 ✅ | Replay engine (teammate) + scenarios, session API removed, coverage test | Board on `POST /game/simulate`, disabled cards with reasons, end-of-game → calculator; `/applications` from the user's own plan |
 | 5 ✅ | Gov mocks, personas, applications, PUE canned replies, charities (verified orgs only) | Login → /me, application forms, help page |
-| 6 | Admin deck (versioned, seeded from the catalog) + submissions | Admin typed forms (grouped params with units, deck as card list) |
+| 6 ✅ | Submissions list; no runtime deck editor (decided) | Typed params form (groups, units, versions), submissions table |
 | 7 | Cases parse/evaluate + golden tests (needs sample PDFs) | Cases review flow reusing `FamilyForm` *(needs BE7)* |
 | 8 | Deploy the backend container + Postgres (managed, or the compose `db` with a real `POSTGRES_PASSWORD`) | Deploy the frontend container (`API_URL` at runtime); contrast fix; Playwright happy path + mobile/desktop screenshots (needed for the submission); 3-min video |
 

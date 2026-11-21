@@ -4,9 +4,8 @@ import secrets
 from fastapi import APIRouter, Depends, Header, HTTPException
 
 from app import repositories
-from app.api import todo
 from app.params import Params, active
-from app.schemas import Card, ConfigVersion, Submission
+from app.schemas import ConfigVersion, Submission
 
 
 # shortcut: one static bearer token from env; swap for real auth before production
@@ -35,16 +34,7 @@ def params_versions() -> list[ConfigVersion]:
     return repositories.list_config("params")
 
 
-@router.get("/deck")
-def get_deck() -> list[Card]:
-    todo(6)
-
-
-@router.put("/deck")
-def put_deck(deck: list[Card]) -> ConfigVersion:
-    todo(6)
-
-
 @router.get("/submissions")
 def submissions() -> list[Submission]:
-    todo(6)
+    """Everything sent through the simulated channels (applications, USC requests, PUE questions), newest first."""
+    return repositories.list_submissions()

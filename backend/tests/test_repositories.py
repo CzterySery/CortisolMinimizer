@@ -75,3 +75,4 @@ def test_submissions_are_listed_per_persona():
     rows = repositories.list_submissions("anna")
     assert [r["id"] for r in rows] == [second, first] and rows[1]["payload"]["form"] == "ZAM"
     assert repositories.list_submissions("magda") == []
+    assert [r["kind"] for r in repositories.list_submissions()] == ["usc", "pue", "application"]  # admin: all

@@ -101,8 +101,9 @@ Wszystkie endpointy są pod `/api/v1`, a pełna lista jest w `/docs`. Działają
 | GET/POST | `/api/v1/auth/personas`, `/api/v1/auth/mobywatel`, `/api/v1/zus/me` | symulowane logowanie mObywatel i konto eZUS: ubezpieczenia, e-ZLA, zaświadczenie o niezaleganiu, złożone dokumenty |
 | POST | `/api/v1/applications`, `/api/v1/usc/birth-certificate`, `/api/v1/pue/messages` | symulowane wysłanie wniosku, wniosek o odpis aktu urodzenia, pytanie do ZUS (gotowe odpowiedzi) |
 | GET/PUT | `/api/v1/admin/params` (+ `/versions`) | parametry prawne, każda zmiana to nowa wersja (nagłówek `Authorization: Bearer $ADMIN_TOKEN`) |
+| GET | `/api/v1/admin/submissions` | wszystko, co wysłano przez symulowane kanały |
 
-Pozostałe (sprawy, talia i wnioski w panelu administracyjnym) mają gotowy kontrakt i zwracają `501` do czasu implementacji.
+Pozostałe (sprawdzanie spraw z PDF) mają gotowy kontrakt i zwracają `501` do czasu implementacji.
 
 ## Karty i późniejsza baza
 

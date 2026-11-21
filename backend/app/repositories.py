@@ -102,8 +102,10 @@ def add_submission(kind: str, payload: dict, status: str) -> int:
                          (kind, Jsonb(payload), status)).fetchone()["id"]
 
 
-def list_submissions(persona: str) -> list[dict]:
-    """What one mObywatel identity sent from this app, newest first."""
+def list_submissions(persona: str | None = None) -> list[dict]:
+    """Newest first; with `persona`, only what that mObywatel identity sent (otherwise everything, for the admin)."""
     with db() as c:
+        if persona is None:
+            return c.execute("SELECT id, kind, payload, status, created_at FROM submissions ORDER BY id DESC").fetchall()
         return c.execute("SELECT id, kind, payload, status, created_at FROM submissions "
                          "WHERE payload->>'persona' = %s ORDER BY id DESC", (persona,)).fetchall()

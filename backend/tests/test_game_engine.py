@@ -110,7 +110,7 @@ def test_rounds_cannot_be_skipped_or_duplicated():
             run(*selected)
 
 
-GATED = {"1D", "1F", "2F", "3F"}  # rehab, adoption/foster, end of insurance: no scenario has those facts
+GATED = {"1F", "2F", "3F"}  # adoption/foster, end of insurance: no scenario has those facts (1D since 540ff05)
 
 
 def test_every_hand_is_playable_and_every_ungated_card_completes_a_legal_plan():
