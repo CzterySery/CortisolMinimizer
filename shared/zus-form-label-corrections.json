@@ -1,0 +1,21 @@
+{
+  "zam": {
+    "sha256": "4c242de9e30c670c6e4e447d4e615179a77b7aa8fe007a8301fe1e405384cd67",
+    "reason": "Page 5 tooltip copy/paste errors; visually checked against printed Oświadczenie and Informacja sections.",
+    "fields": {
+      "p5-4": {"name":"topmostSubform[0].Page5[0].TAK2[0]","label":"Zaznacz TAK, jeśli pobierasz z innego tytułu zasiłek macierzyński za okres urlopu ojcowskiego. To oświadczenie dotyczy wniosku za okres ojcowskiego."},
+      "p5-5": {"name":"topmostSubform[0].Page5[0].NIE2[0]","label":"Zaznacz NIE, jeśli nie pobierasz z innego tytułu zasiłku macierzyńskiego za okres urlopu ojcowskiego. To oświadczenie dotyczy wniosku za okres ojcowskiego."},
+      "p5-6": {"name":"topmostSubform[0].Page5[0].Okres1[0]","label":"Jeśli w oświadczeniu o pobieraniu z innego tytułu zasiłku za okres ojcowskiego zaznaczasz TAK, podaj ten tytuł i okres pobierania."},
+      "p5-7": {"name":"topmostSubform[0].Page5[0].TAK[0]","label":"Zaznacz TAK, jeśli drugi rodzic będzie korzystał z zasiłku za okres urlopu rodzicielskiego lub uzupełniającego macierzyńskiego. Wypełnij tę informację dla tych rodzajów urlopu."},
+      "p5-8": {"name":"topmostSubform[0].Page5[0].NIE[0]","label":"Zaznacz NIE, jeśli drugi rodzic nie będzie korzystał z zasiłku za okres urlopu rodzicielskiego lub uzupełniającego macierzyńskiego. Wypełnij tę informację dla tych rodzajów urlopu."}
+    }
+  },
+  "z15": {
+    "sha256": "c95838a4262a823b8d36dc3a289332c42fbcaf4e41266d17d1427038d60f56f0",
+    "reason": "Page 2 surname and kinship tooltips are swapped; checked against printed labels and widget rectangles.",
+    "fields": {
+      "p2-4": {"name":"topmostSubform[0].Page2[0].Nazwisko[0]","label":"Wpisz nazwisko osoby, nad którą sprawujesz opiekę."},
+      "p2-8": {"name":"topmostSubform[0].Page2[0].pokrewienstwo[0]","label":"Podaj stopień pokrewieństwa osoby wymagającej opieki w stosunku do Ciebie, np. dziecko."}
+    }
+  }
+}

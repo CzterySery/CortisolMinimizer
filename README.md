@@ -24,6 +24,12 @@ Pierwszy krok ma trzy zaznaczane przyciski, a uzasadnienie prawne jest dostępne
 
 [Przegląd zgodności kalkulatora z materiałami ZUS i pozostałe ograniczenia](docs/calculator-review.md).
 
+## Podgląd dokumentów
+
+Na stronie „Twoje dokumenty” kliknij nazwę pozycji albo „Pokaż demo: co wpisać i gdzie”. Dla ZAM, Z-15 (także dawnej pozycji Z-15A), ZAS-53, ZNp-7, Z-3 i Z-3a otwiera się oryginalny formularz ZUS z zaznaczanymi polami. Wybranie pola pokazuje instrukcję; próbny wpis pojawia się we właściwym miejscu. Okres z planu można przenieść do sprawdzonego pola okresu. Oryginalny PDF i stronę ZUS można otworzyć osobno. Biblioteka wzorów działa również bez własnego planu.
+
+Pisma urlopowe do pracodawcy mają osobny, wyraźnie oznaczony przykład, a nie udawany formularz ZUS. Podgląd wskazuje, że Z-3/Z-3a wypełnia płatnik, e-ZLA wystawia lekarz, a część II ZNp-7 należy do płatnika. Próby w podglądzie nie zmieniają PDF-u, nie zapisują się i niczego nie wysyłają. Szczegóły źródeł i odświeżania: [przewodnik formularzy](docs/form-guides.md).
+
 ## Struktura
 
 ```text

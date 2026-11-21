@@ -87,39 +87,43 @@ export function ScrollHero3D() {
     };
   }, []);
 
-  // Scroll timings (0.0 -> 1.0, strictly left-to-right story):
+  // Scroll timings (0.0 -> 1.0, strictly left-to-right story over a longer scroll distance):
   const p = progress;
 
-  // Stage 1 (Always visible at left, subtle breathing/weight shift as scroll begins)
+  // Stage 1: Parents start slightly further left and take one smooth step forward together (p: 0.00 -> 0.16)
   const parentsEnter = 1;
-  const parentsPregnant = 1 - smoothstep(0.14, 0.28, p); // belly gently softens after carrier appears
+  const parentsWalkMove = smoothstep(0.0, 0.16, p);
+  // One single step arc over the entire 0.00 -> 0.16 duration: sin(0..PI) goes 0 -> 1 -> 0
+  const parentsStride = Math.sin(parentsWalkMove * Math.PI);
+  const parentsBob = -Math.sin(parentsWalkMove * Math.PI) * 4.5;
+  const parentsX = lerp(48, 145, parentsWalkMove);
+  const parentsPregnant = 1 - smoothstep(0.24, 0.38, p); // belly gently softens after carrier appears
 
-  // Stage 2: Baby in Carrier (Nosidełko) appears to the right of parents and stays longer in focus (p: 0.05 -> 0.48)
-  const carrierEnter = smoothstep(0.04, 0.18, p);
-  const carrierRock = Math.sin(p * Math.PI * 10) * 4.2 * (1 - smoothstep(0.50, 0.64, p));
-  const babyInCarrierAlpha = 1 - smoothstep(0.42, 0.52, p);
+  // Stage 2: Baby in Carrier (Nosidełko) appears after parents finish their step and stays longer (p: 0.15 -> 0.54)
+  const carrierEnter = smoothstep(0.14, 0.26, p);
+  const carrierRock = Math.sin(p * Math.PI * 10) * 4.2 * (1 - smoothstep(0.55, 0.67, p));
+  const babyInCarrierAlpha = 1 - smoothstep(0.47, 0.56, p);
 
-  // Stage 3: Crawling Baby (Raczkowanie) emerges from carrier moving right (p: 0.42 -> 0.68)
-  const crawlEnter = smoothstep(0.40, 0.50, p);
-  const crawlMove = smoothstep(0.42, 0.68, p);
-  const crawlFade = 1 - smoothstep(0.64, 0.74, p);
+  // Stage 3: Crawling Baby (Raczkowanie) emerges from carrier moving right (p: 0.47 -> 0.72)
+  const crawlEnter = smoothstep(0.45, 0.54, p);
+  const crawlMove = smoothstep(0.47, 0.72, p);
+  const crawlFade = 1 - smoothstep(0.68, 0.76, p);
   const crawlAlpha = crawlEnter * crawlFade;
   const crawlX = lerp(635, 815, crawlMove);
-  const crawlCycle = Math.sin(crawlMove * Math.PI * 5);
+  const crawlCycle = Math.sin(crawlMove * Math.PI * 2);
 
-  // Stage 4 -> 5: Child stands up, walks right, and grows from toddler to tall child (p: 0.64 -> 0.98)
-  const walkEnter = smoothstep(0.63, 0.73, p);
-  const walkMove = smoothstep(0.65, 0.97, p);
+  // Stage 4 -> 5: Child stands up, takes one long smooth step right while growing from toddler to tall child (p: 0.68 -> 0.98)
+  const walkEnter = smoothstep(0.67, 0.76, p);
+  const walkMove = smoothstep(0.69, 0.98, p);
   // Continuous left-to-right travel from x = 885 to x = 1275
   const childX = lerp(885, 1275, walkMove);
   // Continuous growth scale from toddler (0.56) to tall older child (0.96)
   const childScale = lerp(0.56, 0.96, walkMove);
-  // Walking stride cycle as child moves right
-  const isWalking = p > 0.65 && p < 0.96 ? 1 : 0;
-  const stride = Math.sin(walkMove * Math.PI * 7) * isWalking;
+  // One single step over the entire walking duration: sin(0..PI) goes 0 -> 1 -> 0
+  const stride = Math.sin(walkMove * Math.PI);
 
   // Ground line progressive draw from left to right
-  const groundWidth = lerp(390, 1410, smoothstep(0.0, 0.95, p));
+  const groundWidth = lerp(310, 1410, smoothstep(0.0, 0.96, p));
 
   return (
     <section
@@ -159,37 +163,41 @@ export function ScrollHero3D() {
             />
 
             {/* ================================================================= */}
-            {/* 1. LEFT: EXPECTING PARENTS (Man & Pregnant Woman facing right)    */}
+            {/* 1. LEFT: EXPECTING PARENTS (Taking 2-3 steps right on start)      */}
             {/* ================================================================= */}
             <g
-              transform="translate(135, 0)"
+              transform={`translate(${parentsX}, ${parentsBob})`}
               opacity={parentsEnter}
             >
-              {/* --- PARTNER (MAN) standing on the left, facing slightly right --- */}
+              {/* --- PARTNER (MAN) standing/walking on the left, facing right --- */}
               <g transform="translate(0, 0)">
-                {/* Back leg (right leg) */}
-                <path
-                  d="M 78 362 L 94 470 L 98 552 H 72 L 64 470 L 54 362 Z"
-                  className="fill-dark ink"
-                />
-                {/* Back shoe */}
-                <path
-                  d="M 72 552 L 70 576 H 122 C 122 563 111 555 98 552 Z"
-                  className="fill-cream ink"
-                />
-                <line x1="70" y1="571" x2="122" y2="571" className="ink-thin" />
+                {/* Back leg (right leg) with initial walking swing */}
+                <g transform={`rotate(${-parentsStride * 14}, 66, 368)`}>
+                  <path
+                    d="M 78 362 L 94 470 L 98 552 H 72 L 64 470 L 54 362 Z"
+                    className="fill-dark ink"
+                  />
+                  {/* Back shoe */}
+                  <path
+                    d="M 72 552 L 70 576 H 122 C 122 563 111 555 98 552 Z"
+                    className="fill-cream ink"
+                  />
+                  <line x1="70" y1="571" x2="122" y2="571" className="ink-thin" />
+                </g>
 
-                {/* Front leg (left leg) */}
-                <path
-                  d="M 42 362 L 46 472 L 48 552 H 22 L 18 472 L 16 362 Z"
-                  className="fill-dark ink"
-                />
-                {/* Front shoe */}
-                <path
-                  d="M 22 552 L 20 576 H 74 C 74 563 62 555 48 552 Z"
-                  className="fill-cream ink"
-                />
-                <line x1="20" y1="571" x2="74" y2="571" className="ink-thin" />
+                {/* Front leg (left leg) with initial walking swing */}
+                <g transform={`rotate(${parentsStride * 15}, 32, 368)`}>
+                  <path
+                    d="M 42 362 L 46 472 L 48 552 H 22 L 18 472 L 16 362 Z"
+                    className="fill-dark ink"
+                  />
+                  {/* Front shoe */}
+                  <path
+                    d="M 22 552 L 20 576 H 74 C 74 563 62 555 48 552 Z"
+                    className="fill-cream ink"
+                  />
+                  <line x1="20" y1="571" x2="74" y2="571" className="ink-thin" />
+                </g>
 
                 {/* Back arm (reaching affectionately toward partner) */}
                 <path
@@ -241,45 +249,51 @@ export function ScrollHero3D() {
                 <path d="M 84 125 L 87 139 L 81 141" fill="none" className="ink-thin" />
                 <path d="M 73 150 Q 80 154 86 150" fill="none" className="ink-thin" />
 
-                {/* Front arm (left arm, relaxed at side / pocket) */}
-                <path
-                  d="M 22 214 C 6 244 4 282 14 326 L 30 324 C 24 286 24 252 36 226 Z"
-                  className="fill-cream ink"
-                />
-                {/* Hand at hip/pocket */}
-                <path
-                  d="M 14 326 C 14 338 22 344 30 340 C 34 337 33 329 30 324 Z"
-                  className="fill-white ink"
-                />
+                {/* Front arm (left arm, swinging gently during the initial 2-3 steps) */}
+                <g transform={`rotate(${-parentsStride * 12}, 28, 220)`}>
+                  <path
+                    d="M 22 214 C 6 244 4 282 14 326 L 30 324 C 24 286 24 252 36 226 Z"
+                    className="fill-cream ink"
+                  />
+                  {/* Hand at hip/pocket */}
+                  <path
+                    d="M 14 326 C 14 338 22 344 30 340 C 34 337 33 329 30 324 Z"
+                    className="fill-white ink"
+                  />
+                </g>
               </g>
 
-              {/* --- PREGNANT WOMAN standing beside him, facing 3/4 right (styled directly after reference!) --- */}
+              {/* --- PREGNANT WOMAN standing/walking beside him, facing 3/4 right --- */}
               <g transform="translate(128, 12)">
-                {/* Back leg */}
-                <path
-                  d="M 66 376 L 82 480 L 86 544 H 66 L 54 480 L 46 376 Z"
-                  className="fill-white ink"
-                />
-                {/* Back flat shoe (cream with toe line, exact match to reference) */}
-                <path
-                  d="M 65 544 L 62 564 H 116 C 116 552 104 546 86 544 Z"
-                  className="fill-cream ink"
-                />
-                <path d="M 64 550 Q 82 556 96 550" fill="none" className="ink-thin" />
-                <path d="M 101 548 V 564" fill="none" className="ink-thin" />
+                {/* Back leg with initial 2-3 steps swing */}
+                <g transform={`rotate(${parentsStride * 13}, 56, 382)`}>
+                  <path
+                    d="M 66 376 L 82 480 L 86 544 H 66 L 54 480 L 46 376 Z"
+                    className="fill-white ink"
+                  />
+                  {/* Back flat shoe (cream with toe line, exact match to reference) */}
+                  <path
+                    d="M 65 544 L 62 564 H 116 C 116 552 104 546 86 544 Z"
+                    className="fill-cream ink"
+                  />
+                  <path d="M 64 550 Q 82 556 96 550" fill="none" className="ink-thin" />
+                  <path d="M 101 548 V 564" fill="none" className="ink-thin" />
+                </g>
 
-                {/* Front leg */}
-                <path
-                  d="M 38 376 L 44 482 L 46 544 H 26 L 18 482 L 18 376 Z"
-                  className="fill-white ink"
-                />
-                {/* Front flat shoe */}
-                <path
-                  d="M 25 544 L 22 564 H 78 C 78 552 65 546 46 544 Z"
-                  className="fill-cream ink"
-                />
-                <path d="M 24 550 Q 42 556 58 550" fill="none" className="ink-thin" />
-                <path d="M 63 548 V 564" fill="none" className="ink-thin" />
+                {/* Front leg with initial 2-3 steps swing */}
+                <g transform={`rotate(${-parentsStride * 14}, 30, 382)`}>
+                  <path
+                    d="M 38 376 L 44 482 L 46 544 H 26 L 18 482 L 18 376 Z"
+                    className="fill-white ink"
+                  />
+                  {/* Front flat shoe */}
+                  <path
+                    d="M 25 544 L 22 564 H 78 C 78 552 65 546 46 544 Z"
+                    className="fill-cream ink"
+                  />
+                  <path d="M 24 550 Q 42 556 58 550" fill="none" className="ink-thin" />
+                  <path d="M 63 548 V 564" fill="none" className="ink-thin" />
+                </g>
 
                 {/* Dark skirt / maternity dress lower half */}
                 <path

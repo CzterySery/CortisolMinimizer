@@ -9,6 +9,8 @@ import { myPlan, userToken } from "@/lib/session";
 import { ApiResult } from "@/components/api-result";
 import { PageHeader } from "@/components/page-header";
 import { DocsChecklist } from "@/components/plan/docs-checklist";
+import { DocumentGuide } from "@/components/forms/document-guide";
+import { documentIssuer, officialForms } from "@/lib/document-guides";
 
 type Doc = S["Document"];
 const key = (d: { form: string; who: string }) => `${d.form}|${d.who}`;
@@ -22,6 +24,7 @@ export default function Applications() {
   const [filed, setFiled] = useState<Set<string>>(new Set());
   const [error, setError] = useState<unknown>();
   const [sent, setSent] = useState<string>();
+  const [guide, setGuide] = useState<{ doc: Doc; name?: string }>();
   const token = userToken.get();
   const auth = token ? { Authorization: `Bearer ${token}` } : undefined;
 
@@ -39,7 +42,7 @@ export default function Applications() {
   }, []);
 
   const shown = documents?.map((d) => ({ ...d, done: filed.has(key(d)) }));
-  const todo = shown?.filter((d) => !d.done) ?? [];
+  const todo = shown?.filter((d) => !d.done && documentIssuer(d) === "parent") ?? [];
 
   return (
     <main className="page">
@@ -49,22 +52,34 @@ export default function Applications() {
       {!plan && <p className="muted">Najpierw <Link href="/calculator">policz swój plan w kalkulatorze</Link> albo otwórz <Link href="/me">Moje dane</Link>, a potem wybierz „Przygotuj wnioski”.</p>}
       {error ? <ApiResult error={error} /> : null}
       {sent && <p className="notice" role="status">{sent}</p>}
-      {shown && <DocsChecklist documents={shown} />}
+      {shown && <><p className="muted">Kliknij nazwę dokumentu, aby otworzyć demo. Dla formularzy ZUS zobaczysz oryginalny układ i instrukcję każdego pola; pisma do pracodawcy mają osobny przykład.</p>
+        <DocsChecklist documents={shown} onInspect={(doc) => setGuide({ doc, name: account?.persona.who === doc.who ? account.persona.name : undefined })} />
+        <p className="muted">Zaświadczenie płatnika (Z-3 / Z-3a) wypełnia pracodawca lub zleceniodawca, a e-ZLA wystawia lekarz. Dlatego nie wyświetlamy dla nich przycisku samodzielnego wysłania.</p></>}
       {todo.length > 0 && <section className="stack">
         <h2 className="eyebrow">Wypełnij i wyślij (symulacja)</h2>
         {todo.map((d) => (
           <ApplicationForm key={`${key(d)}|${d.start}|${d.due_by}|${account?.persona.id}`} doc={d} auth={auth}
             name={account && account.persona.who === d.who ? account.persona.name : ""}
             birth={plan?.family.birth_date ?? plan?.family.due_date ?? ""}
+            onInspect={(name) => setGuide({ doc: d, name })}
             onSent={(id) => { setFiled((f) => new Set(f).add(key(d))); setSent(`Wysłano (symulacja): ${d.form} → ${recipientLabel[d.recipient]}, numer ${id}.`); }} />
         ))}
       </section>}
+      <details className="form-template-library"><summary>Przejrzyj oficjalne formularze ZUS — demo pól</summary>
+        <p className="muted">Biblioteka wzorów, niezależna od listy wymaganej dla Twojego planu.</p>
+        <div className="choice-grid">{officialForms.map((form) => <button type="button" className="choice" key={form.id}
+          onClick={() => setGuide({ doc: { form: form.code, who: "mother", recipient: "zus", done: false,
+            due_by: null, start: null, end: null, rule: "Oficjalny wzór ZUS", note: "Podgląd wzoru — bez danych osoby i okresów z planu." } })}>
+          <strong>{form.code}</strong><span>{form.title}</span><span>{form.pages.length} stron · {form.issuer === "employer" ? "wypełnia płatnik" : "wniosek"}</span>
+        </button>)}</div>
+      </details>
+      {guide && <DocumentGuide key={`${key(guide.doc)}|${guide.doc.start}`} doc={guide.doc} plan={plan} name={guide.name} onClose={() => setGuide(undefined)} />}
     </main>
   );
 }
 
-function ApplicationForm({ doc, auth, name, birth, onSent }: {
-  doc: Doc; auth?: Record<string, string>; name: string; birth: string; onSent: (id: number) => void;
+function ApplicationForm({ doc, auth, name, birth, onSent, onInspect }: {
+  doc: Doc; auth?: Record<string, string>; name: string; birth: string; onSent: (id: number) => void; onInspect: (name: string) => void;
 }) {
   const [fields, setFields] = useState({ name, child: "", birth, fullCopy: false, notes: doc.note });
   const [out, setOut] = useState<{ data?: unknown; error?: unknown }>({});
@@ -85,6 +100,7 @@ function ApplicationForm({ doc, auth, name, birth, onSent }: {
   return (
     <details className="form-card">
       <summary><strong>{doc.form}</strong> · {whoLabel[doc.who]} → {recipientLabel[doc.recipient]}{doc.due_by && <> · do {day(doc.due_by)}</>}</summary>
+      <button type="button" className="button" onClick={() => onInspect(fields.name)}>Pokaż demo: co wpisać i gdzie</button>
       <div className="form-grid">
         {usc ? <>
           <label className="field">Imię i nazwisko dziecka<input value={fields.child} onChange={(e) => set({ child: e.target.value })} /></label>

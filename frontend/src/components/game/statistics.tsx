@@ -1,15 +1,17 @@
+import type { ReactNode } from "react";
 import type { Statistic } from "@/types/game";
 import type { CardSignals } from "@/lib/card-signals";
 
 const symbols = { money: "zł", time: "◷", knowledge: "i" };
 
 // Decorative balance of authored card effects, never calculator quantities.
-export function Statistics({ statistics, simulation }: {
+export function Statistics({ statistics, simulation, deckSlot }: {
   statistics: Statistic[]; projected?: Statistic[];
   baseline?: Statistic[];
   hideValues?: boolean;
   startAtMidpoint?: boolean;
   simulation?: { signals?: CardSignals; title?: string; hovering: boolean; balance?: Record<"money" | "time" | "knowledge", number> };
+  deckSlot?: ReactNode;
 }) {
   return (
     <aside className="statistics" aria-labelledby="statistics-title">
@@ -30,6 +32,7 @@ export function Statistics({ statistics, simulation }: {
           </div>
         );
       })}
+      {deckSlot && <div className="statistics-deck-slot">{deckSlot}</div>}
     </aside>
   );
 }

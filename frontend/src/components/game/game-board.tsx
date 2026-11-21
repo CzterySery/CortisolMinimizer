@@ -51,7 +51,7 @@ export function GameBoard(props: GameBoardProps) {
   const stage = stages.find((item) => item.id === currentRound) ?? stages.at(-1);
   const stageId = stage?.id;
 
-  // Observe when the round-track slots and the hand enter the viewport
+  // Observe when the round-track slots and the hand enter or leave the viewport so scrolling back up and down replays the animations
   useEffect(() => {
     const board = boardRef.current;
     if (!board || typeof IntersectionObserver === "undefined") return;
@@ -60,12 +60,26 @@ export function GameBoard(props: GameBoardProps) {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          if (entry.target === roundsEl) setTableInView(true);
-          if (entry.target === handEl) setHandInView(true);
+          if (entry.target === roundsEl) {
+            if (entry.isIntersecting) {
+              setTableInView(true);
+            } else if (entry.boundingClientRect.top > 0) {
+              // User scrolled back up above the game board: reset so scrolling down again replays slots & card deal
+              setTableInView(false);
+              setSlotsReady(false);
+              setHandInView(false);
+            }
+          }
+          if (entry.target === handEl) {
+            if (entry.isIntersecting) {
+              setHandInView(true);
+            } else if (entry.boundingClientRect.top > 0) {
+              setHandInView(false);
+            }
+          }
         }
       },
-      { threshold: 0.22 },
+      { threshold: 0.18 },
     );
     if (roundsEl) observer.observe(roundsEl);
     if (handEl) observer.observe(handEl);
@@ -99,14 +113,14 @@ export function GameBoard(props: GameBoardProps) {
     }
     const timer = window.setTimeout(() => {
       setSlotsReady(true);
-    }, reduced ? 0 : 620);
+    }, reduced ? 0 : 760);
     return () => {
       window.clearTimeout(timer);
       animations.forEach((a) => a.cancel());
     };
   }, [tableInView]);
 
-  // Deal cards from the deck stack only after the table slots have dynamically appeared AND the hand is in view
+  // Deal cards from the deck stack (now beneath the status bars) only after the table slots have dynamically appeared AND the hand is in view
   const canRevealHand = slotsReady && handInView;
   useEffect(() => {
     if (!canRevealHand) return;
@@ -117,9 +131,9 @@ export function GameBoard(props: GameBoardProps) {
       deck.querySelectorAll("span").forEach((layer, index) => {
         animations.push(layer.animate([
           { translate: "0 0", rotate: "0deg" },
-          { translate: `${(index - 1) * 14}px -14px`, rotate: `${(index - 1) * 11}deg` },
+          { translate: `${(index - 1) * 16}px -16px`, rotate: `${(index - 1) * 12}deg` },
           { translate: "0 0", rotate: "0deg" },
-        ], { duration: 460, delay: index * 45, easing: "ease-out" }));
+        ], { duration: 760, delay: index * 85, easing: "ease-out" }));
       });
       boardRef.current?.querySelectorAll<HTMLElement>(".hand-card").forEach((card, index) => {
         const target = card.getBoundingClientRect();
@@ -127,10 +141,10 @@ export function GameBoard(props: GameBoardProps) {
         const dy = origin.top + origin.height / 2 - target.top - target.height / 2;
         animations.push(card.animate([
           { transform: `translate(${dx}px, ${dy}px) rotate(-14deg) scale(.18)`, opacity: 0 },
-          { opacity: 1, offset: .28 },
-          { transform: "translate(0, -6px) rotate(0deg) scale(1.02)", opacity: 1, offset: .82 },
+          { opacity: 1, offset: .25 },
+          { transform: "translate(0, -6px) rotate(0deg) scale(1.02)", opacity: 1, offset: .84 },
           { transform: "translate(0, 0) rotate(0deg) scale(1)", opacity: 1 },
-        ], { duration: 580, delay: 160 + index * 115, fill: "backwards", easing: "cubic-bezier(.18,.75,.25,1)" }));
+        ], { duration: 960, delay: 260 + index * 210, fill: "backwards", easing: "cubic-bezier(.18,.75,.25,1)" }));
       });
     }
     return () => {
@@ -198,7 +212,6 @@ export function GameBoard(props: GameBoardProps) {
         <RoundTrack stages={stages} currentRound={currentRound} playedCards={played} draggedId={draggedId} onPlayCard={playCard} />
         <section className="hand-section" aria-labelledby="hand-title">
           <div className="section-heading hand-heading"><h2 id="hand-title">{complete ? "Twój profil" : "Twoja ręka"}</h2>{mode === "game" && <span>{complete ? `${played.length} zagranych kart` : `${handSize} karty · przeciągnij jedną na podświetlone miejsce`}</span>}
-            {onReset && <button className="deck-stack" ref={deckRef} onClick={resetBoard} disabled={props.busy} aria-label="Rozdaj karty ze stosu" title="Nowe rozdanie"><span /><span /><span><b>c.</b></span></button>}
           </div>
           <div className="hand-and-balance">
           {complete && props.finishedHand}
@@ -230,7 +243,15 @@ export function GameBoard(props: GameBoardProps) {
               <button className="play-card-button" disabled={props.busy || playingId !== null || !!props.unavailable?.[card.id]} onClick={() => void playCard(card.id)} aria-label={`Zagraj kartę: ${card.title}`}>{props.unavailable?.[card.id] ? "Niedostępna" : "Połóż na stole"} <span aria-hidden="true">↑</span></button>
             </div>
           ))}</div>}
-          <Statistics statistics={statistics} baseline={props.baseline} projected={projected} simulation={props.simulation} hideValues={mode === "preview"} startAtMidpoint={played.length === 0 && !projected} />
+          <Statistics
+            statistics={statistics}
+            baseline={props.baseline}
+            projected={projected}
+            simulation={props.simulation}
+            hideValues={mode === "preview"}
+            startAtMidpoint={played.length === 0 && !projected}
+            deckSlot={onReset && <button className="deck-stack" ref={deckRef} onClick={resetBoard} disabled={props.busy} aria-label="Rozdaj karty ze stosu" title="Nowe rozdanie"><span /><span /><span><b>c.</b></span></button>}
+          />
           </div>
           <div className="board-controls">
             <p className="preview-note">{note}</p>
