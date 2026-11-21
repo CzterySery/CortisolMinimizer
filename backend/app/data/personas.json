@@ -1,0 +1,331 @@
+[
+ {
+  "id": "anna",
+  "name": "Anna Kowalczyk",
+  "who": "mother",
+  "description": "Umowa o pracę w małej firmie, więc zasiłki wypłaca ZUS. W ciąży na zwolnieniu z kodem B, poród w styczniu 2027. Część dokumentów już złożona.",
+  "insurance": [
+   {
+    "title": "umowa o pracę na czas nieokreślony",
+    "payer": "Pracownia „Przykład” sp. z o.o. (12 ubezpieczonych)",
+    "start": "2023-03-01",
+    "end": null,
+    "sickness_insurance": true,
+    "contribution_base": "7200.00"
+   }
+  ],
+  "ezla": [
+   {
+    "number": "ZY 1048576",
+    "start": "2026-10-06",
+    "end": "2026-11-04",
+    "code_b": true
+   },
+   {
+    "number": "ZY 1048923",
+    "start": "2026-11-05",
+    "end": "2026-12-06",
+    "code_b": true
+   }
+  ],
+  "applications": [
+   {
+    "form": "e-ZLA (zwolnienie lekarskie)",
+    "who": "mother",
+    "recipient": "zus",
+    "filed_on": "2026-10-06",
+    "status": "przyjęte"
+   },
+   {
+    "form": "Z-3: zaświadczenie płatnika składek do zasiłku chorobowego",
+    "who": "mother",
+    "recipient": "zus",
+    "filed_on": "2026-11-10",
+    "status": "przyjęte, zasiłek wypłacany"
+   }
+  ],
+  "plan": {
+   "family": {
+    "mother": {
+     "employment": "employee",
+     "insured_since": "2023-03-01",
+     "payer_insured_count": 12,
+     "age": 31,
+     "salary_history": [
+      {
+       "month": "2025-10",
+       "gross": "7200.00"
+      },
+      {
+       "month": "2025-11",
+       "gross": "7200.00"
+      },
+      {
+       "month": "2025-12",
+       "gross": "7200.00"
+      },
+      {
+       "month": "2026-01",
+       "gross": "7200.00"
+      },
+      {
+       "month": "2026-02",
+       "gross": "7200.00"
+      },
+      {
+       "month": "2026-03",
+       "gross": "7200.00"
+      },
+      {
+       "month": "2026-04",
+       "gross": "7200.00"
+      },
+      {
+       "month": "2026-05",
+       "gross": "7200.00"
+      },
+      {
+       "month": "2026-06",
+       "gross": "7200.00"
+      },
+      {
+       "month": "2026-07",
+       "gross": "7200.00"
+      },
+      {
+       "month": "2026-08",
+       "gross": "7200.00"
+      },
+      {
+       "month": "2026-09",
+       "gross": "7200.00"
+      }
+     ]
+    },
+    "father": {
+     "employment": "employee",
+     "base_monthly": "8500.00",
+     "insured_since": "2019-09-01",
+     "payer_insured_count": 250
+    },
+    "due_date": "2027-01-20"
+   },
+   "blocks": [
+    {
+     "who": "mother",
+     "kind": "sick",
+     "start": "2026-10-06",
+     "days": 30
+    },
+    {
+     "who": "mother",
+     "kind": "sick",
+     "start": "2026-11-05",
+     "days": 32
+    },
+    {
+     "who": "mother",
+     "kind": "maternity",
+     "start": "2027-01-20",
+     "days": 140
+    },
+    {
+     "who": "father",
+     "kind": "paternity",
+     "start": "2027-01-20",
+     "days": 14
+    },
+    {
+     "who": "mother",
+     "kind": "parental",
+     "start": "2027-06-09",
+     "days": 168
+    },
+    {
+     "who": "father",
+     "kind": "parental",
+     "start": "2027-11-24",
+     "days": 63
+    }
+   ]
+  }
+ },
+ {
+  "id": "magda",
+  "name": "Magdalena Wiśniewska",
+  "who": "mother",
+  "description": "Własna działalność z dobrowolnym chorobowym, zaległość w składkach i podstawa podniesiona w ciąży. Partner na zleceniu bez dobrowolnego chorobowego.",
+  "insurance": [
+   {
+    "title": "pozarolnicza działalność gospodarcza",
+    "payer": "płatnik własnych składek",
+    "start": "2025-02-01",
+    "end": null,
+    "sickness_insurance": true,
+    "contribution_base": "9000.00"
+   }
+  ],
+  "ezla": [
+   {
+    "number": "ZY 2097152",
+    "start": "2026-09-14",
+    "end": "2026-09-20",
+    "code_b": true
+   }
+  ],
+  "applications": [
+   {
+    "form": "e-ZLA (zwolnienie lekarskie)",
+    "who": "mother",
+    "recipient": "zus",
+    "filed_on": "2026-09-14",
+    "status": "przyjęte"
+   },
+   {
+    "form": "ZAS-53: wniosek o zasiłek chorobowy",
+    "who": "mother",
+    "recipient": "zus",
+    "filed_on": "2026-09-22",
+    "status": "wstrzymane: zaległość w składkach (art. 2a)"
+   }
+  ],
+  "plan": {
+   "family": {
+    "mother": {
+     "employment": "self_employed",
+     "voluntary_sickness": true,
+     "insured_since": "2025-02-01",
+     "contribution_debt": "150.00",
+     "age": 34,
+     "salary_history": [
+      {
+       "month": "2025-09",
+       "gross": "5000.00"
+      },
+      {
+       "month": "2025-10",
+       "gross": "5000.00"
+      },
+      {
+       "month": "2025-11",
+       "gross": "5000.00"
+      },
+      {
+       "month": "2025-12",
+       "gross": "5000.00"
+      },
+      {
+       "month": "2026-01",
+       "gross": "5000.00"
+      },
+      {
+       "month": "2026-02",
+       "gross": "5000.00"
+      },
+      {
+       "month": "2026-03",
+       "gross": "5000.00"
+      },
+      {
+       "month": "2026-04",
+       "gross": "5000.00"
+      },
+      {
+       "month": "2026-05",
+       "gross": "5000.00"
+      },
+      {
+       "month": "2026-06",
+       "gross": "9000.00"
+      },
+      {
+       "month": "2026-07",
+       "gross": "9000.00"
+      },
+      {
+       "month": "2026-08",
+       "gross": "9000.00"
+      }
+     ]
+    },
+    "father": {
+     "employment": "contract",
+     "base_monthly": "4500.00",
+     "payer_insured_count": 3
+    },
+    "due_date": "2027-02-14"
+   },
+   "blocks": [
+    {
+     "who": "mother",
+     "kind": "sick",
+     "start": "2026-09-14",
+     "days": 7
+    },
+    {
+     "who": "mother",
+     "kind": "maternity",
+     "start": "2027-02-14",
+     "days": 140
+    },
+    {
+     "who": "father",
+     "kind": "paternity",
+     "start": "2027-02-14",
+     "days": 14
+    },
+    {
+     "who": "mother",
+     "kind": "parental",
+     "start": "2027-07-04",
+     "days": 180
+    }
+   ]
+  }
+ },
+ {
+  "id": "ola",
+  "name": "Aleksandra Zielińska",
+  "who": "mother",
+  "description": "Umowa na czas określony kończy się w styczniu, przed porodem w kwietniu 2027. Samodzielna mama. Zasiłek po ustaniu ubezpieczenia.",
+  "insurance": [
+   {
+    "title": "umowa o pracę na czas określony",
+    "payer": "Sklep „Przykład” S.A. (40 ubezpieczonych)",
+    "start": "2025-08-01",
+    "end": "2027-01-31",
+    "sickness_insurance": true,
+    "contribution_base": "6500.00"
+   }
+  ],
+  "ezla": [],
+  "applications": [],
+  "plan": {
+   "family": {
+    "mother": {
+     "employment": "employee",
+     "base_monthly": "5608.85",
+     "insured_since": "2025-08-01",
+     "insured_until": "2027-01-31",
+     "payer_insured_count": 40,
+     "age": 27
+    },
+    "due_date": "2027-04-02"
+   },
+   "blocks": [
+    {
+     "who": "mother",
+     "kind": "maternity",
+     "start": "2027-04-02",
+     "days": 140
+    },
+    {
+     "who": "mother",
+     "kind": "parental",
+     "start": "2027-08-20",
+     "days": 180
+    }
+   ]
+  }
+ }
+]

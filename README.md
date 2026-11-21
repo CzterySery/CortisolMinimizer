@@ -97,10 +97,12 @@ Wszystkie endpointy są pod `/api/v1`, a pełna lista jest w `/docs`. Działają
 | GET | `/api/v1/game/preview` | statyczny podgląd planszy z pustymi statystykami |
 | POST | `/api/v1/game/simulate` | odtworzenie wybranych kart, plan, wspólne pule i wykonalność kolejnych kart |
 | POST | `/api/v1/calc/base`, `/api/v1/calc/plan` | podstawa zasiłku i kalkulator planu z walidacją prawną |
-| GET | `/api/v1/info/links` | oficjalne źródła (ZUS, MRPiPS, PIP) |
+| GET | `/api/v1/info/links`, `/api/v1/info/charities` | oficjalne źródła (ZUS, MRPiPS, PIP) i sprawdzone fundacje (z numerem KRS) |
+| GET/POST | `/api/v1/auth/personas`, `/api/v1/auth/mobywatel`, `/api/v1/zus/me` | symulowane logowanie mObywatel i konto eZUS: ubezpieczenia, e-ZLA, zaświadczenie o niezaleganiu, złożone dokumenty |
+| POST | `/api/v1/applications`, `/api/v1/usc/birth-certificate`, `/api/v1/pue/messages` | symulowane wysłanie wniosku, wniosek o odpis aktu urodzenia, pytanie do ZUS (gotowe odpowiedzi) |
 | GET/PUT | `/api/v1/admin/params` (+ `/versions`) | parametry prawne, każda zmiana to nowa wersja (nagłówek `Authorization: Bearer $ADMIN_TOKEN`) |
 
-Pozostałe (gra z sesją, sprawy, symulacje mObywatel/PUE/wniosków, talia w panelu) mają gotowy kontrakt i zwracają `501` do czasu implementacji.
+Pozostałe (sprawy, talia i wnioski w panelu administracyjnym) mają gotowy kontrakt i zwracają `501` do czasu implementacji.
 
 ## Karty i późniejsza baza
 

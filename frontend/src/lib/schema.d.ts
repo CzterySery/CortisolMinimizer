@@ -228,68 +228,20 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/zus/me/insurance": {
+    "/api/v1/zus/me": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Insurance */
-        get: operations["insurance_api_v1_zus_me_insurance_get"];
+        /**
+         * Account
+         * @description Everything the simulated eZUS account shows: insurance, e-ZLA, debt certificate, filed applications.
+         */
+        get: operations["account_api_v1_zus_me_get"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/zus/me/ezla": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Ezla */
-        get: operations["ezla_api_v1_zus_me_ezla_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/zus/me/debt-certificate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Debt Certificate */
-        get: operations["debt_certificate_api_v1_zus_me_debt_certificate_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/pue/messages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Pue */
-        post: operations["pue_api_v1_pue_messages_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -324,6 +276,23 @@ export interface paths {
         put?: never;
         /** Birth Certificate */
         post: operations["birth_certificate_api_v1_usc_birth_certificate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pue/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pue */
+        post: operations["pue_api_v1_pue_messages_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -462,9 +431,17 @@ export interface components {
              * @enum {string}
              */
             who: "mother" | "father";
-            /** Payload */
-            payload: {
-                [key: string]: unknown;
+            /**
+             * Recipient
+             * @enum {string}
+             */
+            recipient: "employer" | "zus" | "usc";
+            /**
+             * Payload
+             * @default {}
+             */
+            payload?: {
+                [key: string]: string;
             };
         };
         /** ApplicationOut */
@@ -513,6 +490,11 @@ export interface components {
         };
         /** BirthCertificateRequest */
         BirthCertificateRequest: {
+            /**
+             * Who
+             * @enum {string}
+             */
+            who: "mother" | "father";
             /** Child Name */
             child_name: string;
             /**
@@ -746,8 +728,17 @@ export interface components {
             name: string;
             /** Url */
             url: string;
+            /** Krs */
+            krs: string;
+            /** Description */
+            description: string;
             /** Helps With */
             helps_with: string[];
+            /**
+             * Phone
+             * @default
+             */
+            phone: string;
         };
         /** Combo */
         "Combo-Input": {
@@ -847,6 +838,10 @@ export interface components {
              * @default
              */
             note: string;
+            /** Start */
+            start: string | null;
+            /** End */
+            end: string | null;
         };
         /** EZla */
         EZla: {
@@ -943,6 +938,28 @@ export interface components {
             za_zyciem: boolean;
             hospitalization: components["schemas"]["Hospitalization"] | null;
             adoption: components["schemas"]["Adoption"] | null;
+        };
+        /** FiledApplication */
+        FiledApplication: {
+            /** Form */
+            form: string;
+            /**
+             * Who
+             * @enum {string}
+             */
+            who: "mother" | "father";
+            /**
+             * Recipient
+             * @enum {string}
+             */
+            recipient: "employer" | "zus" | "usc";
+            /**
+             * Filed On
+             * Format: date
+             */
+            filed_on: string;
+            /** Status */
+            status: string;
         };
         /** Game */
         "Game-Input": {
@@ -1363,6 +1380,11 @@ export interface components {
             name: string;
             /** Description */
             description: string;
+            /**
+             * Who
+             * @enum {string}
+             */
+            who: "mother" | "father";
         };
         /** Plan */
         "Plan-Input": {
@@ -1733,6 +1755,18 @@ export interface components {
             /** Context */
             ctx?: Record<string, never>;
         };
+        /** ZusAccount */
+        ZusAccount: {
+            persona: components["schemas"]["Persona"];
+            /** Insurance */
+            insurance: components["schemas"]["InsurancePeriod"][];
+            /** Ezla */
+            ezla: components["schemas"]["EZla"][];
+            debt: components["schemas"]["DebtCertificate"];
+            /** Applications */
+            applications: components["schemas"]["FiledApplication"][];
+            plan: components["schemas"]["Plan-Output"];
+        };
     };
     responses: never;
     parameters: never;
@@ -2093,10 +2127,12 @@ export interface operations {
             };
         };
     };
-    insurance_api_v1_zus_me_insurance_get: {
+    account_api_v1_zus_me_get: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2108,71 +2144,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InsurancePeriod"][];
-                };
-            };
-        };
-    };
-    ezla_api_v1_zus_me_ezla_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EZla"][];
-                };
-            };
-        };
-    };
-    debt_certificate_api_v1_zus_me_debt_certificate_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DebtCertificate"];
-                };
-            };
-        };
-    };
-    pue_api_v1_pue_messages_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PueMessage"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PueReply"];
+                    "application/json": components["schemas"]["ZusAccount"];
                 };
             };
             /** @description Validation Error */
@@ -2189,7 +2161,9 @@ export interface operations {
     submit_application_api_v1_applications_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2222,7 +2196,9 @@ export interface operations {
     birth_certificate_api_v1_usc_birth_certificate_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2239,6 +2215,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApplicationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pue_api_v1_pue_messages_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PueMessage"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PueReply"];
                 };
             };
             /** @description Validation Error */

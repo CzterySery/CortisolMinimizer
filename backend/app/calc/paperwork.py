@@ -28,20 +28,24 @@ def documents(plan: Plan, p: Params) -> list[Document]:
     found: dict[tuple, tuple[date, Document]] = {}
 
     def add(who: str, form: str, recipient: str, rule: str, note: str = "", due: date | None = None,
-            order: date | None = None) -> None:
-        doc = Document(form=form, who=who, recipient=recipient, due_by=due, rule=rule, note=note.strip())
+            order: date | None = None, start: date | None = None, end: date | None = None) -> None:
+        doc = Document(form=form, who=who, recipient=recipient, due_by=due, rule=rule, note=note.strip(),
+                       start=start, end=end)
         found.setdefault((form, who, recipient, due, note), (due or order or birth, doc))
 
     for b in blocks:
         parent = parents[b.who]
-        if parent.employment == "none" or b.kind == "vacation":
-            continue  # no insurance means no benefit (rules.py flags it); paid leave needs no benefit paperwork
-        _block(b, parent, parents, plan, p, birth, maternity_end, partial(add, order=b.start))
+        uninsured = parent.employment == "none" or (parent.employment != "employee" and not parent.voluntary_sickness)
+        if uninsured or b.kind == "vacation":
+            continue  # no sickness insurance, no benefit (rules.py flags it); paid leave needs no benefit paperwork
+        _block(b, parent, parents, plan, p, birth, maternity_end, partial(add, order=b.start, start=b.start, end=last_day(b)))
 
     mother = parents["mother"]
     if plan.rate_variant == "averaged" and mother.employment != "none":
-        employee = mother.employment == "employee"
-        add("mother", "Wniosek o zasiłek macierzyński w wysokości 81,5%", "employer" if employee else payer(mother, p),
+        ended = mother.insured_until is not None and mother.insured_until < birth
+        employee = mother.employment == "employee" and not ended
+        add("mother", "Wniosek o zasiłek macierzyński w wysokości 81,5%",
+            "employer" if employee else "zus" if ended else payer(mother, p),
             "art. 30a ust. 1", "Wniosek pisemny; obejmuje macierzyński i cały rodzicielski poza 9 tygodniami taty."
             + ("" if employee else " Zaznacz tę opcję we wniosku ZAM."),
             due=birth + timedelta(days=p.deadlines.averaged_request_days_after_birth))
@@ -65,7 +69,9 @@ def _pays(b: Block, parent: Parent, p: Params) -> str:
 def _block(b: Block, parent: Parent, parents: dict[str, Parent], plan: Plan, p: Params, birth: date,
            maternity_end: date | None, add) -> None:
     who, kind = b.who, b.kind
-    employee, jdg = parent.employment == "employee", parent.employment == "self_employed"
+    ended = parent.insured_until is not None and b.start > parent.insured_until
+    # only a current employee files with the employer; after the contract ends it's ZAM to ZUS
+    employee, jdg = parent.employment == "employee" and not ended, parent.employment == "self_employed"
     pays = _pays(b, parent, p)
     registry = FROM_REGISTRY if pays == "zus" and kind in MATERNITY_BENEFIT else ""
     period = f"Okres {b.start.isoformat()} – {last_day(b).isoformat()}. "
@@ -152,10 +158,11 @@ def _block(b: Block, parent: Parent, parents: dict[str, Parent], plan: Plan, p: 
 
     # payer certificate: when ZUS pays, the employer (Z-3) or contracting party (Z-3a) certifies pay and periods
     if pays == "zus" and not jdg and kind != "job_loss_benefit" and (kind != "sick" or _zus_sick(b, parent, plan, p)):
-        form, issuer = ("Z-3", "pracodawca") if employee else ("Z-3a", "zleceniodawca")
+        form, issuer = ("Z-3", "pracodawca") if parent.employment == "employee" else ("Z-3a", "zleceniodawca")
         add(who, f"{form}: zaświadczenie płatnika składek do {BENEFIT[kind]}", "zus",
             f"art. 61 ust. 3; rozp. dok. § 3 ust. 1 pkt {1 if employee else 2}",
-            f"Wystawia {issuer} (zgłasza najwyżej {p.payer_threshold_insured} osób) i wysyła do ZUS."
+            (f"Wystawia były {issuer} i wysyła do ZUS." if ended else
+             f"Wystawia {issuer} (zgłasza najwyżej {p.payer_threshold_insured} osób) i wysyła do ZUS.")
             + (" Na kolejne zwolnienia wystarczy ZAS-12." if employee and kind == "sick" else "") + registry)
 
 

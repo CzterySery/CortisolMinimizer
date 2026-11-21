@@ -115,6 +115,15 @@ def test_after_insurance_ends_zus_pays():
 def test_uninsured_parent_and_vacation_get_no_benefit_paperwork():
     assert docs(blk("mother", "maternity", BIRTH, 140), blk("father", "vacation", BIRTH, 5),
                 mother=parent("none")) == []
+    no_voluntary = Parent(employment="contract", base_monthly=Decimal(4000))  # zlecenie without voluntary sickness
+    assert docs(blk("father", "paternity", BIRTH, 14), father=no_voluntary) == []
+
+
+def test_after_the_contract_ends_she_files_zam_with_zus_and_the_former_employer_sends_z3():
+    found = docs(blk("mother", "maternity", BIRTH, 140), mother=parent(insured=40, insured_until=at(-60)))
+    assert rows(found) == {("ZAM", "mother", "zus", None), ("Z-3", "mother", "zus", None)}
+    assert next(d for d in found if d.form.startswith("Z-3")).note.startswith("Wystawia były pracodawca")
+    assert (found[0].start, found[0].end) == (BIRTH, at(139))  # the period, for pre-filled forms
 
 
 def test_plan_explains_the_payer():

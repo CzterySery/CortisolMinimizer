@@ -1,0 +1,69 @@
+[
+ {
+  "name": "Fundacja Wcześniak Rodzice-Rodzicom",
+  "url": "https://www.wczesniak.pl",
+  "krs": "0000191989",
+  "description": "Poradnik dla rodziców wcześniaków, bezpłatna wypożyczalnia sprzętu, program mentorów (rodzice starszych wcześniaków).",
+  "helps_with": [
+   "wcześniak",
+   "przedwczesny poród"
+  ],
+  "phone": ""
+ },
+ {
+  "name": "Fundacja Warszawskie Hospicjum dla Dzieci",
+  "url": "https://hospicjum.waw.pl",
+  "krs": "0000097123",
+  "description": "Hospicjum perinatalne dla rodzin spodziewających się dziecka z wadą letalną; grupy wsparcia w żałobie dla rodziców i rodzeństwa, także po stracie przed porodem.",
+  "helps_with": [
+   "ciężko chore dziecko",
+   "śmierć dziecka",
+   "poronienie"
+  ],
+  "phone": "22 678 16 11"
+ },
+ {
+  "name": "Fundacja Gajusz",
+  "url": "https://gajusz.org.pl/hospicjum-perinatalne",
+  "krs": "0000109866",
+  "description": "Bezpłatne hospicjum perinatalne (Łódź): lekarz, psycholog i koordynator przed porodem, w szpitalu i po śmierci dziecka.",
+  "helps_with": [
+   "ciężko chore dziecko",
+   "śmierć dziecka"
+  ],
+  "phone": ""
+ },
+ {
+  "name": "Fundacja Nagle Sami",
+  "url": "https://naglesami.org.pl",
+  "krs": "0000398530",
+  "description": "Bezpłatny Telefon Wsparcia dla osób w żałobie (dni robocze 14:00–20:00) i konsultacje psychologiczne.",
+  "helps_with": [
+   "śmierć dziecka",
+   "poronienie"
+  ],
+  "phone": "800 108 108"
+ },
+ {
+  "name": "Fundacja Medycyny Prenatalnej im. Ernesta Wójcickiego (Fundacja Ernesta)",
+  "url": "https://fundacjaernesta.pl",
+  "krs": "0000789473",
+  "description": "Bezpłatna pomoc psychologiczna i prawna po poronieniu, martwym urodzeniu i w trudnych sytuacjach okołoporodowych.",
+  "helps_with": [
+   "poronienie",
+   "śmierć dziecka",
+   "ciężko chore dziecko"
+  ],
+  "phone": "22 350 00 50"
+ },
+ {
+  "name": "Fundacja Dzieciom „Zdążyć z Pomocą”",
+  "url": "https://www.dzieciom.pl",
+  "krs": "0000037904",
+  "description": "Subkonta na leczenie i rehabilitację chorych i niepełnosprawnych dzieci, bezpłatne poradnictwo psychologiczne i społeczno-prawne.",
+  "helps_with": [
+   "ciężko chore dziecko"
+  ],
+  "phone": ""
+ }
+]

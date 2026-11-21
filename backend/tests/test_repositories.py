@@ -65,3 +65,13 @@ def test_admin_params_roundtrip(monkeypatch):
         del current["rates"]
         assert client.put("/api/v1/admin/params", json=current, headers=AUTH).status_code == 422
         assert len(client.get("/api/v1/admin/params/versions", headers=AUTH).json()) == 2
+
+
+def test_submissions_are_listed_per_persona():
+    first = repositories.add_submission("application", {"form": "ZAM", "who": "mother", "recipient": "zus",
+                                                        "persona": "anna"}, "wysłano (symulacja)")
+    repositories.add_submission("pue", {"question": "?", "persona": None}, "odpowiedź automatyczna")
+    second = repositories.add_submission("usc", {"form": "Odpis", "persona": "anna"}, "wysłano (symulacja)")
+    rows = repositories.list_submissions("anna")
+    assert [r["id"] for r in rows] == [second, first] and rows[1]["payload"]["form"] == "ZAM"
+    assert repositories.list_submissions("magda") == []
