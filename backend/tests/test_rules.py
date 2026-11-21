@@ -8,7 +8,7 @@ from app.calc.plan import compute_plan
 from app.calc.rules import check, supplementary_weeks
 from app.params import Params
 from app.repositories import DATA
-from app.schemas import Adoption, Block, Family, Hospitalization, Parent, Plan
+from app.schemas import Adoption, Block, Family, Hospitalization, MonthPay, Parent, Plan
 
 P = Params.model_validate_json((DATA / "params.json").read_text(encoding="utf-8"))
 BIRTH = date(2027, 3, 1)
@@ -106,6 +106,17 @@ CASES = {
     "rehab without sickness": ([blk("father", "rehab", at(10), 30)], {}, "rehab.sick-not-exhausted"),
     "adoption": ([MATERNITY], {"adoption": Adoption(kind="adoption", child_age_years=3, accepted_on=BIRTH)},
                  "adoption.not-checked"),
+    "benefit before insurance": ([MATERNITY], {"mother": Parent(employment="employee", base_monthly=Decimal(6000),
+                                                                insured_since=at(10))}, "insured-parent.not-yet-insured"),
+    "insured during pregnancy": ([MATERNITY], {"mother": Parent(employment="employee", base_monthly=Decimal(6000),
+                                                                insured_since=at(-100))},
+                                 "insured-parent.started-in-pregnancy"),
+    "base raised in pregnancy": ([MATERNITY], {"mother": Parent(employment="employee", salary_history=[
+        MonthPay(month=f"2026-{m:02d}", gross=Decimal(9000 if m == 9 else 6000)) for m in range(1, 13)])},
+                                 "base.raised-in-pregnancy"),
+    "insurance ends before birth": ([MATERNITY], {"mother": Parent(employment="contract", voluntary_sickness=True,
+                                                                   base_monthly=Decimal(5000), insured_until=at(-10))},
+                                    "insured-parent.ends-before-birth"),
 }
 
 
@@ -128,6 +139,18 @@ def test_deadlines_only_with_today():
     assert {"averaged.deadline", "paternity.notice"} <= found
     found = codes([MATERNITY, blk("mother", "parental", at(140), 30, "0.5")], today=at(130))
     assert {"parental-docs.notice", "part-time.notice"} <= found
+    handover = [blk("mother", "maternity", BIRTH, 98), blk("father", "maternity", at(98), 42)]
+    assert "transfer.notice" in codes(handover, today=at(90))
+    assert "transfer.notice" not in codes(handover, today=at(80))
+
+
+def test_contract_end_before_birth_is_a_warning_for_employees():
+    # a fixed-term contract may be extended to the birth (KP art. 177 § 3), so only a warning
+    mother = Parent(employment="employee", base_monthly=Decimal(6000), insured_until=at(-10))
+    assert {i.code: i.severity for i in issues([MATERNITY], mother=mother)} == {
+        "insured-parent.ends-before-birth": "warning"}
+    lost_job = [blk("mother", "job_loss_benefit", at(-9), 9), MATERNITY]  # art. 30 ust. 1: still entitled
+    assert "insured-parent.ends-before-birth" not in codes(lost_job, mother=mother)
 
 
 def test_supplementary_entitlement_table():

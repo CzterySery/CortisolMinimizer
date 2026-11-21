@@ -11,7 +11,11 @@ import { PageHeader } from "@/components/page-header";
 import { PlanTimeline } from "@/components/plan/plan-timeline";
 
 const initial: S["Plan-Input"] = {
-  family: { mother: { employment: "employee", base_monthly: "6000" }, due_date: "2027-03-01" },
+  family: {
+    mother: { employment: "employee", base_monthly: "6000" },
+    father: { employment: "employee", base_monthly: "8000" },
+    due_date: "2027-03-01",
+  },
   blocks: [{ who: "mother", kind: "maternity", start: "2027-03-01", days: 140 }],
 };
 

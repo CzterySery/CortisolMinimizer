@@ -10,6 +10,7 @@ export function DocsChecklist({ documents }: { documents: S["Document"][] }) {
         <li key={i} className={d.done ? "done" : ""}>
           <strong>{d.form}</strong> · {whoLabel[d.who]} → {recipientLabel[d.recipient]}
           {d.due_by && <> · do {day(d.due_by)}</>}
+          <small>{d.note && <>{d.note} </>}({d.rule})</small>
           <span className="sr-only">{d.done ? " (gotowe)" : " (do zrobienia)"}</span>
         </li>
       ))}

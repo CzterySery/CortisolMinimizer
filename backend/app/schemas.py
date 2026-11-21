@@ -103,6 +103,7 @@ class Parent(Model):
     employment: Employment
     voluntary_sickness: bool = False
     insured_since: date | None = None
+    insured_until: date | None = None  # last day of the insurance title: contract end, JDG closed (brief H.3)
     base_monthly: Decimal | None = None   # podstawa wymiaru; derived from salary_history when absent
     salary_history: list[MonthPay] = []
     full_time: bool = True  # art. 45 floor when the base is computed from salary_history
@@ -183,10 +184,12 @@ class Pools(Model):
 
 class Document(Model):
     form: str  # ZAM, Z-3, Z-15A, wniosek o urlop ...
-    who: Who
+    who: Who  # whose benefit or leave it is (a Z-3 is still issued by the employer)
     recipient: Recipient
     due_by: date | None = None
     done: bool = False
+    rule: str  # legal basis, e.g. "KP art. 182^1d § 1; rozp. wn. § 15"
+    note: str = ""  # how to file it, what to attach, who issues it
 
 
 class Issue(Model):

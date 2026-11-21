@@ -8,7 +8,8 @@ from decimal import Decimal
 from itertools import pairwise
 from math import ceil
 
-from app.calc.plan import KIND, ONE, WHO, day_map, last_day, pool_sizes
+from app.calc.base import pln
+from app.calc.plan import KIND, MATERNITY_BENEFIT, ONE, WHO, day_map, last_day, pool_sizes
 from app.params import Params
 from app.schemas import Block, Issue, Plan, PlanResult
 
@@ -68,11 +69,42 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
             add(f"{rule_id}.before-birth", "error", f"{span(b)}: ten okres może zacząć się dopiero po narodzinach "
                 "dziecka.", rule)
 
-    # --- insurance: no title or no sickness insurance means no benefits (art. 2a, 4, 29) ---
+    # --- insurance: no title or no sickness insurance means no benefits (art. 2a, 4, 29); risks from brief part H ---
+    pregnancy = f.due_date - timedelta(weeks=p.maternity.pregnancy_weeks)
     for who, parent in parents.items():
-        taken = [b for b in plan.blocks if b.who == who and b.kind in BENEFITS]
+        taken = sorted((b for b in plan.blocks if b.who == who and b.kind in BENEFITS), key=lambda b: b.start)
         if not taken:
             continue
+        since, until = parent.insured_since, parent.insured_until
+        if since and taken[0].start < since:
+            add("insured-parent.not-yet-insured", "error", f"{span(taken[0])}: zaczyna się przed początkiem "
+                f"ubezpieczenia ({since.isoformat()}).", "art. 29 ust. 1")
+        if since and pregnancy < since <= birth:
+            add("insured-parent.started-in-pregnancy", "warning", f"{WHO[who]}: ubezpieczenie zaczęło się w czasie "
+                f"ciąży ({since.isoformat()}). ZUS może sprawdzić, czy umowa lub działalność nie jest pozorna; wtedy "
+                "stwierdzi niepodleganie ubezpieczeniu i zasiłki nie przysługują.", "zadanie ZUS, cz. H pkt 1")
+        in_pregnancy = [m for m in parent.salary_history if f"{pregnancy:%Y-%m}" <= m.month <= f"{birth:%Y-%m}"]
+        before = [m.gross for m in parent.salary_history if m.month < f"{pregnancy:%Y-%m}"]
+        raised = [m for m in in_pregnancy if before and m.gross > max(before)]
+        if raised:
+            add("base.raised-in-pregnancy", "warning", f"{WHO[who]}: w czasie ciąży wynagrodzenie (podstawa składek) "
+                f"wzrosło ({raised[0].month}: {pln(raised[0].gross)}). ZUS może sprawdzić, czy podwyżka nie miała "
+                "tylko podnieść zasiłku, i ustalić niższą podstawę.", "zadanie ZUS, cz. H pkt 2")
+        # shortcut: only the birth date is checked; benefits after an insurance that ended later (and the
+        # father's) need the art. 7 / art. 29 exceptions modelled first
+        maternity_type = any(b.kind in MATERNITY_BENEFIT for b in taken)
+        job_loss = any(b.kind == "job_loss_benefit" for b in taken)  # art. 30 ust. 1 pkt 1 covers that case
+        if who == "mother" and until and until < birth and maternity_type and not job_loss:
+            if parent.employment == "employee":
+                add("insured-parent.ends-before-birth", "warning", f"Mama: umowa kończy się {until.isoformat()}, "
+                    "przed porodem. Umowa na czas określony lub na okres próbny dłuższy niż miesiąc, która skończyłaby "
+                    "się po 3. miesiącu ciąży, przedłuża się do dnia porodu i zasiłek macierzyński przysługuje; po innym "
+                    "rozwiązaniu umowy bez ubezpieczenia w dniu porodu zasiłku nie ma.",
+                    "KP art. 177 § 3; art. 30 ust. 4; art. 29 ust. 1")
+            elif parent.employment != "none":
+                add("insured-parent.ends-before-birth", "error", f"Mama: ubezpieczenie kończy się {until.isoformat()}, "
+                    "przed porodem, więc zasiłek macierzyński nie przysługuje. Nie kończ umowy ani działalności i nie "
+                    "wyrejestrowuj się z ubezpieczenia chorobowego przed porodem.", "art. 29 ust. 1")
         if parent.employment == "none":
             add("insured-parent.not-insured", "error", f"{WHO[who]} nie ma tytułu do ubezpieczenia chorobowego, więc "
                 "zasiłki nie przysługują.", "art. 29 ust. 1")
@@ -258,6 +290,11 @@ def _deadlines(plan: Plan, birth: date, days, p: Params, add) -> None:
             if b.start - timedelta(days=notice) < today:
                 add(code, "warning", f"{WHO[b.who]}: wniosek o {KIND[b.kind].lower()} od {b.start.isoformat()} trzeba "
                     f"złożyć co najmniej {notice} dni wcześniej; pracodawca może się zgodzić na krótszy termin.", rule)
+        if b.kind == "maternity" and b.who == "father" and b.start - timedelta(
+                days=d.maternity_takeover_notice_days) < today:
+            add("transfer.notice", "warning", f"Wniosek taty o pozostałą część macierzyńskiego od {b.start.isoformat()} "
+                f"składa się co najmniej {d.maternity_takeover_notice_days} dni wcześniej, a rezygnację mamy co najmniej "
+                f"{d.maternity_resign_notice_days} dni przed jej powrotem do pracy.", "KP art. 180 § 8–9")
         if b.work_fraction and b.start - timedelta(days=d.part_time_notice_days) < today:
             add("part-time.notice", "warning", f"Wniosek o pracę w trakcie rodzicielskiego od {b.start.isoformat()} "
                 f"składa się co najmniej {d.part_time_notice_days} dni wcześniej.", "KP art. 182^1e § 2")
