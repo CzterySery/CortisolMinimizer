@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 from app.repositories import get_catalog
 from app.schemas import Card, Catalog, Preview, Round, Statistic
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter()
 
 
 @router.get("/health", tags=["health"])

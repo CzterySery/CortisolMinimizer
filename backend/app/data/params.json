@@ -1,0 +1,76 @@
+{
+  "effective_from": "2026-01-01",
+  "contribution_deduction": "0.1371",
+  "min_wage": "4806.00",
+  "voluntary_base_cap": "20321.30",
+  "parental_benefit_floor": "1000.00",
+  "payer_threshold_insured": 20,
+  "debt_threshold_pct_min_wage": "0.01",
+  "rates": {
+    "sick": "0.80",
+    "sick_pregnancy": "1.00",
+    "maternity": "1.00",
+    "supplementary": "1.00",
+    "paternity": "1.00",
+    "job_loss": "1.00",
+    "parental": "0.70",
+    "averaged": "0.815",
+    "care": "0.80"
+  },
+  "sick": {
+    "employer_days": 33,
+    "employer_days_50plus": 14,
+    "period_days": 182,
+    "period_days_pregnancy": 270,
+    "period_days_after_insurance": 91,
+    "waiting_days_mandatory": 30,
+    "waiting_days_voluntary": 90,
+    "break_days_same_period": 60
+  },
+  "maternity": {
+    "weeks_by_children": [20, 31, 33, 35, 37],
+    "prebirth_max_weeks": 6,
+    "mother_personal_weeks": 14,
+    "mother_personal_weeks_incapacity": 8,
+    "stillbirth_weeks": 8,
+    "after_death_min_days": 7,
+    "adoption_min_weeks": 9
+  },
+  "parental": {
+    "weeks_single": 41,
+    "weeks_multiple": 43,
+    "weeks_za_zyciem_single": 65,
+    "weeks_za_zyciem_multiple": 67,
+    "exclusive_weeks": 9,
+    "max_parts": 5,
+    "last_child_age_years": 6,
+    "part_time_max_fraction": "0.5",
+    "part_time_cap_weeks_single": 82,
+    "part_time_cap_weeks_multiple": 86
+  },
+  "paternity": {
+    "days": 14,
+    "min_part_days": 7,
+    "max_parts": 2,
+    "use_by_child_months": 12,
+    "notice_days": 7
+  },
+  "supplementary": {
+    "extreme": {"before_pregnancy_week": 28, "max_weight_g": 1000, "cap_weeks": 15},
+    "preterm": {"before_pregnancy_week": 37, "cap_weeks": 8},
+    "term": {"min_stay_days": 2, "window_from_day": 5, "window_to_day": 28, "cap_weeks": 8}
+  },
+  "deadlines": {
+    "averaged_request_days_after_birth": 21,
+    "part_time_notice_days": 21,
+    "supplementary_notice_days_before_maternity_end": 21
+  },
+  "care": {
+    "days_per_year_child_under_14": 60,
+    "days_per_year_other": 14
+  },
+  "game": {
+    "round_offsets_days": [-70, 0, 14, 90, 730],
+    "budget_target_ratio": "0.80"
+  }
+}
