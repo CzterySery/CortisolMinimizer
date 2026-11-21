@@ -30,10 +30,12 @@
           "explanation": "Brak dodatkowych dni przed porodem; cała pula pozostaje po narodzinach."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "reserve",
@@ -121,7 +123,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -151,10 +153,12 @@
           "explanation": "Wcześniejsze wolne zużywa tę samą pulę; mniej macierzyńskiego zostaje po porodzie."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "preparation",
@@ -251,7 +255,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -285,10 +289,12 @@
           "explanation": "Dni niezdolności nie są automatycznie dniami zdolności do opieki; przed porodem nie zwiększają pokrycia potrzeb dziecka."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "health",
@@ -431,7 +437,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -471,10 +477,12 @@
           "explanation": "Okres leczenia nie oznacza zdolności do osobistej opieki; brak fikcyjnych dodatkowych dni opieki."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "health",
@@ -546,7 +554,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -581,10 +589,12 @@
           "explanation": "Brak zużycia podstawowego macierzyńskiego przed porodem; okres nie zwiększa jeszcze pokrycia opieki po narodzinach."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "security",
@@ -667,7 +677,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -702,10 +712,12 @@
           "explanation": "Rezerwacja nie jest wykorzystaniem urlopu ani dniem zapewnionej opieki; pokazuje przyszły plan."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "adoption",
@@ -804,7 +816,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -833,10 +845,12 @@
           "explanation": "Zużyj pulę ojcowskiego; wspólne dni licz raz do pokrycia opieki, osobno do wspólnego czasu."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "shared",
@@ -954,7 +968,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -990,10 +1004,12 @@
           "explanation": "Wpisz pierwszą część; pozostałe dni pozostają dostępne i nie są jeszcze pokrytą opieką."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "reserve",
@@ -1106,7 +1122,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -1135,10 +1151,12 @@
           "explanation": "Bez bieżącego zużycia puli i bez dodatkowych pokrytych dni; późniejszy blok musi zostać zrealizowany."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "reserve",
@@ -1240,7 +1258,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -1274,10 +1292,12 @@
           "explanation": "Dodaj obliczony blok po macierzyńskim; nie odejmuj go z puli rodzicielskiego."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "health",
@@ -1400,7 +1420,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -1434,10 +1454,12 @@
           "explanation": "Jedna wspólna pula uzupełniającego; ten sam okres nie może zostać przyznany obojgu."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "health",
@@ -1535,7 +1557,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -1571,10 +1593,12 @@
           "explanation": "Wpisz rzeczywisty blok i właściwy wymiar dla wieku oraz ścieżki; nie używaj daty urodzenia jako daty przyjęcia."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "adoption",
@@ -1673,7 +1697,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -1699,10 +1723,12 @@
           "explanation": "Wariant stawek sam nie dodaje dni i nie zmienia puli urlopów."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "budget",
@@ -1805,7 +1831,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -1836,10 +1862,12 @@
           "explanation": "Bez dodatkowych tygodni; pilnuj wykorzystania rodzicielskiego w pierwszym roku i ewentualnego wyrównania."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "budget",
@@ -1953,7 +1981,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -1982,10 +2010,12 @@
           "explanation": "Przenieś dni, nie twórz nowej puli. Okres przedporodowy nie zastępuje wymaganego okresu po porodzie."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "shared",
@@ -2073,7 +2103,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -2105,10 +2135,12 @@
           "explanation": "Bez dodatkowych dni urlopu; mniej otwartych formalności w planie."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "documents",
@@ -2227,7 +2259,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -2259,10 +2291,12 @@
           "explanation": "Zaktualizuj uprawnioną pulę, osobno zachowaj części wyłączne; przy przyjęciu użyj właściwego wariantu."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "rights",
@@ -2366,7 +2400,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -2398,10 +2432,12 @@
           "explanation": "Pokazuje okres pobierania świadczenia bez fikcyjnego urlopu u byłego pracodawcy."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "security",
@@ -2500,7 +2536,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -2536,10 +2572,12 @@
           "explanation": "Kolejne bloki wydłużają pokryty kalendarz; zużywają odpowiednie pule i części obojga."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "shared",
@@ -2661,7 +2699,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -2697,10 +2735,12 @@
           "explanation": "Każdy rodzic zużywa własne dni; pokrycie tej samej potrzeby dziecka licz raz. Wspólny czas przechowuj osobno."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "shared",
@@ -2828,7 +2868,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -2859,10 +2899,12 @@
           "explanation": "Wydłuż właściwy blok zgodnie z zasadami; nie uznawaj całego dnia pracy za zapewnioną osobistą opiekę."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "work",
@@ -2985,7 +3027,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -3021,10 +3063,12 @@
           "explanation": "Rezerwa nie zużywa części ani dni i nie zwiększa pokrytej opieki, dopóki nie stanie się blokiem."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "reserve",
@@ -3128,7 +3172,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -3158,10 +3202,12 @@
           "explanation": "Odejmij wykorzystane dni i część; przyznaj pokrycie wyłącznie za rzeczywiście zamkniętą potrzebę."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "reserve",
@@ -3275,7 +3321,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -3304,10 +3350,12 @@
           "explanation": "Odejmij dni z części ojca i całej puli; nie dodawaj ich ponownie ponad pulę rodziny."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "shared",
@@ -3412,7 +3460,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -3442,10 +3490,12 @@
           "explanation": "Pokryj konkretne dni, zużyj pulę odpowiedniego rodzica i jedną część."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "reserve",
@@ -3564,7 +3614,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -3602,10 +3652,12 @@
           "explanation": "Dwa bloki pokrywają dwie potrzeby i zużywają dwie części; sprawdź sumę wniosków obojga rodziców."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "flexibility",
@@ -3713,7 +3765,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -3745,10 +3797,12 @@
           "explanation": "Oblicz wydłużenie i opiekę godzinową; pozostałe godziny wymagają innego opiekuna."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "work",
@@ -3871,7 +3925,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -3904,10 +3958,12 @@
           "explanation": "Pokryj rzeczywiste dni nagłej opieki; odejmij je ze wspólnego limitu rocznego rodziny."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "emergency",
@@ -4010,7 +4066,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -4043,10 +4099,12 @@
           "explanation": "Ta sama opieka i ten sam wspólny limit; drugi rodzic nie dostaje świadczenia za te same dni."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "emergency",
@@ -4149,7 +4207,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     },
@@ -4188,10 +4246,12 @@
           "explanation": "Dwa rozłączne odcinki pokrywają jedną potrzebę; łączny limit rodziny maleje o rzeczywistą liczbę dni."
         },
         "happiness": {
-          "kind": "game_score",
-          "chips": 10,
-          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+          "kind": "game_balance",
+          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
         }
+      },
+      "game_points": {
+        "chips": 10
       },
       "tags": [
         "emergency",
@@ -4294,7 +4354,7 @@
           "field": "stats.happiness",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Punktacja autorska, bez podstawy prawnej."
+          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
         }
       ]
     }

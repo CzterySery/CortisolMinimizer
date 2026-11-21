@@ -151,8 +151,9 @@ def card(card_id, title, description, conditions, effects, money, time, chips, t
             "description": description, "conditions": conditions, "effects": effects,
             "stats": {"money": {"kind": "derived", "explanation": money},
                       "time": {"kind": "derived", "explanation": time},
-                      "happiness": {"kind": "game_score", "chips": chips,
-                                    "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."}},
+                      "happiness": {"kind": "game_balance",
+                                    "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."}},
+            "game_points": {"chips": chips},
             "tags": tags.split(), "legal_rule_ids": rules.split(),
             "parameter_refs": list(parameters), "combo": combo, "notes": notes}
 
@@ -529,7 +530,7 @@ def make_deck(rules):
                          "rule_ids": rules_for_parameter(path)} for path in c["parameter_refs"]]
         c["claims"].append({"id": f'{c["id"]}.happiness', "field": "stats.happiness",
                             "kind": "game_design", "rule_ids": [],
-                            "explanation": "Punktacja autorska, bez podstawy prawnej."})
+                            "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."})
     return {"schema_version": 1, "status": "design_only_not_runtime_deck",
             "hand_size": 3, "rounds": 5, "cards_per_round": 6,
             "legal_rules_file": "shared/legal-rules.json",
@@ -547,7 +548,7 @@ def render_cards(deck):
              "[deck-design.json](shared/deck-design.json). Zasady wspólne i tryby: "
              "[projekt działania](docs/card-grounding.md)."), "",
              ("Pieniądze i czas są wyliczane z planu, nigdy dodawane jako stały bonus. "
-             "Szczęście to punkty gry. Zerowy wpływ decyzji formalnej na pieniądze lub czas jest poprawny. "
+             "Szczęście jest umownym bilansem pieniędzy i czasu. Punkty combo to osobny projekt. Zerowy wpływ decyzji formalnej na pieniądze lub czas jest poprawny. "
              "Wartości ustawowe są odczytywane przez referencje do parametrów, a nie utrzymywane w treści kart."), ""]
     names = ["Ciąża / przygotowanie do przyjęcia", "Poród / przyjęcie", "Pierwszy miesiąc", "Pierwszy rok", "Kolejne lata"]
     for stage, name in enumerate(names, 1):
@@ -557,8 +558,8 @@ def render_cards(deck):
                       c["description"], "", f'**Kiedy:** {c["conditions"]}', "",
                       f'**Pieniądze:** {c["stats"]["money"]["explanation"]}', "",
                       f'**Czas:** {c["stats"]["time"]["explanation"]}', "",
-                      f'**Szczęście:** {c["stats"]["happiness"]["chips"]} bazowych punktów za poprawnie zrealizowaną decyzję. ' +
-                      "Punkty są autorską mechaniką gry.", "", "**Zmiana stanu:**", "", "```json",
+                      '**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.', "",
+                      f'**Punkty combo (projekt):** {c["game_points"]["chips"]} bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.', "", "**Zmiana stanu:**", "", "```json",
                       json.dumps(c["effects"], ensure_ascii=False, indent=2), "```", "",
                       "**Podstawy:** " + ", ".join(rule_link(r) for r in c["legal_rule_ids"]) + ".", "",
                       "**Parametry:** " + (", ".join(f'`{p}`' for p in c["parameter_refs"]) or "wymagają uzupełnienia przed wdrożeniem") + ".", ""]

@@ -20,7 +20,7 @@ Efekty w JSON są deklaratywną specyfikacją: `add_block`, `set_rate_variant`, 
 | --- | --- | --- |
 | Pieniądze | Najniższy miesięczny dochód rodziny w z góry ustalonym horyzoncie scenariusza | Ponowne obliczenie wynagrodzeń, świadczeń i podwyższeń; delta do tego samego planu i horyzontu |
 | Czas | Liczba dni, w których zapewniono wymaganą opiekę | Unia pokrytych potrzeb, bez podwójnego liczenia wspólnych dni; przy pracy częściowej wymagane pokrycie godzinowe |
-| Szczęście | Autorskie punkty za wykonalne decyzje i osiągnięcie celu | Bazowo 10 punktów za każdą zrealizowaną decyzję; combo i premia wybranego trybu |
+| Szczęście | Umowny bilans kierunków pieniędzy i czasu | Równe wagi; poprawa i pogorszenie znoszą się. Niepewność jednego wejścia pozostaje niepewnością bilansu. To autorska mechanika, nie miara zdrowia. |
 
 Każda karta ma opis wpływu na wszystkie trzy statystyki. Nie wymuszamy niezerowej zmiany: samo uporządkowanie dokumentów nie podnosi należnego świadczenia ani nie daje urlopu. Punkty przyznajemy za organizację planu, nie za chorobę czy diagnozę. Zdarzenia związane ze śmiercią dziecka lub matki i porzuceniem nie są punktowanymi kartami tej talii.
 
@@ -40,7 +40,9 @@ Tryb nie zmienia prawa, stawek, dostępności kart ani kwot. Dostępny jest ten 
 
 Dla samotnego rodzica cele aury dotyczą samodzielnej opieki i zorganizowanego wsparcia; nie wymagają nieistniejącego partnera. Nie wymagamy równego podziału za wszelką cenę. Brak celów danej kategorii wyłącza ją z mianownika i przeskalowuje pozostałe wagi. Wynik pieniędzy porównujemy dla tej samej sytuacji i tych samych ograniczeń, nie między rodzinami. Maksimum nie może pochodzić z niewykonalnego układu. Jeśli brak dodatniego należnego świadczenia, cel ma status „nie dotyczy”, a nie karę za brak ubezpieczenia.
 
-Proponowane szczęście: suma punktów kart z combo + do 50 punktów premii za wybrany cel, po normalizacji 0–100. To propozycja do playtestów. Choroby nie mają odrębnego bonusu. Cel i horyzont są zamrożone przed rozdaniem, żeby wybór krótkiego planu nie podnosił sztucznie wyniku.
+Wskaźnik szczęścia nie korzysta z dawnych bazowych punktów kart. W UI powstaje wyłącznie z pieniędzy i czasu dla jawnie wskazanego porównania. Niepewny dochód nie staje się pewnym szczęściem; szrafowany pasek pokazuje umowną ilustrację zakresu, nie przewidywaną kwotę ani pomiar samopoczucia. Nie sumujemy znaków z różnych okresów jako liczby dni lub punktów całego planu. [Audyt wszystkich kart](card-impact-audit.md) rozdziela skutki w porównywanym okresie od późniejszych.
+
+Punkty combo i ewentualna premia wybranego celu pozostają oddzielnym, niewdrożonym projektem punktacji (`game_points`), nie wpływają na obecny wskaźnik szczęścia. Choroba ani diagnoza nie daje samodzielnego bonusu.
 
 Punkty po mnożniku zaokrąglamy do liczby całkowitej metodą ROUND_HALF_UP raz przy rozliczeniu zagrania; premię końcową analogicznie raz przy zakończeniu. Obliczenia balansu używają Decimal. Te reguły są autorską częścią punktacji, niezależną od zasad zaokrąglania świadczeń.
 

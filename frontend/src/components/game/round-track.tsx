@@ -12,8 +12,7 @@ interface RoundTrackProps {
 export function RoundTrack({ stages, currentRound, playedCards, draggedId, onPlayCard }: RoundTrackProps) {
   const [overRound, setOverRound] = useState<number | null>(null);
   return (
-    <section className="rounds-section" aria-labelledby="rounds-title">
-      <div className="section-heading"><h2 id="rounds-title">Wasza historia</h2><span>{playedCards.length} / {stages.length} decyzji na stole</span></div>
+    <section className="rounds-section" aria-label="Etapy planu">
       <ol className="round-track">
         {stages.map((round) => {
           const card = playedCards.find((item) => item.round_id === round.id);

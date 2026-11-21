@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Card, Stage, Statistic } from "@/types/game";
 import { DecisionCard } from "./decision-card";
 import { RoundTrack } from "./round-track";
 import { Statistics } from "./statistics";
+import type { CardSignals } from "@/lib/card-signals";
 
 export interface GameBoardProps {
   mode: "preview" | "game";
@@ -19,9 +20,12 @@ export interface GameBoardProps {
   hand: Card[];
   onPlay: (cardId: string) => void;
   onFocusCard?: (cardId: string) => void;
+  onUnfocusCard?: (cardId: string) => void;
+  simulation?: { signals?: CardSignals; title?: string; hovering: boolean };
   onReset?: () => void;
   summaryHref?: string;
   previewGoal?: string;
+  dealKey?: number;
 }
 
 // Presentational board. State lives in the caller: PreviewGame (local, no backend) or /game/[id] (server game).
@@ -29,17 +33,81 @@ export function GameBoard(props: GameBoardProps) {
   const { mode, stages, currentRound, totalRounds, handSize, statistics, projected, played, hand, onPlay, onFocusCard, onReset, summaryHref } = props;
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const boardRef = useRef<HTMLElement>(null);
+  const deckRef = useRef<HTMLButtonElement>(null);
+  const playAnimation = useRef<Animation | null>(null);
+  const playLocked = useRef(false);
+  const ignoreClickUntil = useRef(0);
+  const playBlockedUntil = useRef(0);
   const complete = currentRound === null;
   const stage = stages.find((item) => item.id === currentRound) ?? stages.at(-1);
+  const stageId = stage?.id;
+
+  useEffect(() => {
+    const animations: Animation[] = [];
+    const deck = deckRef.current;
+    if (deck && !complete && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const origin = deck.getBoundingClientRect();
+      deck.querySelectorAll("span").forEach((layer, index) => {
+        animations.push(layer.animate([
+          { translate: "0 0", rotate: "0deg" },
+          { translate: `${(index - 1) * 12}px -12px`, rotate: `${(index - 1) * 9}deg` },
+          { translate: "0 0", rotate: "0deg" },
+        ], { duration: 420, delay: index * 35, easing: "ease-out" }));
+      });
+      boardRef.current?.querySelectorAll<HTMLElement>(".hand-card").forEach((card, index) => {
+        const target = card.getBoundingClientRect();
+        const dx = origin.left + origin.width / 2 - target.left - target.width / 2;
+        const dy = origin.top + origin.height / 2 - target.top - target.height / 2;
+        animations.push(card.animate([
+          { transform: `translate(${dx}px, ${dy}px) rotate(-12deg) scale(.18)`, opacity: 0 },
+          { opacity: 1, offset: .3 },
+          { transform: "translate(0, 0) rotate(0deg) scale(1)", opacity: 1 },
+        ], { duration: 520, delay: 150 + index * 95, fill: "backwards", easing: "cubic-bezier(.18,.7,.25,1)" }));
+      });
+    }
+    return () => {
+      animations.forEach((animation) => animation.cancel());
+      playAnimation.current?.cancel();
+    };
+  }, [props.dealKey, stageId, complete]);
+
   if (!stage) throw new Error("Brak rundy.");
 
-  function playCard(cardId: string) {
+  async function playCard(cardId: string) {
     const card = hand.find((item) => item.id === cardId);
-    if (complete || !card) return;
+    if (complete || !card || playLocked.current || Date.now() < playBlockedUntil.current) return;
+    playLocked.current = true;
+    setPlayingId(cardId);
     setDraggedId(null);
-    onPlay(cardId);
-    const next = stages.find((item) => item.id === stage!.id + 1);
-    setAnnouncement(`Karta „${card.title}” trafiła na stół. ${next ? `Teraz runda ${next.id}: ${next.title}.` : `Wszystkie ${totalRounds} kart jest na stole.`}`);
+    try {
+      const source = boardRef.current?.querySelector<HTMLElement>(`[data-card-id="${CSS.escape(cardId)}"]`);
+      const target = boardRef.current?.querySelector<HTMLElement>(".round-slot.current");
+      if (source && target && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const from = source.getBoundingClientRect();
+        const to = target.getBoundingClientRect();
+        const dx = to.left + to.width / 2 - from.left - from.width / 2;
+        const dy = to.top + to.height / 2 - from.top - from.height / 2;
+        const animation = source.animate([
+          { transform: "translate(0, 0) scale(1)", opacity: 1 },
+          { transform: `translate(${dx}px, ${dy}px) scale(${to.width / from.width})`, opacity: .15 },
+        ], { duration: 320, easing: "cubic-bezier(.35,0,.2,1)", fill: "forwards" });
+        playAnimation.current = animation;
+        await animation.finished;
+      }
+      playBlockedUntil.current = Date.now() + 250;
+      onPlay(cardId);
+      const next = stages.find((item) => item.id === stage!.id + 1);
+      setAnnouncement(`Karta „${card.title}” trafiła na stół. ${next ? `Teraz runda ${next.id}: ${next.title}.` : `Wszystkie ${totalRounds} kart jest na stole.`}`);
+    } catch {
+      // A restart or navigation cancels the flight; do not commit a stale choice.
+    } finally {
+      playAnimation.current?.cancel();
+      playAnimation.current = null;
+      playLocked.current = false;
+      setPlayingId(null);
+    }
   }
 
   function resetBoard() {
@@ -50,34 +118,48 @@ export function GameBoard(props: GameBoardProps) {
 
   const note = complete
     ? mode === "preview" ? "Układ jest podglądem — statystyki nie są jeszcze przeliczane." : "Wszystkie decyzje są na stole. Zobacz, co oznaczają dla budżetu i opieki."
-    : "Przeciągnij kartę na stół lub użyj przycisku „Połóż na stole”.";
+    : "Kliknij kartę lub przeciągnij ją na stół.";
 
   return (
-    <main className="game-layout">
-      <Statistics statistics={statistics} projected={projected} />
+    <main className="game-layout" ref={boardRef}>
+      <Statistics statistics={statistics} projected={projected} simulation={props.simulation} />
       <div className="main-board">
         <section className="board-context" aria-labelledby="story-title">
-          {mode === "preview" && <span className="preview-badge"><span />Podgląd planszy</span>}
           <p className="eyebrow">{complete ? "Wasz plan jest na stole" : `Runda 0${stage.id} / 0${totalRounds} · ${stage.title}`}</p>
           <h1 id="story-title" className="sr-only">{complete ? "Wasz plan rodziny" : `Runda ${stage.id}: ${stage.title}`}</h1>
-          <p>{complete ? "Wszystkie miejsca są już zajęte. Możesz rozłożyć karty jeszcze raz i sprawdzić inny układ." : stage.description}</p>
+          {mode === "game" && <p>{complete ? "Wszystkie miejsca są już zajęte. Możesz rozłożyć karty jeszcze raz i sprawdzić inny układ." : stage.description}</p>}
           {props.previewGoal && <p className="goal-note">Wasz cel: {props.previewGoal}</p>}
         </section>
         <RoundTrack stages={stages} currentRound={currentRound} playedCards={played} draggedId={draggedId} onPlayCard={playCard} />
         <section className="hand-section" aria-labelledby="hand-title">
-          <div className="section-heading"><h2 id="hand-title">{complete ? "Kompletny stół" : "Twoja ręka"}</h2><span>{complete ? `${played.length} zagranych kart` : `${handSize} karty · przeciągnij jedną na podświetlone miejsce`}</span></div>
-          {!complete && <div className="hand" key={stage.id}>{hand.map((card, index) => (
-            <div className={`hand-card ${draggedId === card.id ? "is-dragging" : ""}`} key={card.id} draggable
+          <div className="section-heading hand-heading"><h2 id="hand-title">{complete ? "Kompletny stół" : "Twoja ręka"}</h2>{mode === "game" && <span>{complete ? `${played.length} zagranych kart` : `${handSize} karty · przeciągnij jedną na podświetlone miejsce`}</span>}
+            {onReset && <button className="deck-stack" ref={deckRef} onClick={resetBoard} aria-label="Rozdaj karty ze stosu" title="Nowe rozdanie"><span /><span /><span><b>c.</b></span></button>}
+          </div>
+          {!complete && <div className="hand" key={`${stage.id}-${props.dealKey ?? 0}`}>{hand.map((card, index) => (
+            <div className={`hand-card ${draggedId === card.id ? "is-dragging" : ""} ${playingId === card.id ? "is-playing" : ""}`} key={card.id} draggable tabIndex={0} role="group" data-card-id={card.id}
+              aria-label={`Karta: ${card.title}. Enter lub spacja, aby zagrać.`}
+              onClick={(event) => {
+                if (Date.now() < ignoreClickUntil.current || (event.target as HTMLElement).closest("button, a, dialog, summary")) return;
+                if (window.getSelection()?.toString()) return;
+                void playCard(card.id);
+              }}
+              onKeyDown={(event) => {
+                if (event.target !== event.currentTarget || !["Enter", " "].includes(event.key)) return;
+                event.preventDefault(); void playCard(card.id);
+              }}
               onPointerEnter={() => onFocusCard?.(card.id)} onFocus={() => onFocusCard?.(card.id)}
+              onPointerLeave={(event) => { if (!event.currentTarget.contains(document.activeElement)) props.onUnfocusCard?.(card.id); }}
+              onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) props.onUnfocusCard?.(card.id); }}
               onDragStart={(event) => {
                 if ((event.target as HTMLElement).closest("button, a, dialog, summary")) { event.preventDefault(); return; }
+                ignoreClickUntil.current = Date.now() + 600;
                 event.dataTransfer.setData("application/x-zus-card", card.id);
                 event.dataTransfer.setData("text/plain", card.id);
                 event.dataTransfer.effectAllowed = "move";
                 setDraggedId(card.id);
-              }} onDragEnd={() => setDraggedId(null)}>
+              }} onDragEnd={() => { setDraggedId(null); ignoreClickUntil.current = Date.now() + 250; }}>
               <DecisionCard card={card} index={index} category={stage.title} />
-              <button className="play-card-button" onClick={() => playCard(card.id)} aria-label={`Zagraj kartę: ${card.title}`}>Połóż na stole <span aria-hidden="true">↑</span></button>
+              <button className="play-card-button" disabled={playingId !== null} onClick={() => void playCard(card.id)} aria-label={`Zagraj kartę: ${card.title}`}>Połóż na stole <span aria-hidden="true">↑</span></button>
             </div>
           ))}</div>}
           <div className="board-controls">
@@ -88,7 +170,6 @@ export function GameBoard(props: GameBoardProps) {
           <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
         </section>
       </div>
-      <div className="deck" aria-hidden="true"><span /><span /><span><b>c.</b></span><small>{mode === "preview" ? "30 kart decyzji" : "Talia decyzji"}</small></div>
     </main>
   );
 }

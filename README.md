@@ -1,5 +1,7 @@
 # Cortisol Minimizer
 
+Kliknięcie powierzchni karty, Enter/spacja lub przeciągnięcie zagrywa ją na stół; przyciski informacji otwierają źródła. Rozdania animują przejście kart ze stosu do ręki, a kliknięcie stosu rozpoczyna nowe rozdanie. Cele planowania znajdują się pod planszą. [Audyt wpływu 30 kart](docs/card-impact-audit.md) określa porównanie, okres, skutek teraz i później oraz podstawy prawne. Nieznany dochód pozostaje nieznany; szczęście jest bilansem pieniędzy i czasu, nie osobną premią.
+
 Strona główna pokazuje [30 kart, po 6 na etap](cards-30.md), rozdaje trzy karty i pozwala sprawdzić ich efekty oraz podstawy prawne. Przycisk „Przejrzyj 30 kart” otwiera całą talię. Opis, warunki i statystyki otwierają wyjaśnienia z cytatami i oryginalnymi PDF-ami. [Mechanika i grounding](docs/card-grounding.md), [źródła prawne w Markdownzie](Documents/legal/README.md). Wyliczenia i prawna kwalifikacja pozostają do wdrożenia; podgląd nie nalicza fikcyjnych kwot ani punktów. Backendowy katalog nadal zawiera wcześniejsze 15 kart. Kontrola projektu: `python scripts/build_deck_design.py --check`.
 
 Gra edukacyjna na hackathon ZUS (HackNation 2026): **Python + FastAPI** oraz **React + Next.js (App Router) + TypeScript**. Jasna plansza nawiązuje do szkicu: statystyki po lewej, pięć miejsc na decyzje na górze, talia w lewym dolnym rogu i trzy karty w ręce. Na telefonie karty układają się pionowo.

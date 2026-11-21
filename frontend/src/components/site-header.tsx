@@ -12,7 +12,7 @@ const nav = [
 export function SiteHeader() {
   return (
     <header className="site-header">
-      <Link className="chapter-brand" href="/" aria-label="Nowy rozdział. Wasze zasady. — strona główna"><span>Nowy rozdział.<br /><em>Wasze zasady.</em></span></Link>
+      <Link className="chapter-brand" href="/" aria-label="Nowy rozdział. Wasze zasady. — strona główna"><span>Nowy rozdział. <em>Wasze zasady.</em></span></Link>
       <nav className="site-nav" aria-label="Główna nawigacja">
         {nav.map(([href, label]) => <Link key={href} href={href}>{label}</Link>)}
       </nav>

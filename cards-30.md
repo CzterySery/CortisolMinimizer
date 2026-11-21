@@ -2,7 +2,7 @@
 
 Po sześć kart na etap, trzy w ręce, jedna decyzja na rundę. To specyfikacja do wdrożenia silnika; plansza pozwala przeglądać i rozdawać 30 kart, a backendowy katalog pozostaje na 15 kartach do czasu wdrożenia silnika. Dane projektu: [deck-design.json](shared/deck-design.json). Zasady wspólne i tryby: [projekt działania](docs/card-grounding.md).
 
-Pieniądze i czas są wyliczane z planu, nigdy dodawane jako stały bonus. Szczęście to punkty gry. Zerowy wpływ decyzji formalnej na pieniądze lub czas jest poprawny. Wartości ustawowe są odczytywane przez referencje do parametrów, a nie utrzymywane w treści kart.
+Pieniądze i czas są wyliczane z planu, nigdy dodawane jako stały bonus. Szczęście jest umownym bilansem pieniędzy i czasu. Punkty combo to osobny projekt. Zerowy wpływ decyzji formalnej na pieniądze lub czas jest poprawny. Wartości ustawowe są odczytywane przez referencje do parametrów, a nie utrzymywane w treści kart.
 
 ## 1. Ciąża / przygotowanie do przyjęcia
 
@@ -17,7 +17,9 @@ Zachowaj całą dostępną pulę macierzyńskiego na czas po porodzie.
 
 **Czas:** Brak dodatkowych dni przed porodem; cała pula pozostaje po narodzinach.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -48,7 +50,9 @@ Rozpocznij macierzyński wcześniej i przygotuj się na narodziny.
 
 **Czas:** Wcześniejsze wolne zużywa tę samą pulę; mniej macierzyńskiego zostaje po porodzie.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -82,7 +86,9 @@ Uporządkuj chorobowe w ciąży na podstawie wystawionego zwolnienia.
 
 **Czas:** Dni niezdolności nie są automatycznie dniami zdolności do opieki; przed porodem nie zwiększają pokrycia potrzeb dziecka.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -120,7 +126,9 @@ Przygotuj sprawę o rehabilitacyjne, gdy chorobowe się wyczerpuje.
 
 **Czas:** Okres leczenia nie oznacza zdolności do osobistej opieki; brak fikcyjnych dodatkowych dni opieki.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -166,7 +174,9 @@ Zabezpiecz szczególną ścieżkę świadczenia przed porodem po utracie zatrudn
 
 **Czas:** Brak zużycia podstawowego macierzyńskiego przed porodem; okres nie zwiększa jeszcze pokrycia opieki po narodzinach.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -205,7 +215,9 @@ Przygotuj plan i dokumenty na przyjęcie dziecka w adopcji albo pieczy niezawodo
 
 **Czas:** Rezerwacja nie jest wykorzystaniem urlopu ani dniem zapewnionej opieki; pokazuje przyszły plan.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -246,7 +258,9 @@ Zaplanuj cały dostępny ojcowski we wspólnym bloku po narodzinach.
 
 **Czas:** Zużyj pulę ojcowskiego; wspólne dni licz raz do pokrycia opieki, osobno do wspólnego czasu.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -279,7 +293,9 @@ Wykorzystaj pierwszą część ojcowskiego i zachowaj drugą na konkretną potrz
 
 **Czas:** Wpisz pierwszą część; pozostałe dni pozostają dostępne i nie są jeszcze pokrytą opieką.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -319,7 +335,9 @@ Zarezerwuj ojcowski na czas, gdy najbardziej przyda się dodatkowa opieka.
 
 **Czas:** Bez bieżącego zużycia puli i bez dodatkowych pokrytych dni; późniejszy blok musi zostać zrealizowany.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -352,7 +370,9 @@ Po hospitalizacji dziecka zaplanuj należny uzupełniający dla mamy.
 
 **Czas:** Dodaj obliczony blok po macierzyńskim; nie odejmuj go z puli rodzicielskiego.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -390,7 +410,9 @@ Po hospitalizacji dziecka zaplanuj należny uzupełniający dla taty.
 
 **Czas:** Jedna wspólna pula uzupełniającego; ten sam okres nie może zostać przyznany obojgu.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -428,7 +450,9 @@ Uruchom plan świadczeń po przyjęciu dziecka na wychowanie.
 
 **Czas:** Wpisz rzeczywisty blok i właściwy wymiar dla wieku oraz ścieżki; nie używaj daty urodzenia jako daty przyjęcia.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -470,7 +494,9 @@ Wybierz podstawowy wariant wypłat za macierzyński i rodzicielski.
 
 **Czas:** Wariant stawek sam nie dodaje dni i nie zmienia puli urlopów.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -500,7 +526,9 @@ Złóż w terminie wniosek o uśredniony wariant wypłat.
 
 **Czas:** Bez dodatkowych tygodni; pilnuj wykorzystania rodzicielskiego w pierwszym roku i ewentualnego wyrównania.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -535,7 +563,9 @@ Zaplanuj powrót mamy do pracy i przejęcie pozostałego macierzyńskiego przez 
 
 **Czas:** Przenieś dni, nie twórz nowej puli. Okres przedporodowy nie zastępuje wymaganego okresu po porodzie.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -568,7 +598,9 @@ Uzupełnij dokumenty, potwierdź podstawę i sprawdź, kto wypłaci świadczenie
 
 **Czas:** Bez dodatkowych dni urlopu; mniej otwartych formalności w planie.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -604,7 +636,9 @@ Zaktualizuj pulę rodzicielskiego na podstawie zaświadczenia „Za życiem”.
 
 **Czas:** Zaktualizuj uprawnioną pulę, osobno zachowaj części wyłączne; przy przyjęciu użyj właściwego wariantu.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -640,7 +674,9 @@ Potwierdź odrębne prawo do macierzyńskiego po ustaniu ubezpieczenia.
 
 **Czas:** Pokazuje okres pobierania świadczenia bez fikcyjnego urlopu u byłego pracodawcy.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -678,7 +714,9 @@ Ułóż rodzicielski w następujących po sobie blokach mamy i taty.
 
 **Czas:** Kolejne bloki wydłużają pokryty kalendarz; zużywają odpowiednie pule i części obojga.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -718,7 +756,9 @@ Zaplanuj wspólny blok rodzicielskiego na okres, gdy potrzebujecie być razem.
 
 **Czas:** Każdy rodzic zużywa własne dni; pokrycie tej samej potrzeby dziecka licz raz. Wspólny czas przechowuj osobno.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -758,7 +798,9 @@ Połącz rodzicielski z uzgodnioną pracą w części etatu.
 
 **Czas:** Wydłuż właściwy blok zgodnie z zasadami; nie uznawaj całego dnia pracy za zapewnioną osobistą opiekę.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -793,7 +835,9 @@ Zabezpiecz bieżącą opiekę i zachowaj konkretny blok rodzicielskiego na póź
 
 **Czas:** Rezerwa nie zużywa części ani dni i nie zwiększa pokrytej opieki, dopóki nie stanie się blokiem.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -833,7 +877,9 @@ Zamień zachowaną pulę ojcowskiego w konkretną opiekę przed upływem terminu
 
 **Czas:** Odejmij wykorzystane dni i część; przyznaj pokrycie wyłącznie za rzeczywiście zamkniętą potrzebę.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -867,7 +913,9 @@ Zaplanuj niewykorzystaną wyłączną część rodzicielskiego taty.
 
 **Czas:** Odejmij dni z części ojca i całej puli; nie dodawaj ich ponownie ponad pulę rodziny.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -902,7 +950,9 @@ Przeznacz pozostały rodzicielski na jeden blok adaptacji.
 
 **Czas:** Pokryj konkretne dni, zużyj pulę odpowiedniego rodzica i jedną część.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -936,7 +986,9 @@ Rozdziel pozostały rodzicielski między dwa okresy potrzebne rodzinie.
 
 **Czas:** Dwa bloki pokrywają dwie potrzeby i zużywają dwie części; sprawdź sumę wniosków obojga rodziców.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -978,7 +1030,9 @@ Wykorzystaj rodzicielski podczas adaptacji, łącząc go z częścią etatu.
 
 **Czas:** Oblicz wydłużenie i opiekę godzinową; pozostałe godziny wymagają innego opiekuna.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -1014,7 +1068,9 @@ W kwalifikującej nagłej sytuacji zaplanuj opiekuńczy mamy.
 
 **Czas:** Pokryj rzeczywiste dni nagłej opieki; odejmij je ze wspólnego limitu rocznego rodziny.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -1051,7 +1107,9 @@ W tej samej nagłej sytuacji zaplanuj opiekuńczy taty.
 
 **Czas:** Ta sama opieka i ten sam wspólny limit; drugi rodzic nie dostaje świadczenia za te same dni.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 
@@ -1088,7 +1146,9 @@ Podziel kwalifikującą nagłą opiekę na kolejne dni mamy i taty.
 
 **Czas:** Dwa rozłączne odcinki pokrywają jedną potrzebę; łączny limit rodziny maleje o rzeczywistą liczbę dni.
 
-**Szczęście:** 10 bazowych punktów za poprawnie zrealizowaną decyzję. Punkty są autorską mechaniką gry.
+**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
 
 **Zmiana stanu:**
 

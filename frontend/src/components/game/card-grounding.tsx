@@ -5,6 +5,7 @@ import legal from "../../../../shared/legal-rules.json";
 import params from "../../../../backend/app/data/params.json";
 import manifest from "../../../../Documents/legal/manifest.json";
 import type { Card } from "@/types/game";
+import { getCardSignals } from "@/lib/card-signals";
 
 const sourceTitles: Record<string, string> = Object.fromEntries(manifest.map((source) => [source.id, source.title]));
 
@@ -64,15 +65,16 @@ export function CardGrounding({ card }: { card: Card }) {
   const design = card.design;
   if (!design) return null;
   const claims = design.claims;
+  const signals = getCardSignals(card);
   const explanation = field.startsWith("parameter:") ? "Wartość z konfiguracji podglądu. W konkretnej sprawie trzeba zastosować wersję właściwą dla daty zdarzenia i sprawdzić wyjątki." :
     field === "description" ? design.description : field === "conditions" ? design.conditions :
-    field === "stats.money" ? design.stats.money.explanation : field === "stats.time" ? design.stats.time.explanation :
-    `${design.stats.happiness.chips} bazowych punktów w projekcie punktacji. ${design.stats.happiness.explanation} W podglądzie nie naliczamy punktów ani combo.`;
-  const ruleIds = design.claims.find((claim) => claim.field === field)?.rule_ids ?? [];
+    field === "stats.money" ? signals?.moneyReason ?? design.stats.money.explanation : field === "stats.time" ? signals?.timeReason ?? design.stats.time.explanation :
+    "Szczęście jest umownym bilansem pieniędzy i czasu w opisanym porównaniu: poprawa jednego obszaru i pogorszenie drugiego równoważą się. Gdy wpływ na dochód lub czas jest nieznany, bilans też pozostaje niepewny. To mechanika gry, nie miara zdrowia ani gwarancja samopoczucia.";
+  const ruleIds = field === "stats.money" || field === "stats.time" ? signals?.ruleIds ?? [] : design.claims.find((claim) => claim.field === field)?.rule_ids ?? [];
   const rules = legal.rules.filter((rule) => ruleIds.includes(rule.id));
-  function inspect(next: string) { setField(next); dialog.current?.showModal(); }
+  function inspect(next: string) { setField(next); if (!dialog.current?.open) dialog.current?.showModal(); }
   function hint(next: string, text: string) {
-    const refs = claims.find((claim) => claim.field === next)?.rule_ids ?? [];
+    const refs = next === "stats.money" || next === "stats.time" ? signals?.ruleIds ?? [] : claims.find((claim) => claim.field === next)?.rule_ids ?? [];
     const locators = legal.rules.filter((rule) => refs.includes(rule.id)).flatMap((rule) => rule.evidence.map((e) => `${sourceTitles[e.document_id]} · ${e.locator}`));
     return `${text}\n${locators.slice(0, 3).join("; ")}\nKliknij, aby przeczytać uzasadnienie.`;
   }
@@ -80,17 +82,23 @@ export function CardGrounding({ card }: { card: Card }) {
     <p className="grounded-description"><button className="grounded-text" onClick={() => inspect("description")}
       title={hint("description", design.description)}>{design.description}<span aria-hidden="true"> ⓘ</span></button></p>
     <button className="card-conditions" onClick={() => inspect("conditions")} title={hint("conditions", design.conditions)}>Warunki zagrania <span aria-hidden="true">↗</span></button>
-    <div className="card-effects" aria-label="Wpływ decyzji">
-      <button onClick={() => inspect("stats.money")} title={hint("stats.money", design.stats.money.explanation)}><span aria-hidden="true">zł</span><strong>Pieniądze</strong><small>Zobacz wpływ</small></button>
-      <button onClick={() => inspect("stats.time")} title={hint("stats.time", design.stats.time.explanation)}><span aria-hidden="true">◷</span><strong>Czas</strong><small>Zobacz wpływ</small></button>
-      <button onClick={() => inspect("stats.happiness")} title="Autorska punktacja gry; kliknij, aby poznać zasady."><span aria-hidden="true">☺</span><strong>Szczęście</strong><small>{design.stats.happiness.chips} pkt · projekt</small></button>
-    </div>
     <dialog ref={dialog} className="evidence-dialog" aria-labelledby={headingId}
       onCancel={(event) => { event.preventDefault(); dialog.current?.close(); }}>
       <header className="dialog-heading"><div><p className="eyebrow">Karta {card.id} · {card.title}</p>
         <h2 id={headingId}>{labels[field.replace("parameter:", "")] ?? "Podstawa informacji"}</h2></div>
         <button className="button" autoFocus onClick={() => dialog.current?.close()}>Zamknij wyjaśnienie</button></header>
+    <div className="card-effects" aria-label="Wpływ decyzji">
+      <button onClick={() => inspect("stats.money")} title={hint("stats.money", signals?.moneyReason ?? design.stats.money.explanation)}><span aria-hidden="true">zł</span><strong>Pieniądze</strong><small>{signals?.money.label ?? "Budżet rodziny"}</small></button>
+      <button onClick={() => inspect("stats.time")} title={hint("stats.time", signals?.timeReason ?? design.stats.time.explanation)}><span aria-hidden="true">◷</span><strong>Czas</strong><small>{signals?.time.label ?? "Plan opieki"}</small></button>
+      <button onClick={() => inspect("stats.happiness")} title="Bilans pieniędzy i czasu; kliknij, aby poznać zasady."><span aria-hidden="true">☺</span><strong>Szczęście</strong><small>{signals?.happiness.label ?? "Bilans planu"}</small></button>
+    </div>
       <p className="evidence-explanation">{explanation}</p>
+      {signals && !field.startsWith("parameter:") && <section className="impact-context" aria-label="Założenia porównania">
+        <p><strong>Porównujemy:</strong> {signals.comparison}</p>
+        <p><strong>Okres:</strong> {signals.period}.</p>
+        <p><strong>Później:</strong> {signals.later}</p>
+        <p>Kierunek dotyczy tego porównania i spełnionych warunków karty. Nie jest wyliczeniem dochodu rodziny ani rankingiem wszystkich kart.</p>
+      </section>}
       {rules.map((rule) => <section className="evidence-rule" key={rule.id}><p>{rule.summary}</p>
         {rule.evidence.map((e, index) => <div className="evidence-quote" key={`${e.document_id}-${index}`}>
           <strong>{sourceTitles[e.document_id]} · {e.locator}</strong><blockquote>{e.quote}</blockquote>

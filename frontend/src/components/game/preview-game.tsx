@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Card, GamePreview } from "@/types/game";
 import { GameBoard } from "./game-board";
 import { DeckLibrary } from "./deck-library";
+import { getCardSignals } from "@/lib/card-signals";
 
 const modes = [
   { id: "calm", title: "Kortyzol Minimizer", text: "Ciągłość opieki, stabilny budżet i formalności na czas." },
@@ -23,19 +24,25 @@ function deal(preview: GamePreview): Card[][] {
   });
 }
 
-// Backend-free walk through the card catalog: no stats, no session, refresh resets. The real game is /game/[id].
+// Backend-free catalog preview with authored, non-numeric signals; no benefit calculations.
 export function PreviewGame({ preview }: { preview: GamePreview }) {
   const [played, setPlayed] = useState<Card[]>([]);
   const [hands, setHands] = useState(() => preview.rounds.map((round) => round.cards.slice(0, preview.hand_size)));
   const [mode, setMode] = useState(modes[0]);
   const [started, setStarted] = useState(false);
   const [library, setLibrary] = useState(false);
+  const [focusedId, setFocusedId] = useState<string | null>(null);
+  const [dealKey, setDealKey] = useState(0);
   const round = preview.rounds[played.length];
+  const focusedCard = hands[played.length]?.find((card) => card.id === focusedId);
+  const signalCard = focusedCard ?? played.at(-1);
 
   function restart() {
     setHands(deal(preview));
     setPlayed([]);
+    setFocusedId(null);
     setStarted(true);
+    setDealKey((key) => key + 1);
   }
 
   return (
@@ -45,9 +52,6 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
         <p>5 etapów · po 6 kart w puli · 3 karty w ręce</p></div>
       <div className="deck-toolbar-actions"><button className="button" onClick={() => setLibrary(true)}>Przejrzyj 30 kart</button>
         <button className="button button-primary" onClick={restart}>{started ? "Nowe rozdanie" : "Potasuj i rozdaj"}</button></div>
-      <div className="mode-options" role="group" aria-label="Wybierz cel planu">{modes.map((item) =>
-        <button key={item.id} className={`mode-option ${mode.id === item.id ? "selected" : ""}`} aria-pressed={mode.id === item.id}
-          onClick={() => setMode(item)}><strong>{item.title}</strong><span>{item.text}</span></button>)}</div>
       <p className="deck-disclaimer">Podgląd talii: wybierasz decyzje i poznajesz ich skutki. Warunki dostępności, wyliczenia i punktację sprawdzi silnik gry po podaniu sytuacji rodziny.</p>
     </section>
     <GameBoard
@@ -59,14 +63,25 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
       statistics={preview.statistics}
       played={played}
       hand={hands[played.length] ?? []}
-      previewGoal={mode.text}
+      dealKey={dealKey}
+      simulation={{ signals: getCardSignals(signalCard), title: signalCard?.title, hovering: !!focusedCard }}
+      onFocusCard={setFocusedId}
+      onUnfocusCard={(id) => setFocusedId((current) => current === id ? null : current)}
       onPlay={(cardId) => {
         const card = hands[played.length]?.find((item) => item.id === cardId);
         // drop and click can both fire for one card: accept only the first play of this round
-        if (card) setPlayed((previous) => (previous.length === played.length ? [...previous, card] : previous));
+        if (card) {
+          setPlayed((previous) => (previous.length === played.length ? [...previous, card] : previous));
+          setFocusedId(null);
+        }
       }}
       onReset={restart}
     />
+    <section className="mode-footer" aria-label="Cele planowania">
+      <div className="mode-options" role="group" aria-label="Wybierz cel planu">{modes.map((item) =>
+        <button key={item.id} className={`mode-option ${mode.id === item.id ? "selected" : ""}`} aria-pressed={mode.id === item.id}
+          onClick={() => setMode(item)}><strong>{item.title}</strong><span>{item.text}</span></button>)}</div>
+    </section>
     <DeckLibrary open={library} onClose={() => setLibrary(false)} rounds={preview.rounds} />
     </>
   );
