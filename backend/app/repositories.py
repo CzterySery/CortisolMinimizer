@@ -1,5 +1,5 @@
 """All persistence in one place: the card catalog (shared JSON) and PostgreSQL for versioned config,
-game states and mock submissions. Callers use these functions only, never SQL."""
+game states, mock submissions and uploaded case PDFs (hash only). Callers use these functions only, never SQL."""
 
 import json
 import os
@@ -63,6 +63,8 @@ def init() -> None:
             CREATE TABLE IF NOT EXISTS submissions (
                 id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, kind TEXT NOT NULL,
                 payload JSONB NOT NULL, status TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+            CREATE TABLE IF NOT EXISTS uploads (
+                sha256 TEXT PRIMARY KEY, extracted JSONB, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
         """)
         # versions <= 1 are the seeds shipped with the code: refreshed on every start so new legal fields reach
         # existing databases; admin edits are versions >= 2 and stay untouched
@@ -115,3 +117,17 @@ def list_submissions(persona: str | None = None) -> list[dict]:
             return c.execute("SELECT id, kind, payload, status, created_at FROM submissions ORDER BY id DESC").fetchall()
         return c.execute("SELECT id, kind, payload, status, created_at FROM submissions "
                          "WHERE payload->>'persona' = %s ORDER BY id DESC", (persona,)).fetchall()
+
+
+def upload_seen(sha256: str) -> dict | None:
+    """Record an uploaded case PDF by its hash (never the file itself); return an earlier upload's stored reading."""
+    with db() as c:
+        c.execute("INSERT INTO uploads (sha256) VALUES (%s) ON CONFLICT DO NOTHING", (sha256,))
+        return c.execute("SELECT extracted FROM uploads WHERE sha256 = %s", (sha256,)).fetchone()["extracted"]
+
+
+def save_reading(sha256: str, extracted: dict) -> None:
+    """Store what was read from an uploaded PDF (by the vision model, or as the user corrected it); only for a hash
+    already recorded by upload_seen, so the same file is not sent to the model again."""
+    with db() as c:
+        c.execute("UPDATE uploads SET extracted = %s WHERE sha256 = %s", (Jsonb(extracted), sha256))

@@ -55,7 +55,15 @@ def documents(plan: Plan, p: Params) -> list[Document]:
     # an employer that pays a maternity-type benefit needs the birth certificate; ZUS fetches it (rozp. dok. § 13 ust. 2)
     by_employer = [b.who for b in blocks if b.kind in MATERNITY_BENEFIT and parents[b.who].employment != "none"
                    and _pays(b, parents[b.who], p) == "employer"]
-    if by_employer and not f.adoption:
+    stillborn = f.child_died_on is not None and f.child_died_on <= birth and not f.adoption
+    maternity = next((b for b in blocks if b.kind == "maternity" and b.who == "mother"), None)
+    if stillborn and maternity and f.mother.employment != "none":
+        add("mother", "Odpis aktu urodzenia z adnotacją o martwym urodzeniu albo zaświadczenie o martwym urodzeniu",
+            "employer" if f.mother.employment == "employee" else _pays(maternity, f.mother, p),
+            "rozp. dok. § 13 ust. 1 pkt 2", "Dołącz do wniosku o zasiłek macierzyński. Jeśli USC nie sporządził aktu "
+            "urodzenia, zaświadczenie o martwym urodzeniu wystawia lekarz położnik albo położna na podstawie "
+            "dokumentacji medycznej, bez względu na czas trwania ciąży.", order=birth)
+    elif by_employer and not f.adoption:
         add(by_employer[0], "Odpis skrócony aktu urodzenia", "usc", "rozp. dok. § 13 ust. 1 pkt 2; rozp. wn. § 22",
             "Zamów w USC po zgłoszeniu urodzenia; pracodawca, który wypłaca zasiłek, potrzebuje go do wniosku "
             "(chyba że ma go już w aktach osobowych).", order=birth)

@@ -206,7 +206,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Evaluate */
+        /**
+         * Evaluate
+         * @description `upload`: SHA-256 of the uploaded PDF the case was read from (ParseResult.sha256). The user's checked, possibly
+         *     corrected case replaces that file's stored reading, once the calculator accepts it.
+         */
         post: operations["evaluate_api_v1_cases_evaluate_post"];
         delete?: never;
         options?: never;
@@ -806,13 +810,25 @@ export interface components {
          * CaseInput
          * @description A case as read from the documents: the family facts and the periods applied for.
          */
-        CaseInput: {
+        "CaseInput-Input": {
             plan: components["schemas"]["Plan-Input"];
             /**
              * Title
              * @default
              */
             title?: string;
+        };
+        /**
+         * CaseInput
+         * @description A case as read from the documents: the family facts and the periods applied for.
+         */
+        "CaseInput-Output": {
+            plan: components["schemas"]["Plan-Output"];
+            /**
+             * Title
+             * @default
+             */
+            title: string;
         };
         /** CaseVerdict */
         CaseVerdict: {
@@ -997,6 +1013,8 @@ export interface components {
             due_date: string;
             /** Birth Date */
             birth_date?: string | null;
+            /** Child Died On */
+            child_died_on?: string | null;
             /**
              * Children
              * @default 1
@@ -1021,6 +1039,8 @@ export interface components {
             due_date: string;
             /** Birth Date */
             birth_date: string | null;
+            /** Child Died On */
+            child_died_on: string | null;
             /**
              * Children
              * @default 1
@@ -1475,6 +1495,9 @@ export interface components {
         /** ParseResult */
         ParseResult: {
             sample: components["schemas"]["SampleCase"] | null;
+            extracted: components["schemas"]["CaseInput-Output"] | null;
+            /** Sha256 */
+            sha256: string | null;
             /** Needs Manual Entry */
             needs_manual_entry: boolean;
             /** Message */
@@ -2257,14 +2280,16 @@ export interface operations {
     };
     evaluate_api_v1_cases_evaluate_post: {
         parameters: {
-            query?: never;
+            query?: {
+                upload?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CaseInput"];
+                "application/json": components["schemas"]["CaseInput-Input"];
             };
         };
         responses: {

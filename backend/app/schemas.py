@@ -145,6 +145,7 @@ class Family(Model):
     father: Parent | None = None
     due_date: date
     birth_date: date | None = None
+    child_died_on: date | None = None  # stillbirth = the birth date; caps maternity (KP art. 180^1)
     children: int = Field(1, ge=1)
     za_zyciem: bool = False
     hospitalization: Hospitalization | None = None
@@ -303,6 +304,8 @@ class SampleCase(CaseInput):
 
 class ParseResult(Model):
     sample: SampleCase | None  # the upload is one of the ZUS sample bundles, recognized by its SHA-256
+    extracted: CaseInput | None = None  # read from the scan by the vision model; the user reviews it before trusting it
+    sha256: str | None = None  # of a non-sample upload; POST /cases/evaluate?upload= stores the user's corrections
     needs_manual_entry: bool
     message: str
 

@@ -1,159 +1,116 @@
 # OtwarteKarty
 
-Kliknięcie powierzchni karty, Enter/spacja lub przeciągnięcie zagrywa ją na stół; przyciski informacji otwierają źródła. Rozdania animują przejście kart ze stosu do ręki, a kliknięcie stosu rozpoczyna nowe rozdanie. Edukacyjne karty zwiększają pasek wiedzy; decyzje urlopowe go nie zmieniają. [Audyt wpływu 30 kart](docs/card-impact-audit.md) określa porównanie, okres, skutek teraz i później oraz podstawy prawne. Nieznany dochód pozostaje nieznany.
+Gra karciana i kalkulator zasiłków dla przyszłych rodziców (HackNation 2026, zadanie ZUS). Backend: **Python + FastAPI + PostgreSQL**. Frontend: **Next.js (App Router) + TypeScript**.
 
-Strona główna pokazuje [30 kart, po 6 na etap](cards-30.md), rozdaje trzy i przelicza jeden wspólny plan za pomocą backendowego kalkulatora. W pierwszej turze rozdanie losuje tylko karty dostępne w wybranej historii; opowieść standardowa ma cztery takie ścieżki: A, B, D i E. Karta 1D sprawdza, kto wypłaca świadczenie. Karty warunkowe 1C i 1F pozostają w bibliotece i trafiają do ręki tylko przy spełnionych przesłankach. Zużyte dni pozostają zużyte w kolejnych turach. Do wyboru są trzy jawne przykładowe historie rodziny. Przycisk „Przejrzyj 30 kart” otwiera całą talię, a opisy i warunki — cytaty oraz oryginalne PDF-y. [Zakres silnika i uproszczenia](docs/game-engine.md), [grounding](docs/card-grounding.md), [źródła prawne](Documents/legal/README.md). Starszy endpoint katalogu zachowuje wcześniejsze 15 kart. Kontrola projektu: `python scripts/build_deck_design.py --check`.
+Plan projektu, konwencje i stan prac: [AGENTS.md](AGENTS.md).
 
-Gra edukacyjna na hackathon ZUS (HackNation 2026): **Python + FastAPI** oraz **React + Next.js (App Router) + TypeScript**. Pięć miejsc na decyzje jest na górze, niżej wachlarz ręki i obok niego paski równowagi. Każda decyzja ma kolorową ilustrację, zachowaną po przejściu na stół. Na telefonie karty układają się pionowo, a paski pod ręką.
+## Architektura
 
-Strona główna to interaktywny podgląd pięciu rund. Karty wysuwają się po najechaniu myszką; przeciągnij jedną na podświetlone miejsce na stole lub użyj przycisku „Połóż na stole” (również na telefonie i klawiaturą). Po położeniu karty pojawia się ręka kolejnej rundy. Po pięciu decyzjach stół jest kompletny. „Rozdaj od nowa” czyści układ.
+```text
+przeglądarka ──/api/v1/*──▶ Next.js (frontend/, port 3000) ──API_URL──▶ FastAPI (backend/, port 8000) ──▶ PostgreSQL
+                                                                              └──▶ Gemini (tylko odczyt skanów spraw)
+```
 
-Plansza wymaga backendu i `API_URL` dla przeliczania stanu; nie zapisuje jeszcze sesji, więc odświeżenie strony rozpoczyna plan od nowa. Kalkulator korzysta z tego samego kodu. Gra nie tworzy wniosków: lista dokumentów (`/applications`) powstaje z własnego planu z kalkulatora. Sprawdzanie spraw i pozostałe niewdrożone endpointy zwracają `501` z numerem kroku planu. Ścieżki adopcji, rehabilitacji i ustania ubezpieczenia w grze są jawnie zablokowane do czasu uzupełnienia historii i modelu danych.
-
-**AI:** aplikacja nie korzysta z AI. Kwoty i uprawnienia liczy deterministyczny kod, a stawki i limity są w `backend/app/data/params.json` (edytowalne w panelu administracyjnym).
-
-Pełny plan projektu, konwencje i kolejność prac: [AGENTS.md](AGENTS.md).
-
-## Kalkulator krok po kroku
-
-Kalkulator prowadzi przez sytuację rodziny, dane dziecka, ubezpieczenie i dochody rodziców, dodatkowe okoliczności, plan urlopów oraz wariant wypłaty. Pytania pojawiają się w kolejnych krokach, a wyniki, raporty i wykresy dopiero po „Oblicz i pokaż wynik”. Można wracać do wcześniejszych odpowiedzi. Scenariusz przekazany z gry lub konta przechodzi przez ten sam przegląd; nowy plan nie ma przykładowych pensji ani dat.
-
-Właściwe pytania mają rozwijane uzasadnienie z cytatem, konkretnym artykułem i stroną oryginalnego dokumentu, korzystające z tych samych źródeł co gra. Pierwszy edytowalny okres przygotowuje `POST /api/v1/calc/start`, korzystając z wersjonowanych pul backendu. `POST /api/v1/calc/plan` wywoływany jest dopiero po zatwierdzeniu ostatniego kroku. Błędy planu wstrzymują prezentację kwot; brak dochodów jest pokazywany jako brak danych, bez fikcyjnego zerowego budżetu. Termin wariantu 81,5% można sprawdzić według daty złożenia lub planowanego złożenia wniosku.
-
-Pierwszy krok ma trzy zaznaczane przyciski, a uzasadnienie prawne jest dostępne przed wyborem. Pracownik może podać jedną pensję brutto do jawnie oznaczonego szacunku; dokładna historia miesięczna pozostaje w opcjach dodatkowych. Jedna pensja nie zastępuje ustawowej średniej z okresu odniesienia. Wynik zachowuje tabelę świadczeń, kalendarz opieki, pule i dokumenty; wykres budżetu został usunięty, a obliczenia szczegółowe są zwijane. Do symulowanego logowania prowadzi widoczny link „mObywatel” w nagłówku oraz przycisk na początku kalkulatora.
-
-[Przegląd zgodności kalkulatora z materiałami ZUS i pozostałe ograniczenia](docs/calculator-review.md).
-
-## Podgląd dokumentów
-
-Na stronie „Twoje dokumenty” kliknij nazwę pozycji albo „Pokaż demo: co wpisać i gdzie”. Dla ZAM, Z-15 (także dawnej pozycji Z-15A), ZAS-53, ZNp-7, Z-3 i Z-3a otwiera się oryginalny formularz ZUS z zaznaczanymi polami. Wybranie pola pokazuje instrukcję; próbny wpis pojawia się we właściwym miejscu. Okres z planu można przenieść do sprawdzonego pola okresu. Oryginalny PDF i stronę ZUS można otworzyć osobno. Biblioteka wzorów działa również bez własnego planu.
-
-Pisma urlopowe do pracodawcy mają osobny, wyraźnie oznaczony przykład, a nie udawany formularz ZUS. Podgląd wskazuje, że Z-3/Z-3a wypełnia płatnik, e-ZLA wystawia lekarz, a część II ZNp-7 należy do płatnika. Próby w podglądzie nie zmieniają PDF-u, nie zapisują się i niczego nie wysyłają. Szczegóły źródeł i odświeżania: [przewodnik formularzy](docs/form-guides.md).
-
-## Struktura
+- **Przeglądarka nie woła FastAPI bezpośrednio.** Strony wołają `/api/v1/...` na serwerze Next.js, a [proxy](frontend/src/app/api/v1/[...path]/route.ts) przekazuje żądanie pod `API_URL` (zmienna tylko serwerowa, czytana w czasie działania). Bez `API_URL` te żądania zwracają `503`.
+- **Kontrakt API** to modele Pydantic w [schemas.py](backend/app/schemas.py). Frontend generuje z nich typy (`npm run gen:api` → `frontend/src/lib/schema.d.ts`).
+- **Jeden deterministyczny kalkulator** (`backend/app/calc/`, czyste funkcje) liczy grę, kalkulator i ocenę spraw: plan rodziny = fakty + okresy (bloki), z których wynikają kwoty, kalendarz opieki, pule, dokumenty i ryzyka.
+- **Parametry prawne** (stawki, limity, terminy) są tylko w [params.json](backend/app/data/params.json) i [params-history.json](backend/app/data/params-history.json), wersjonowane w PostgreSQL i edytowalne w panelu administracyjnym.
+- **Trwałe dane** są tylko w [repositories.py](backend/app/repositories.py). Tabele `config`, `games`, `submissions` i `uploads` backend tworzy sam przy starcie; nie ma migracji.
+- **AI:** wyłącznie odczyt wgranych skanów spraw modelem Google Gemini ([vision.py](backend/app/vision.py)). Model przepisuje fakty do formularza, który użytkownik sprawdza; prawo do zasiłku i kwoty liczy kalkulator. Bez `GEMINI_API_KEY` sprawę wpisuje się ręcznie.
 
 ```text
 backend/
   app/
-    main.py             # aplikacja, CORS, routery pod /api/v1
-    schemas.py          # kontrakt API (karty, rundy, statystyki, plan, gra, sprawy, mocki)
-    repositories.py     # katalog kart (JSON) + PostgreSQL: wersjonowane parametry, gry, wnioski
-    params.py           # model parametrów prawnych
-    api/                # catalog, calc, game, cases, gov_mock, info, admin
-    data/               # params.json, links.json
+    main.py           # aplikacja, CORS, routery pod /api/v1
+    schemas.py        # kontrakt API
+    repositories.py   # katalog kart (JSON) + PostgreSQL
+    params.py         # model parametrów prawnych
+    vision.py         # odczyt skanów spraw (Gemini)
+    api/              # catalog, calc, game, cases, gov_mock, info, admin
+    calc/             # base, plan, rules, paperwork, family: kalkulator
+    game/             # engine: odtwarzanie zagranych kart w jeden plan
+    data/             # parametry, scenariusze gry, persony, sprawy przykładowe, fundacje
   tests/
 frontend/
   src/
-    app/                # strony: gra, kalkulator, sprawy, wnioski, pomoc, mObywatel, admin; proxy /api/v1
-    components/         # game/ (plansza), plan/ (wyniki), forms/, nagłówek i stopka
-    hooks/              # use-game, use-plan
-    lib/                # klient API (typy generowane z OpenAPI), formatowanie, etykiety, sesja
-    types/game.ts       # aliasy typów gry z wygenerowanego kontraktu
-shared/cards.json       # wspólny katalog kart dla obu aplikacji
-scripts/sync_cards.py   # eksport 15 kart z cards.md
+    app/              # strony: gra, kalkulator, sprawy, wnioski, pomoc, mObywatel, admin, źródła; proxy /api/v1
+    components/       # game/, plan/, forms/, landing/, nagłówek i stopka
+    hooks/            # use-plan
+    lib/              # klient API (typy z OpenAPI), formatowanie, etykiety, sesja, logika rozdania
+    types/            # aliasy typów gry
+shared/               # talia kart (deck-design.json, cards.json) i reguły prawne dla obu aplikacji
+scripts/              # budowa talii i reguł, ekstrakcja źródeł prawnych, formularze ZUS
+Documents/legal/      # transkrypcje dostarczonych źródeł prawnych
+docs/                 # zakres silnika gry, grounding kart, przegląd kalkulatora, formularze
 ```
 
-## Uruchomienie
+Pełny opis API: http://127.0.0.1:8000/docs (wszystkie endpointy pod `/api/v1`).
 
-Wymagane Python 3.11+, Node.js 20.9+ z npm oraz Docker (baza PostgreSQL).
+## Instalacja i uruchomienie
 
-Baza, z katalogu głównego (port 5432, użytkownik i hasło `otwartekarty`):
+Wymagane: Python 3.11+, Node.js 20.9+ z npm (22.6+ dla `npm run test:cards`), Docker.
+
+### Wszystko w kontenerach
+
+Z katalogu głównego:
+
+```sh
+cp -n backend/.env.example backend/.env    # opcjonalnie GEMINI_API_KEY, GEMINI_MODEL
+docker compose up --build
+```
+
+Aplikacja: http://localhost:3000. Compose wczytuje `backend/.env` i `frontend/.env`, ale adres bazy, `ADMIN_TOKEN`, `SESSION_SECRET` i `API_URL` ustawia sam. Po zmianie pliku `.env` odtwórz kontener: `docker compose up -d backend`.
+
+### Lokalnie
+
+Baza (port 5432, użytkownik, hasło i baza `otwartekarty`):
 
 ```sh
 docker compose up -d db
 ```
 
-Backend, z katalogu `backend/` (wariant z [uv](https://docs.astral.sh/uv/)):
+Backend, z katalogu `backend/` (z [uv](https://docs.astral.sh/uv/)):
 
 ```sh
 uv sync --extra dev
-ADMIN_TOKEN=dev uv run uvicorn app.main:app --reload --port 8000
+cp -n .env.example .env
+ADMIN_TOKEN=dev uv run uvicorn app.main:app --reload --port 8000 --env-file .env
 ```
 
-Bez uv, z katalogu głównego:
-
-```sh
-python3 -m venv .venv && source .venv/bin/activate
-pip install -e './backend[dev]'
-cd backend && ADMIN_TOKEN=dev uvicorn app.main:app --reload --port 8000
-```
-
-Dokumentacja API: http://127.0.0.1:8000/docs
+Bez uv: `python3 -m venv .venv && source .venv/bin/activate && pip install -e './backend[dev]'`, potem to samo polecenie `uvicorn` z katalogu `backend/`.
 
 Frontend, w drugim terminalu:
 
 ```sh
 cd frontend
+cp -n .env.example .env    # odkomentuj API_URL=http://127.0.0.1:8000
 npm install
 npm run dev
 ```
 
-Plansza: http://localhost:3000. Ilustracje i opisy korzystają z [talii 30 kart](shared/deck-design.json), a wyliczenia z API. `npm run dev` i `npm run build` przygotowują publiczne dokumenty źródłowe. Żeby plansza i pozostałe strony rozmawiały z FastAPI, utwórz `frontend/.env.local`:
+### Konfiguracja
 
-```dotenv
-API_URL=http://127.0.0.1:8000
-```
+Zmienne opisują [backend/.env.example](backend/.env.example) i [frontend/.env.example](frontend/.env.example). Pliki `.env` są w `.gitignore` i nie trafiają do obrazów Dockera.
 
-Przeglądarka woła zawsze `/api/v1/...` na serwerze Next.js, który przekazuje żądanie pod `API_URL`. Adres backendu nie trafia do przeglądarki, a zmienna jest czytana w czasie działania. Bez `API_URL` te żądania zwracają `503`.
+### Produkcja
 
-Oba serwisy w kontenerach, z katalogu głównego:
-
-```sh
-docker compose up --build
-```
-
-Produkcyjnie (publiczny jest tylko frontend na porcie 3000; TLS zapewnia reverse proxy albo load balancer hosta):
+Publiczny jest tylko frontend (port 3000). TLS zapewnia reverse proxy albo load balancer hosta.
 
 ```sh
 POSTGRES_PASSWORD=... ADMIN_TOKEN=... SESSION_SECRET=... \
   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
 
-Bez tych trzech zmiennych polecenie się nie uruchomi. Baza i backend nie mają publicznych portów.
-
-## API
-
-Wszystkie endpointy są pod `/api/v1`, a pełna lista jest w `/docs`. Działają już:
-
-| Metoda | Ścieżka | Dane |
-| --- | --- | --- |
-| GET | `/api/v1/health` | status serwera |
-| GET | `/api/v1/cards`, `/api/v1/rounds`, `/api/v1/rounds/{id}` | katalog kart i rund |
-| GET | `/api/v1/game/preview` | statyczny podgląd planszy z pustymi statystykami |
-| POST | `/api/v1/game/simulate` | odtworzenie wybranych kart, plan, wspólne pule i wykonalność kolejnych kart |
-| POST | `/api/v1/calc/base`, `/api/v1/calc/plan` | podstawa zasiłku i kalkulator planu z walidacją prawną |
-| GET | `/api/v1/info/links`, `/api/v1/info/charities` | oficjalne źródła (ZUS, MRPiPS, PIP) i sprawdzone fundacje (z numerem KRS) |
-| GET/POST | `/api/v1/auth/personas`, `/api/v1/auth/mobywatel`, `/api/v1/zus/me` | symulowane logowanie mObywatel i konto eZUS: ubezpieczenia, e-ZLA, zaświadczenie o niezaleganiu, złożone dokumenty |
-| POST | `/api/v1/applications`, `/api/v1/usc/birth-certificate`, `/api/v1/pue/messages` | symulowane wysłanie wniosku, wniosek o odpis aktu urodzenia, pytanie do ZUS (gotowe odpowiedzi) |
-| GET/PUT | `/api/v1/admin/params` (+ `/versions`) | parametry prawne, każda zmiana to nowa wersja (nagłówek `Authorization: Bearer $ADMIN_TOKEN`) |
-| GET | `/api/v1/admin/submissions` | wszystko, co wysłano przez symulowane kanały |
-| GET/POST | `/api/v1/cases/samples`, `/api/v1/cases/parse`, `/api/v1/cases/evaluate` | przykładowe sprawy ZUS (same liczby), rozpoznanie wgranego PDF po skrócie SHA-256, ocena sprawy kalkulatorem |
-
-Przykładowe sprawy ZUS to skany bez warstwy tekstowej. Aplikacja ich nie odczytuje (nie używa OCR ani AI): rozpoznaje wgrany plik przykładowej sprawy po skrócie, a inną sprawę wpisuje się ręcznie. Same dokumenty spraw są tylko lokalnie (`Documents/Sprawy `, poza repozytorium).
-
-## Karty i późniejsza baza
-
-Treść pochodzi z [cards.md](cards.md). [cards_inspo.md](cards_inspo.md) pozostaje materiałem do rozwoju, nie jest zestawem kart podglądu. Po zmianach tekstu wykonaj z katalogu głównego:
-
-```sh
-python3 scripts/sync_cards.py
-```
-
-Eksport nadpisuje katalog i zeruje listy źródeł; używaj go na etapie prototypu, zanim źródła i mechanika kart będą uzupełniane. Każda karta ma stabilny identyfikator (`1A`–`5C`), `round_id`, tytuł, opis i `sources`. Docelowe źródło ma `id`, `title`, `url` i opcjonalny `locator` (np. artykuł lub strona). Mechanika gry (`tags`, `requires`, `effects`, `chips`, `combos`) ma domyślnie puste wartości.
-
-Trwałe dane są w [repositories.py](backend/app/repositories.py): katalog kart z JSON oraz PostgreSQL (`DATABASE_URL`, domyślnie baza z `docker compose up -d db`). Tabele i parametry startowe backend zakłada sam przy starcie. Backend domyślnie wymaga katalogu `shared` obok `backend`; przy przenoszeniu samego backendu ustaw `CARDS_DATA_PATH` na pełną ścieżkę pliku JSON. Opcjonalne zmienne opisuje [przykład konfiguracji](backend/.env.example).
+Bez tych trzech zmiennych polecenie się nie uruchomi.
 
 ## Sprawdzanie
 
 ```sh
 cd backend && uv run pytest && uv run ruff check app tests   # testy jednostkowe, bez bazy
-TEST_DATABASE_URL=postgresql://otwartekarty:otwartekarty@localhost:5432/otwartekarty uv run pytest -m integration   # SQL na prawdziwym PostgreSQL (schemat otwartekarty_test)
+TEST_DATABASE_URL=postgresql://otwartekarty:otwartekarty@localhost:5432/otwartekarty uv run pytest -m integration
 cd frontend && npm run typecheck && npm run lint && npm run build
-cd frontend && npx playwright install chromium && npm run e2e   # ścieżka jurora na działającym stosie (docker compose up --build)
+cd frontend && npx playwright install chromium && npm run e2e   # na działającym stosie
+python scripts/build_deck_design.py --check                     # talia, reguły i cytaty prawne
 ```
 
-`npm run e2e` przechodzi grę, kalkulator, wnioski, logowanie mObywatel, sprawdzanie sprawy, pomoc i panel admina w widoku komputera (1280 px) i telefonu (375 px). Sprawdza, że żadna strona nie wychodzi poza szerokość ekranu, i zapisuje zrzuty do [docs/screenshots](docs/screenshots/).
-
-Po zmianie modeli w `backend/app/schemas.py` (przy działającym backendzie) wygeneruj typy frontendu: `cd frontend && npm run gen:api`.
-
-Przykładowe sprawy ZUS są wyłącznie do użytku HackNation i **nie mogą trafić do repozytorium** (`.gitignore` obejmuje `Documents/*[Ss]prawy*/`, a `.dockerignore` cały katalog `Documents/` poza źródłami prawnymi).
+Po zmianie modeli w `backend/app/schemas.py` (przy działającym backendzie): `cd frontend && npm run gen:api`.

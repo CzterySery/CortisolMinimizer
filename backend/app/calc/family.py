@@ -5,6 +5,19 @@ from app.params import Params
 from app.schemas import Plan
 
 
+def maternity_end_after_death(plan: Plan, p: Params) -> date | None:
+    """Last maternity day after a stillbirth or the child's death (KP art. 180^1): 8 weeks after the birth for a death
+    within 8 weeks, but no sooner than 7 days after the death; after a later death, 7 days after it."""
+    f = plan.family
+    if f.child_died_on is None or f.adoption:
+        return None
+    # shortcut: assumes no child of the birth survived; for twins with a survivor the pool follows the survivors
+    # (§ 1 zd. 2), add a survivors count when such a case appears
+    seven = f.child_died_on + timedelta(days=p.maternity.after_death_min_days)  # the day of death not counted
+    eight = event_date(plan) + timedelta(weeks=p.maternity.stillbirth_weeks)
+    return max(eight - timedelta(days=1), seven) if f.child_died_on < eight else seven
+
+
 def plus_years(d: date, years: int) -> date:
     try:
         return d.replace(year=d.year + years)
