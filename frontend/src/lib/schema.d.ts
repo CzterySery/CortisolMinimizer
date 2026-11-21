@@ -870,9 +870,15 @@ export interface components {
         ConfigVersion: {
             /** Version */
             version: number;
-            /** Effective From */
+            /**
+             * Effective From
+             * Format: date
+             */
             effective_from: string;
-            /** Created At */
+            /**
+             * Created At
+             * Format: date-time
+             */
             created_at: string;
         };
         /** Deadlines */
@@ -1712,7 +1718,10 @@ export interface components {
             };
             /** Status */
             status: string;
-            /** Created At */
+            /**
+             * Created At
+             * Format: date-time
+             */
             created_at: string;
         };
         /** Supplementary */

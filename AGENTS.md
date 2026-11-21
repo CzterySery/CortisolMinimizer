@@ -21,7 +21,7 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 - a fully responsive UI
 
 **Decisions:**
-- **Backend:** Python 3.11+ + FastAPI + SQLite.
+- **Backend:** Python 3.11+ + FastAPI + PostgreSQL 17 (Docker image `postgres:17-alpine`).
 - **Frontend:** Next.js 16 (App Router, `src/`) with plain CSS.
 - **No AI inside the app.** All rules are deterministic. Say so in the submission.
 - **Contract-first REST under `/api/v1`.** Pydantic models are described in OpenAPI, and the frontend generates its types from them.
@@ -34,25 +34,29 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 
 ## Status (2026-11-21)
 **Step 1 (skeleton) is done and merged onto the team's UI.**
-- **Backend:** catalog endpoints (`/cards`, `/rounds`, `/game/preview`), `/health`, `/info/links` and `/admin/params*` work. Every other endpoint returns **501 with its build step**. 8 tests pass and ruff is clean.
+- **Backend:** catalog endpoints (`/cards`, `/rounds`, `/game/preview`), `/health`, `/info/links` and `/admin/params*` work. Every other endpoint returns **501 with its build step**. 7 unit tests (no database) and 3 Postgres integration tests pass; ruff is clean.
 - **Frontend:**
   - `/` is the team's board in local preview mode (no backend needed).
   - Every other route, the plan views, forms, hooks and the typed API client exist. They render backend errors until their endpoints land.
   - Typecheck, lint and build all pass.
-- **Docker:** `docker compose up --build` runs both images. The frontend reaches the backend through the proxy.
+- **Docker:** `docker compose up --build` runs `db` (Postgres), `backend` and `frontend`. The frontend reaches the backend through the proxy, and the backend waits for a healthy database.
 - **The visual pages haven't been checked in a browser.** No headless browser was available, so do a manual pass at 375px and 1280px.
 
 ## Conventions
 - **Backend:**
+  - Start the database first: `docker compose up -d db` (from the repo root; port 5432, user/password/db `zp`).
   - Run from `backend/`: `uv sync --extra dev` then `ADMIN_TOKEN=dev uv run uvicorn app.main:app --reload`. pip also works: `pip install -e './backend[dev]'`.
-  - Test with `uv run pytest`; lint with `uv run ruff check app tests` (ruff sorts imports).
+  - Lint with `uv run ruff check app tests` (ruff sorts imports).
+- **Tests:**
+  - **Unit tests never touch a database.** `uv run pytest` runs them; the API `client` fixture stubs `repositories.init`. Calculator and game logic are pure functions, so their tests stay unit tests.
+  - **Integration tests** (`@pytest.mark.integration`, `tests/test_repositories.py`) cover the SQL against real Postgres and are skipped unless `TEST_DATABASE_URL` is set: `TEST_DATABASE_URL=postgresql://zp:zp@localhost:5432/zp uv run pytest -m integration`. Each test recreates a `zp_test` schema, so pointing at the dev database leaves its tables alone (the schema stays behind until the next run).
   - Docs are at `/docs`. Health is at `/api/v1/health`; there is no root `/health`.
 - **Frontend:** `cd frontend && npm install && npm run dev`. Check with `npm run typecheck && npm run lint && npm run build`.
 - **API contract** lives in `backend/app/schemas.py`. Every model inherits `Model`, which sets `json_schema_serialization_defaults_required`, so defaulted fields are **required in responses and optional in requests**.
 - **After any schema change**, with the backend running: `cd frontend && npm run gen:api` (writes `src/lib/schema.d.ts`; never edit it), then typecheck.
   - Models used both in requests and responses are split into `S["X-Input"]` / `S["X-Output"]` (e.g. `Plan-Input`, `Card-Output`, `Source-Output`). Others keep their plain name (`GameState`, `Statistic`, `Stage`, `Round`, `Preview`, `CardPreview`).
   - Board components import friendly aliases from `src/types/game.ts`; everything else uses `S[...]` from `src/lib/api.ts`.
-- **Persistence lives only in `backend/app/repositories.py`:** the card catalog (`shared/cards.json`, or `CARDS_DATA_PATH`) plus SQLite (`DB_PATH`, default `zp.db` in the working directory). It holds versioned config, games and submissions.
+- **Persistence lives only in `backend/app/repositories.py`:** the card catalog (`shared/cards.json`, or `CARDS_DATA_PATH`) plus PostgreSQL via `psycopg` 3 (`DATABASE_URL`, default `postgresql://zp:zp@localhost:5432/zp` = the compose `db`). Tables `config` (versioned params, JSONB), `games` and `submissions` are created and seeded by `init()` at startup; there are no migrations yet (`CREATE TABLE IF NOT EXISTS`), so a column change needs a manual `ALTER` or a fresh volume. Callers use its functions, never SQL.
 - **Legal numbers live only in `backend/app/data/params.json`.** They are admin-editable and versioned by `effective_from`. Never hardcode a rate, duration or limit in code, and that includes the frontend.
 - **Money is `Decimal`, rounded ROUND_HALF_UP to grosze.** The daily rate is monthly/30 (art. 36 ust. 3). Money crosses the API as decimal strings; the frontend only formats it (`src/lib/format.ts`). The sidebar stat `money` is a whole-złoty `int` for display.
 - **The browser never calls FastAPI directly.**
@@ -75,7 +79,7 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 - **Language:** code and comments in English, UI in Polish. Every calculated amount carries an `Explain{text, rule}` citing the article.
 - **Never commit ZUS sample-case documents.** They are for HackNation only (`.gitignore` covers `Documents/Przykładowe sprawy/`). Tests store only the numbers.
 - Shortcuts with a known limit are marked in code as `# shortcut: <limit>, <when to upgrade>`.
-- **Git:** commit directly on `main` (hackathon team, no feature branches). Small logical commits; never commit secrets, `*.db` or ZUS sample cases. Push only when asked.
+- **Git:** commit directly on `main` (hackathon team, no feature branches). Small logical commits; never commit secrets or ZUS sample cases. Push only when asked.
 
 ## Repo layout
 ```
@@ -83,13 +87,14 @@ backend/
   app/
     main.py            # app, CORS, all routers under /api/v1, lifespan -> repositories.init()
     schemas.py         # API contract (catalog, family/plan, results, game, cases, gov mocks, admin)
-    repositories.py    # catalog JSON + SQLite (config versions, games, submissions)
+    repositories.py    # catalog JSON + PostgreSQL (config versions, games, submissions)
     params.py          # Params model + active(on)
     api/               # catalog.py calc.py game.py cases.py gov_mock.py info.py admin.py  (todo(step) => 501)
     calc/              # base.py plan.py rules.py paperwork.py   (step 2-3, not created yet)
     game/              # engine.py effects.py combos.py          (step 4, not created yet)
     data/              # params.json links.json (+ scenarios.json personas.json charities.json samples.json later)
-  tests/test_api.py    Dockerfile (context: repo root)   .env.example
+  tests/               # test_api.py (unit, no DB), test_repositories.py (integration, Postgres)
+  Dockerfile (context: repo root)   .env.example
 frontend/
   src/app/             # page.tsx (/ preview board), game/[id], game/[id]/summary, calculator, cases, applications,
                        # help, login, me, admin/{,deck,submissions}, api/v1/[...path]/route.ts (proxy), globals.css
@@ -239,10 +244,10 @@ Backend and frontend run in parallel once the contract exists. FE steps that dep
 | 5 | Gov mocks, personas, applications, PUE canned replies, charities (verified orgs only) | Login → /me, application forms, help page *(needs BE5)* |
 | 6 | Admin deck (versioned, seeded from the catalog) + submissions | Admin typed forms (grouped params with units, deck as card list) |
 | 7 | Cases parse/evaluate + golden tests (needs sample PDFs) | Cases review flow reusing `FamilyForm` *(needs BE7)* |
-| 8 | Deploy the backend container (sqlite volume) | Deploy the frontend container (`API_URL` at runtime); contrast fix; Playwright happy path + mobile/desktop screenshots (needed for the submission); 3-min video |
+| 8 | Deploy the backend container + Postgres (managed, or the compose `db` with a real `POSTGRES_PASSWORD`) | Deploy the frontend container (`API_URL` at runtime); contrast fix; Playwright happy path + mobile/desktop screenshots (needed for the submission); 3-min video |
 
 ## Verification
-- **Backend:** `uv run pytest` (today: catalog, board preview, health, links, admin auth/versioning/validation, 501 stubs) and `uv run ruff check app tests`. Planned tests:
+- **Backend:** `uv run pytest` (unit, no DB: catalog, board preview, health, links, admin auth/validation, 501 stubs), the integration run above (seeding, versions, effective dates, admin round trip on Postgres) and `uv run ruff check app tests`. Planned unit tests:
   - `test_base`: art. 36–45 cases
   - `test_plan`: durations, rates, the 9-week exclusive part at 70%, top-up, floor, part-time, sick-pay split, supplementary table
   - `test_rules`
@@ -250,7 +255,7 @@ Backend and frontend run in parallel once the contract exists. FE steps that dep
 - **Frontend:** `npm run typecheck && npm run lint && npm run build`. Then run both servers (`API_URL` set) and walk `/` → `/game/{id}` → summary → `/applications`, and `/calculator`, at 375px and 1280px.
 - **Proxy:** `curl localhost:3000/api/v1/health` must return the backend's body. Without `API_URL` it must return 503 while `/` still renders.
 - **Contract drift:** `npm run gen:api` then typecheck shows every UI spot that needs updating.
-- **Docker:** `docker compose up --build`, then `curl localhost:3000/api/v1/cards` must return 15 cards.
+- **Docker:** `docker compose up --build`, then `curl localhost:3000/api/v1/cards` must return 15 cards and `curl -H 'Authorization: Bearer dev' localhost:3000/api/v1/admin/params/versions` must list version 1 (proves frontend → backend → Postgres).
 
 ## Open items
 - **Deck:** keep the 15 fixed cards (3 per round, from `cards.md`), or move to the 30-card dealt deck from `cards_inspo.md`? The engine supports both; decide before step 4.

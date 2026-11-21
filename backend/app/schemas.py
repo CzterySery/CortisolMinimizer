@@ -1,5 +1,5 @@
 """API contract. Frontend types are generated from these via /openapi.json — change here, then `npm run gen:api`."""
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Literal
 
@@ -382,10 +382,10 @@ class Submission(Model):
     kind: str
     payload: dict[str, Any]
     status: str
-    created_at: str
+    created_at: datetime
 
 
 class ConfigVersion(Model):
     version: int
-    effective_from: str
-    created_at: str
+    effective_from: date
+    created_at: datetime

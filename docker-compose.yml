@@ -1,11 +1,28 @@
-# Both images build from the repo root: backend and frontend read shared/cards.json.
+# Both app images build from the repo root: backend and frontend read shared/cards.json.
+# Local backend dev only needs the database: `docker compose up -d db`.
 services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: zp
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-zp}  # dev default; set a real one when deploying
+      POSTGRES_DB: zp
+    ports: ["5432:5432"]  # for the backend and integration tests run outside Docker
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zp -d zp"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
   backend:
     build: { context: ., dockerfile: backend/Dockerfile }
     ports: ["8000:8000"]
     environment:
       ADMIN_TOKEN: ${ADMIN_TOKEN:-dev}
-    volumes: [db:/data]
+      DATABASE_URL: postgresql://zp:${POSTGRES_PASSWORD:-zp}@db:5432/zp
+    depends_on:
+      db: { condition: service_healthy }
 
   frontend:
     build: { context: ., dockerfile: frontend/Dockerfile }
@@ -15,4 +32,4 @@ services:
     depends_on: [backend]
 
 volumes:
-  db:
+  pgdata:

@@ -17,7 +17,7 @@ backend/
   app/
     main.py             # aplikacja, CORS, routery pod /api/v1
     schemas.py          # kontrakt API (karty, rundy, statystyki, plan, gra, sprawy, mocki)
-    repositories.py     # katalog kart (JSON) + SQLite: wersjonowane parametry, gry, wnioski
+    repositories.py     # katalog kart (JSON) + PostgreSQL: wersjonowane parametry, gry, wnioski
     params.py           # model parametrów prawnych
     api/                # catalog, calc, game, cases, gov_mock, info, admin
     data/               # params.json, links.json
@@ -35,7 +35,13 @@ scripts/sync_cards.py   # eksport 15 kart z cards.md
 
 ## Uruchomienie
 
-Wymagane Python 3.11+ i Node.js 20.9+ z npm.
+Wymagane Python 3.11+, Node.js 20.9+ z npm oraz Docker (baza PostgreSQL).
+
+Baza, z katalogu głównego (port 5432, użytkownik i hasło `zp`):
+
+```sh
+docker compose up -d db
+```
 
 Backend, z katalogu `backend/` (wariant z [uv](https://docs.astral.sh/uv/)):
 
@@ -100,12 +106,13 @@ python3 scripts/sync_cards.py
 
 Eksport nadpisuje katalog i zeruje listy źródeł; używaj go na etapie prototypu, zanim źródła i mechanika kart będą uzupełniane. Każda karta ma stabilny identyfikator (`1A`–`5C`), `round_id`, tytuł, opis i `sources`. Docelowe źródło ma `id`, `title`, `url` i opcjonalny `locator` (np. artykuł lub strona). Mechanika gry (`tags`, `requires`, `effects`, `chips`, `combos`) ma domyślnie puste wartości.
 
-Trwałe dane są w [repositories.py](backend/app/repositories.py): katalog kart z JSON oraz SQLite (`DB_PATH`, domyślnie `backend/zp.db`). Backend domyślnie wymaga katalogu `shared` obok `backend`; przy przenoszeniu samego backendu ustaw `CARDS_DATA_PATH` na pełną ścieżkę pliku JSON. Opcjonalne zmienne opisuje [przykład konfiguracji](backend/.env.example).
+Trwałe dane są w [repositories.py](backend/app/repositories.py): katalog kart z JSON oraz PostgreSQL (`DATABASE_URL`, domyślnie baza z `docker compose up -d db`). Tabele i parametry startowe backend zakłada sam przy starcie. Backend domyślnie wymaga katalogu `shared` obok `backend`; przy przenoszeniu samego backendu ustaw `CARDS_DATA_PATH` na pełną ścieżkę pliku JSON. Opcjonalne zmienne opisuje [przykład konfiguracji](backend/.env.example).
 
 ## Sprawdzanie
 
 ```sh
-cd backend && uv run pytest && uv run ruff check app tests
+cd backend && uv run pytest && uv run ruff check app tests   # testy jednostkowe, bez bazy
+TEST_DATABASE_URL=postgresql://zp:zp@localhost:5432/zp uv run pytest -m integration   # SQL na prawdziwym PostgreSQL (schemat zp_test)
 cd frontend && npm run typecheck && npm run lint && npm run build
 ```
 

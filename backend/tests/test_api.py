@@ -1,15 +1,20 @@
+"""Unit tests: no database. Persistence is covered by test_repositories.py (integration)."""
+import json
+
 import pytest
 from fastapi.testclient import TestClient
+
+from app import repositories
 
 AUTH = {"Authorization": "Bearer test-token"}
 
 
 @pytest.fixture
-def client(tmp_path, monkeypatch):
-    monkeypatch.setenv("DB_PATH", str(tmp_path / "test.db"))
+def client(monkeypatch):
     monkeypatch.setenv("ADMIN_TOKEN", "test-token")
+    monkeypatch.setattr(repositories, "init", lambda: None)  # startup must not need Postgres
     from app.main import app
-    with TestClient(app) as c:  # runs lifespan => seeds DB
+    with TestClient(app) as c:
         yield c
 
 
@@ -26,21 +31,10 @@ def test_admin_requires_token(client):
     assert client.get("/api/v1/admin/params", headers={"Authorization": "Bearer wrong"}).status_code == 401
 
 
-def test_admin_params_roundtrip_and_versioning(client):
-    params = client.get("/api/v1/admin/params", headers=AUTH).json()
-    assert params["rates"]["parental"] == "0.70"
-
-    params["rates"]["parental"] = "0.75"
-    saved = client.put("/api/v1/admin/params", json=params, headers=AUTH)
-    assert saved.json()["version"] == 2
-    assert client.get("/api/v1/admin/params", headers=AUTH).json()["rates"]["parental"] == "0.75"
-
-
 def test_admin_rejects_invalid_params(client):
-    params = client.get("/api/v1/admin/params", headers=AUTH).json()
+    params = json.loads((repositories.DATA / "params.json").read_text(encoding="utf-8"))
     del params["rates"]
     assert client.put("/api/v1/admin/params", json=params, headers=AUTH).status_code == 422
-    assert len(client.get("/api/v1/admin/params/versions", headers=AUTH).json()) == 1
 
 
 def test_stubs_are_501_not_500(client):
