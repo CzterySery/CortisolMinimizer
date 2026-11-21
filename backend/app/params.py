@@ -53,6 +53,7 @@ class Maternity(BaseModel):
     stillbirth_weeks: int
     after_death_min_days: int
     adoption_min_weeks: int
+    pregnancy_weeks: int  # risk checks: an insurance or a base change within this many weeks before the due date
 
 
 class Parental(BaseModel):
@@ -107,6 +108,8 @@ class Deadlines(BaseModel):
     parental_notice_days: int  # KP art. 182^1d § 1
     part_time_notice_days: int
     supplementary_notice_days_before_maternity_end: int
+    maternity_resign_notice_days: int  # KP art. 180 § 8: mother hands over the rest of maternity leave
+    maternity_takeover_notice_days: int  # KP art. 180 § 9: father's application for that rest
 
 
 class Care(BaseModel):

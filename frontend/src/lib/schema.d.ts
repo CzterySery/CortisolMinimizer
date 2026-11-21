@@ -918,6 +918,10 @@ export interface components {
             part_time_notice_days: number;
             /** Supplementary Notice Days Before Maternity End */
             supplementary_notice_days_before_maternity_end: number;
+            /** Maternity Resign Notice Days */
+            maternity_resign_notice_days: number;
+            /** Maternity Takeover Notice Days */
+            maternity_takeover_notice_days: number;
         };
         /** DebtCertificate */
         DebtCertificate: {
@@ -952,6 +956,13 @@ export interface components {
              * @default false
              */
             done: boolean;
+            /** Rule */
+            rule: string;
+            /**
+             * Note
+             * @default
+             */
+            note: string;
         };
         /** EZla */
         EZla: {
@@ -1204,6 +1215,8 @@ export interface components {
             after_death_min_days: number;
             /** Adoption Min Weeks */
             adoption_min_weeks: number;
+            /** Pregnancy Weeks */
+            pregnancy_weeks: number;
         };
         /** MonthPay */
         "MonthPay-Input": {
@@ -1348,6 +1361,8 @@ export interface components {
             voluntary_sickness?: boolean;
             /** Insured Since */
             insured_since?: string | null;
+            /** Insured Until */
+            insured_until?: string | null;
             /** Base Monthly */
             base_monthly?: number | string | null;
             /**
@@ -1395,6 +1410,8 @@ export interface components {
             voluntary_sickness: boolean;
             /** Insured Since */
             insured_since: string | null;
+            /** Insured Until */
+            insured_until: string | null;
             /** Base Monthly */
             base_monthly: string | null;
             /**

@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from app import params
 from app.calc.base import benefit_base
+from app.calc.paperwork import documents
 from app.calc.plan import compute_plan
 from app.calc.rules import check
 from app.schemas import BaseRequest, BaseResult, Plan, PlanResult
@@ -24,6 +25,7 @@ def plan(req: Plan) -> PlanResult:
         p = params.active(req.family.birth_date or req.family.due_date)
         result = compute_plan(req, p)
         result.issues = check(req, result, p)
+        result.documents = documents(req, p)
         return result
     except (ValueError, LookupError) as e:
         raise HTTPException(422, str(e)) from e

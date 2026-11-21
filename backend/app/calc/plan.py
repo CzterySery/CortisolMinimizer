@@ -1,5 +1,5 @@
 """Plan ledger: family facts + leave/benefit blocks -> money per month, care calendar, remaining pools.
-Pure: Plan + Params in, PlanResult out. Legal validation is rules.py (step 2c), documents paperwork.py (step 3)."""
+Pure: Plan + Params in, PlanResult out. Legal validation is rules.py, documents paperwork.py."""
 from calendar import monthrange
 from collections import Counter
 from datetime import date, timedelta
@@ -161,6 +161,8 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
             explain.append(Explain(text=f"{WHO[who]}: {KIND[b.kind]} {b.start.isoformat()} – {last_day(b).isoformat()}"
                                         f"{part}: {paid}.", rule=RULE[b.kind]))
         explain.extend(_sick_payer(who, parents[who], days[who], p))
+        if base[who] > 0 and amount[who]:
+            explain.append(_payer_explain(who, parents[who], p))
 
     if averaged:
         explain.append(Explain(
@@ -205,17 +207,36 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
                       pools=_pools(plan, days, p), documents=[], issues=[], explain=explain, top_up=top_up)
 
 
+def payer(parent: Parent, p: Params) -> str:
+    """Who sets and pays the benefits (art. 61 ust. 1): a payer reporting more than 20 people to sickness insurance
+    (employer or contracting party), otherwise ZUS; always ZUS for JDG."""
+    big = parent.employment in ("employee", "contract") and parent.payer_insured_count > p.payer_threshold_insured
+    return "employer" if big else "zus"
+
+
+def _payer_explain(who: str, parent: Parent, p: Params) -> Explain:
+    n = p.payer_threshold_insured
+    if payer(parent, p) == "employer":
+        why = f"płatnik składek, bo zgłasza do ubezpieczenia chorobowego ponad {n} osób"
+    elif parent.employment == "self_employed":
+        why = "ZUS (działalność gospodarcza)"
+    else:
+        why = f"ZUS, bo płatnik składek zgłasza do ubezpieczenia chorobowego najwyżej {n} osób"
+    return Explain(text=f"{WHO[who]}: zasiłki ustala i wypłaca {why}.", rule="art. 61 ust. 1–2")
+
+
 def _sick_payer(who: str, parent: Parent, days: dict[date, Block], p: Params) -> list[Explain]:
-    """Who pays sick days: employer first (33 days a year, 14 from age 50), then ZUS. Same amount either way."""
+    """Sick days: an employee gets sick pay from the employer first (33 days a year, 14 from age 50), then the
+    sickness benefit. Same amount either way; who pays the benefit is art. 61 (`payer`)."""
     if parent.employment != "employee":
         sick = sum(1 for b in days.values() if b.kind == "sick")
-        return [Explain(text=f"{WHO[who]}: zasiłek chorobowy z ZUS od pierwszego dnia ({sick} dni).",
+        return [Explain(text=f"{WHO[who]}: zasiłek chorobowy od pierwszego dnia ({sick} dni).",
                         rule="art. 12 ust. 1")] if sick else []
     limit = p.sick.employer_days_50plus if parent.age >= 50 else p.sick.employer_days
     # shortcut: assumes no sick days earlier in the same calendar year outside this plan
     per_year = Counter(d.year for d, b in days.items() if b.kind == "sick")
     return [Explain(text=f"{WHO[who]}: w {y} r. {min(n, limit)} dni wynagrodzenia chorobowego od pracodawcy, "
-                         f"{max(0, n - limit)} dni zasiłku z ZUS (ta sama kwota).", rule="KP art. 92, art. 12")
+                         f"{max(0, n - limit)} dni zasiłku chorobowego (ta sama kwota).", rule="KP art. 92, art. 12")
             for y, n in sorted(per_year.items())]
 
 

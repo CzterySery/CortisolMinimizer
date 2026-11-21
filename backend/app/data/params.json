@@ -42,7 +42,8 @@
     "mother_personal_weeks_incapacity": 8,
     "stillbirth_weeks": 8,
     "after_death_min_days": 7,
-    "adoption_min_weeks": 9
+    "adoption_min_weeks": 9,
+    "pregnancy_weeks": 40
   },
   "parental": {
     "weeks_single": 41,
@@ -74,7 +75,9 @@
     "averaged_request_days_after_birth": 21,
     "parental_notice_days": 21,
     "part_time_notice_days": 21,
-    "supplementary_notice_days_before_maternity_end": 21
+    "supplementary_notice_days_before_maternity_end": 21,
+    "maternity_resign_notice_days": 7,
+    "maternity_takeover_notice_days": 14
   },
   "care": {
     "days_per_year_child_under_14": 60,

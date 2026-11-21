@@ -14,7 +14,7 @@ export function FamilyForm({ value, onChange }: { value: Family; onChange: (f: F
       <div className="form-grid">
         <ParentFields label="Mama" value={value.mother} onChange={(mother) => set({ mother })} />
         {value.father
-          ? <ParentFields label="Tata" value={value.father} onChange={(father) => set({ father })} />
+          ? <ParentFields label="Tata" value={value.father} onChange={(father) => set({ father })} onRemove={() => set({ father: null })} />
           : <button type="button" className="button button-dashed" onClick={() => set({ father: { employment: "employee" } })}>+ Dodaj drugiego rodzica</button>}
         <label className="field">Przewidywana data porodu
           <input type="date" value={value.due_date} onChange={(e) => set({ due_date: e.target.value })} />
@@ -31,10 +31,11 @@ export function FamilyForm({ value, onChange }: { value: Family; onChange: (f: F
   );
 }
 
-function ParentFields({ label, value, onChange }: { label: string; value: Parent; onChange: (p: Parent) => void }) {
+function ParentFields({ label, value, onChange, onRemove }: { label: string; value: Parent; onChange: (p: Parent) => void; onRemove?: () => void }) {
   return (
     <fieldset className="form-card">
       <legend>{label}</legend>
+      {onRemove && <button type="button" className="button button-dashed" onClick={onRemove}>Usuń drugiego rodzica</button>}
       <label className="field">Forma zatrudnienia
         <select value={value.employment} onChange={(e) => onChange({ ...value, employment: e.target.value as Parent["employment"] })}>
           {Object.entries(employmentLabel).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
