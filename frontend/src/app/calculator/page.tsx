@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import type { S } from "@/lib/api";
-import { planHandoff } from "@/lib/session";
+import Link from "next/link";
+import { myPlan, planHandoff } from "@/lib/session";
 import { usePlan } from "@/hooks/use-plan";
 import { ApiResult } from "@/components/api-result";
 import { BlocksEditor } from "@/components/forms/blocks-editor";
@@ -43,6 +44,7 @@ export default function Calculator() {
             <label className="field-check"><input type="radio" name="rate" checked={plan.rate_variant === "averaged"} onChange={() => setPlan({ ...plan, rate_variant: "averaged" })} /> 81,5% za cały okres (wniosek do 21 dni po porodzie)</label>
           </fieldset>
           <BlocksEditor value={plan.blocks ?? []} onChange={(blocks) => setPlan({ ...plan, blocks })} />
+          <div className="actions"><Link href="/applications" className="button" onClick={() => myPlan.put(plan)}>Przygotuj wnioski dla tego planu</Link></div>
         </div>
         <div>{error ? <ApiResult error={error} /> : result ? <PlanTimeline result={result} /> : <ApiResult />}</div>
       </div>

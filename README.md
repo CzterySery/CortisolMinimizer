@@ -8,7 +8,7 @@ Gra edukacyjna na hackathon ZUS (HackNation 2026): **Python + FastAPI** oraz **R
 
 Strona główna to interaktywny podgląd pięciu rund. Karty wysuwają się po najechaniu myszką; przeciągnij jedną na podświetlone miejsce na stole lub użyj przycisku „Połóż na stole” (również na telefonie i klawiaturą). Po położeniu karty pojawia się ręka kolejnej rundy. Po pięciu decyzjach stół jest kompletny. „Rozdaj od nowa” czyści układ.
 
-Plansza wymaga backendu i `API_URL` dla przeliczania stanu; nie zapisuje jeszcze sesji, więc odświeżenie strony rozpoczyna plan od nowa. Kalkulator korzysta z tego samego kodu. Starsza gra z sesją (`/game/{id}`), sprawdzanie spraw i pozostałe niewdrożone endpointy zwracają `501` z numerem kroku planu. Ścieżki adopcji, rehabilitacji i ustania ubezpieczenia w grze są jawnie zablokowane do czasu uzupełnienia historii i modelu danych.
+Plansza wymaga backendu i `API_URL` dla przeliczania stanu; nie zapisuje jeszcze sesji, więc odświeżenie strony rozpoczyna plan od nowa. Kalkulator korzysta z tego samego kodu. Gra nie tworzy wniosków: lista dokumentów (`/applications`) powstaje z własnego planu z kalkulatora. Sprawdzanie spraw i pozostałe niewdrożone endpointy zwracają `501` z numerem kroku planu. Ścieżki adopcji, rehabilitacji i ustania ubezpieczenia w grze są jawnie zablokowane do czasu uzupełnienia historii i modelu danych.
 
 **AI:** aplikacja nie korzysta z AI. Kwoty i uprawnienia liczy deterministyczny kod, a stawki i limity są w `backend/app/data/params.json` (edytowalne w panelu administracyjnym).
 
@@ -97,10 +97,12 @@ Wszystkie endpointy są pod `/api/v1`, a pełna lista jest w `/docs`. Działają
 | GET | `/api/v1/game/preview` | statyczny podgląd planszy z pustymi statystykami |
 | POST | `/api/v1/game/simulate` | odtworzenie wybranych kart, plan, wspólne pule i wykonalność kolejnych kart |
 | POST | `/api/v1/calc/base`, `/api/v1/calc/plan` | podstawa zasiłku i kalkulator planu z walidacją prawną |
-| GET | `/api/v1/info/links` | oficjalne źródła (ZUS, MRPiPS, PIP) |
+| GET | `/api/v1/info/links`, `/api/v1/info/charities` | oficjalne źródła (ZUS, MRPiPS, PIP) i sprawdzone fundacje (z numerem KRS) |
+| GET/POST | `/api/v1/auth/personas`, `/api/v1/auth/mobywatel`, `/api/v1/zus/me` | symulowane logowanie mObywatel i konto eZUS: ubezpieczenia, e-ZLA, zaświadczenie o niezaleganiu, złożone dokumenty |
+| POST | `/api/v1/applications`, `/api/v1/usc/birth-certificate`, `/api/v1/pue/messages` | symulowane wysłanie wniosku, wniosek o odpis aktu urodzenia, pytanie do ZUS (gotowe odpowiedzi) |
 | GET/PUT | `/api/v1/admin/params` (+ `/versions`) | parametry prawne, każda zmiana to nowa wersja (nagłówek `Authorization: Bearer $ADMIN_TOKEN`) |
 
-Pozostałe (gra z sesją, sprawy, symulacje mObywatel/PUE/wniosków, talia w panelu) mają gotowy kontrakt i zwracają `501` do czasu implementacji.
+Pozostałe (sprawy, talia i wnioski w panelu administracyjnym) mają gotowy kontrakt i zwracają `501` do czasu implementacji.
 
 ## Karty i późniejsza baza
 

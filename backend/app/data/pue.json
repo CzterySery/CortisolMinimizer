@@ -1,0 +1,115 @@
+[
+ {
+  "keywords": [
+   "81,5",
+   "81.5",
+   "uśredn",
+   "jeden wniosek o cały"
+  ],
+  "links": [
+   "/calculator",
+   "/sources/benefits-act#article-30a"
+  ],
+  "answer": "Zasiłek w wysokości {rates.averaged|%} podstawy za cały macierzyński i rodzicielski przysługuje, jeśli mama złoży pisemny wniosek najpóźniej {deadlines.averaged_request_days_after_birth} dni po porodzie (art. 30a ust. 1). Bez wniosku: {rates.maternity|%} za macierzyński i {rates.parental|%} za rodzicielski. Wyłączne {parental.exclusive_weeks} tygodni taty zawsze ma {rates.parental|%}."
+ },
+ {
+  "keywords": [
+   "ojcowsk"
+  ],
+  "links": [
+   "/sources/labour-code#article-1823"
+  ],
+  "answer": "Urlop ojcowski trwa {paternity.days} dni, w najwyżej {paternity.max_parts} częściach po co najmniej {paternity.min_part_days} dni, do ukończenia przez dziecko {paternity.use_by_child_months} miesięcy. Wniosek składa się co najmniej {paternity.notice_days} dni przed (KP art. 182³). Zasiłek: {rates.paternity|%} podstawy."
+ },
+ {
+  "keywords": [
+   "rodzicielsk"
+  ],
+  "links": [
+   "/sources/labour-code#article-1821a",
+   "https://www.gov.pl/web/rodzina/urlop-rodzicielski"
+  ],
+  "answer": "Urlop rodzicielski trwa {parental.weeks_single} tygodni ({parental.weeks_multiple} przy więcej niż jednym dziecku), z czego po {parental.exclusive_weeks} tygodni należy wyłącznie do każdego z rodziców. Można go podzielić na najwyżej {parental.max_parts} części i wykorzystać do końca roku, w którym dziecko kończy {parental.last_child_age_years} lat. Wniosek: co najmniej {deadlines.parental_notice_days} dni przed (KP art. 182¹a–182¹d). Można łączyć go z pracą na najwyżej {parental.part_time_max_fraction|%} etatu."
+ },
+ {
+  "keywords": [
+   "opiekuńcz",
+   "opieka nad",
+   "chore dziecko"
+  ],
+  "links": [
+   "/calculator"
+  ],
+  "answer": "Zasiłek opiekuńczy wynosi {rates.care|%} podstawy, do {care.days_per_year_child_under_14} dni w roku przy dziecku do 14 lat, wspólnie dla obojga rodziców. Za ten sam dzień dostaje go tylko jeden rodzic. Wniosek: Z-15A."
+ },
+ {
+  "keywords": [
+   "chorob",
+   "l4",
+   "zwolnien",
+   "e-zla",
+   "ezla"
+  ],
+  "links": [
+   "/sources/benefits-act#article-11"
+  ],
+  "answer": "Zasiłek chorobowy wynosi {rates.sick|%} podstawy, a w ciąży {rates.sick_pregnancy|%} (e-ZLA z kodem B). Pracownikowi przez pierwsze {sick.employer_days} dni choroby w roku płaci pracodawca (wynagrodzenie chorobowe). Prawo do zasiłku powstaje po {sick.waiting_days_mandatory} dniach ubezpieczenia obowiązkowego albo {sick.waiting_days_voluntary} dniach dobrowolnego (art. 4). W ciąży zasiłek przysługuje najwyżej {sick.period_days_pregnancy} dni."
+ },
+ {
+  "keywords": [
+   "zadłuż",
+   "zaległ",
+   "dług"
+  ],
+  "links": [
+   "/me",
+   "/sources/benefits-act#article-2a"
+  ],
+  "answer": "Przy działalności gospodarczej zaległość w składkach wyższa niż {debt_threshold_pct_min_wage|%} minimalnego wynagrodzenia wstrzymuje zasiłki do czasu spłaty całego zadłużenia (art. 2a). Stan sprawdzisz w zakładce Moje dane."
+ },
+ {
+  "keywords": [
+   "kto wypłaca",
+   "płatnik",
+   "pracodawca czy zus",
+   "kto płaci"
+  ],
+  "links": [
+   "/sources/benefits-act#article-61"
+  ],
+  "answer": "Zasiłki wypłaca płatnik składek, który zgłasza do ubezpieczenia chorobowego ponad {payer_threshold_insured} osób. Przy mniejszym płatniku, przy działalności gospodarczej i po ustaniu ubezpieczenia wypłaca ZUS (art. 61)."
+ },
+ {
+  "keywords": [
+   "akt urodzenia",
+   "odpis",
+   "usc"
+  ],
+  "links": [
+   "/applications"
+  ],
+  "answer": "Gdy zasiłek wypłaca ZUS, nie trzeba dostarczać odpisu aktu urodzenia: ZUS pobierze go z rejestru na podstawie danych dziecka (rozporządzenie o dokumentach, § 13 ust. 2–3). Pracodawca, który sam wypłaca zasiłek, potrzebuje odpisu skróconego. Wniosek o odpis złożysz w zakładce Wnioski."
+ },
+ {
+  "keywords": [
+   "macierzyńsk"
+  ],
+  "links": [
+   "/sources/labour-code#article-180"
+  ],
+  "answer": "Urlop macierzyński przy jednym dziecku trwa {maternity.weeks_by_children.0} tygodni; do {maternity.prebirth_max_weeks} tygodni można wykorzystać przed porodem. Pierwsze {maternity.mother_personal_weeks} tygodni po porodzie mama wykorzystuje sama, resztę może przejąć tata. Zasiłek: {rates.maternity|%} podstawy."
+ },
+ {
+  "keywords": [
+   "wniosek",
+   "formularz",
+   "zam",
+   "dokument"
+  ],
+  "links": [
+   "/applications",
+   "https://www.zus.pl"
+  ],
+  "answer": "Pracownik składa wnioski o urlop u pracodawcy; jeśli zasiłek wypłaca ZUS, pracodawca dołącza zaświadczenie Z-3. Pozostali składają ZAM tam, gdzie wypłacany jest zasiłek. Listę dokumentów i terminów dla Twojego planu znajdziesz w zakładce Wnioski."
+ }
+]

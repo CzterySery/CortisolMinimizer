@@ -16,7 +16,15 @@ const slot = (key: string) => ({ get: () => read(key), set: (v?: string) => writ
 export const userToken = slot("zp.user");
 export const adminToken = slot("zp.admin");
 
-// "Otwórz w kalkulatorze": the end-of-game plan travels to /calculator once.
+// The plan the user built in the calculator, read by /applications (their own case, never a game result).
+export const myPlan = {
+  put: (plan: unknown) => write("zp.myplan", JSON.stringify(plan)),
+  get: (): unknown => {
+    try { return JSON.parse(read("zp.myplan") ?? "null") ?? undefined; } catch { return undefined; }
+  },
+};
+
+// "Otwórz w kalkulatorze": the finished game's sample plan travels to /calculator once.
 export const planHandoff = {
   put: (plan: unknown) => write("zp.plan", JSON.stringify(plan)),
   take: (): unknown => {

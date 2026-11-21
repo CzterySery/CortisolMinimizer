@@ -132,110 +132,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Simulate Plan */
+        /**
+         * Simulate Plan
+         * @description Stateless replay: the client sends every selected card id, the server rebuilds and judges one plan.
+         */
         post: operations["simulate_plan_api_v1_game_simulate_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/game/scenarios": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Scenarios */
-        get: operations["scenarios_api_v1_game_scenarios_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/game": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** New Game */
-        post: operations["new_game_api_v1_game_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/game/{game_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Game */
-        get: operations["get_game_api_v1_game__game_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/game/{game_id}/preview": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Preview */
-        post: operations["preview_api_v1_game__game_id__preview_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/game/{game_id}/play": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Play */
-        post: operations["play_api_v1_game__game_id__play_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/game/{game_id}/summary": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Summary */
-        get: operations["summary_api_v1_game__game_id__summary_get"];
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -327,68 +228,20 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/zus/me/insurance": {
+    "/api/v1/zus/me": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Insurance */
-        get: operations["insurance_api_v1_zus_me_insurance_get"];
+        /**
+         * Account
+         * @description Everything the simulated eZUS account shows: insurance, e-ZLA, debt certificate, filed applications.
+         */
+        get: operations["account_api_v1_zus_me_get"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/zus/me/ezla": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Ezla */
-        get: operations["ezla_api_v1_zus_me_ezla_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/zus/me/debt-certificate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Debt Certificate */
-        get: operations["debt_certificate_api_v1_zus_me_debt_certificate_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/pue/messages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Pue */
-        post: operations["pue_api_v1_pue_messages_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -423,6 +276,23 @@ export interface paths {
         put?: never;
         /** Birth Certificate */
         post: operations["birth_certificate_api_v1_usc_birth_certificate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/pue/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pue */
+        post: operations["pue_api_v1_pue_messages_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -561,9 +431,17 @@ export interface components {
              * @enum {string}
              */
             who: "mother" | "father";
-            /** Payload */
-            payload: {
-                [key: string]: unknown;
+            /**
+             * Recipient
+             * @enum {string}
+             */
+            recipient: "employer" | "zus" | "usc";
+            /**
+             * Payload
+             * @default {}
+             */
+            payload?: {
+                [key: string]: string;
             };
         };
         /** ApplicationOut */
@@ -612,6 +490,11 @@ export interface components {
         };
         /** BirthCertificateRequest */
         BirthCertificateRequest: {
+            /**
+             * Who
+             * @enum {string}
+             */
+            who: "mother" | "father";
             /** Child Name */
             child_name: string;
             /**
@@ -783,23 +666,6 @@ export interface components {
              */
             combos: components["schemas"]["Combo-Output"][];
         };
-        /** CardPreview */
-        CardPreview: {
-            /** Card Id */
-            card_id: string;
-            /** Statistics */
-            statistics: components["schemas"]["Statistic"][];
-            pools: components["schemas"]["Pools"];
-            /** New Documents */
-            new_documents: components["schemas"]["Document"][];
-            /** New Issues */
-            new_issues: components["schemas"]["Issue"][];
-        };
-        /** CardRequest */
-        CardRequest: {
-            /** Card Id */
-            card_id: string;
-        };
         /** Care */
         Care: {
             /** Days Per Year Child Under 14 */
@@ -862,8 +728,17 @@ export interface components {
             name: string;
             /** Url */
             url: string;
+            /** Krs */
+            krs: string;
+            /** Description */
+            description: string;
             /** Helps With */
             helps_with: string[];
+            /**
+             * Phone
+             * @default
+             */
+            phone: string;
         };
         /** Combo */
         "Combo-Input": {
@@ -963,6 +838,10 @@ export interface components {
              * @default
              */
             note: string;
+            /** Start */
+            start: string | null;
+            /** End */
+            end: string | null;
         };
         /** EZla */
         EZla: {
@@ -1060,6 +939,28 @@ export interface components {
             hospitalization: components["schemas"]["Hospitalization"] | null;
             adoption: components["schemas"]["Adoption"] | null;
         };
+        /** FiledApplication */
+        FiledApplication: {
+            /** Form */
+            form: string;
+            /**
+             * Who
+             * @enum {string}
+             */
+            who: "mother" | "father";
+            /**
+             * Recipient
+             * @enum {string}
+             */
+            recipient: "employer" | "zus" | "usc";
+            /**
+             * Filed On
+             * Format: date
+             */
+            filed_on: string;
+            /** Status */
+            status: string;
+        };
         /** Game */
         "Game-Input": {
             /** Round Offsets Days */
@@ -1097,49 +998,6 @@ export interface components {
              * Format: date
              */
             horizon_end: string;
-        };
-        /** GameState */
-        GameState: {
-            /** Id */
-            id: string;
-            /** Scenario Id */
-            scenario_id: string;
-            /** Seed */
-            seed: number;
-            plan: components["schemas"]["Plan-Output"];
-            /** Current Round */
-            current_round: number;
-            /**
-             * Total Rounds
-             * @default 5
-             */
-            total_rounds: number;
-            /**
-             * Hand Size
-             * @default 3
-             */
-            hand_size: number;
-            /** Stages */
-            stages: components["schemas"]["Stage"][];
-            /** Statistics */
-            statistics: components["schemas"]["Statistic"][];
-            /** Table */
-            table: components["schemas"]["Card-Output"][];
-            /** Hand */
-            hand: components["schemas"]["Card-Output"][];
-            /** Combos Hit */
-            combos_hit: string[];
-            result: components["schemas"]["PlanResult"] | null;
-            /**
-             * Bonuses
-             * @default []
-             */
-            bonuses: components["schemas"]["ScoreLine"][];
-            /**
-             * Finished
-             * @default false
-             */
-            finished: boolean;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -1276,14 +1134,6 @@ export interface components {
             total: string;
             /** Below Target */
             below_target: boolean;
-        };
-        /** NewGame */
-        NewGame: {
-            /** Scenario Id */
-            scenario_id?: string | null;
-            /** Persona Id */
-            persona_id?: string | null;
-            family?: components["schemas"]["Family-Input"] | null;
         };
         /** Params */
         "Params-Input": {
@@ -1530,6 +1380,11 @@ export interface components {
             name: string;
             /** Description */
             description: string;
+            /**
+             * Who
+             * @enum {string}
+             */
+            who: "mother" | "father";
         };
         /** Plan */
         "Plan-Input": {
@@ -1583,18 +1438,6 @@ export interface components {
              * @default 0
              */
             top_up: string;
-        };
-        /** PlayResult */
-        PlayResult: {
-            state: components["schemas"]["GameState"];
-            /** Combos */
-            combos: string[];
-            /** Chips */
-            chips: number;
-            /** Mult */
-            mult: string;
-            /** Points */
-            points: number;
         };
         /** Pools */
         Pools: {
@@ -1752,13 +1595,6 @@ export interface components {
             /** Description */
             description: string;
         };
-        /** ScoreLine */
-        ScoreLine: {
-            /** Label */
-            label: string;
-            /** Points */
-            points: number;
-        };
         /** Session */
         Session: {
             /** Token */
@@ -1834,15 +1670,6 @@ export interface components {
             url: string;
             /** Locator */
             locator: string | null;
-        };
-        /** Stage */
-        Stage: {
-            /** Id */
-            id: number;
-            /** Title */
-            title: string;
-            /** Description */
-            description: string;
         };
         /**
          * Statistic
@@ -1927,6 +1754,18 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** ZusAccount */
+        ZusAccount: {
+            persona: components["schemas"]["Persona"];
+            /** Insurance */
+            insurance: components["schemas"]["InsurancePeriod"][];
+            /** Ezla */
+            ezla: components["schemas"]["EZla"][];
+            debt: components["schemas"]["DebtCertificate"];
+            /** Applications */
+            applications: components["schemas"]["FiledApplication"][];
+            plan: components["schemas"]["Plan-Output"];
         };
     };
     responses: never;
@@ -2149,191 +1988,6 @@ export interface operations {
             };
         };
     };
-    scenarios_api_v1_game_scenarios_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ScenarioSummary"][];
-                };
-            };
-        };
-    };
-    new_game_api_v1_game_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["NewGame"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GameState"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_game_api_v1_game__game_id__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                game_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GameState"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    preview_api_v1_game__game_id__preview_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                game_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CardRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CardPreview"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    play_api_v1_game__game_id__play_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                game_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CardRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PlayResult"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    summary_api_v1_game__game_id__summary_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                game_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GameState"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     samples_api_v1_cases_samples_get: {
         parameters: {
             query?: never;
@@ -2473,10 +2127,12 @@ export interface operations {
             };
         };
     };
-    insurance_api_v1_zus_me_insurance_get: {
+    account_api_v1_zus_me_get: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2488,71 +2144,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["InsurancePeriod"][];
-                };
-            };
-        };
-    };
-    ezla_api_v1_zus_me_ezla_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EZla"][];
-                };
-            };
-        };
-    };
-    debt_certificate_api_v1_zus_me_debt_certificate_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DebtCertificate"];
-                };
-            };
-        };
-    };
-    pue_api_v1_pue_messages_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PueMessage"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PueReply"];
+                    "application/json": components["schemas"]["ZusAccount"];
                 };
             };
             /** @description Validation Error */
@@ -2569,7 +2161,9 @@ export interface operations {
     submit_application_api_v1_applications_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2602,7 +2196,9 @@ export interface operations {
     birth_certificate_api_v1_usc_birth_certificate_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2619,6 +2215,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ApplicationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pue_api_v1_pue_messages_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PueMessage"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PueReply"];
                 };
             };
             /** @description Validation Error */

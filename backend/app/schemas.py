@@ -190,6 +190,8 @@ class Document(Model):
     done: bool = False
     rule: str  # legal basis, e.g. "KP art. 182^1d § 1; rozp. wn. § 15"
     note: str = ""  # how to file it, what to attach, who issues it
+    start: date | None = None  # the period it concerns, for pre-filled forms
+    end: date | None = None
 
 
 class Issue(Model):
@@ -222,61 +224,12 @@ class BaseResult(Model):
     steps: list[Explain]
 
 
-# --- game session (B4) ---
+# --- game (stateless replay, game/engine.py) ---
 
 class ScenarioSummary(Model):
     id: str
     title: str
     description: str
-
-
-class NewGame(Model):
-    scenario_id: str | None = None
-    persona_id: str | None = None
-    family: Family | None = None  # custom family facts => generic story
-
-
-class ScoreLine(Model):
-    label: str
-    points: int
-
-
-class GameState(Model):
-    id: str
-    scenario_id: str
-    seed: int
-    plan: Plan
-    current_round: int  # 1..total_rounds; finished games keep the last round
-    total_rounds: int = 5
-    hand_size: int = 3
-    stages: list[Stage]  # this scenario's story per round (round track labels + story panel)
-    statistics: list[Statistic]  # money / time / happiness, derived from the plan and score
-    table: list[Card]  # played cards, in round order
-    hand: list[Card]
-    combos_hit: list[str]
-    result: PlanResult | None = None
-    bonuses: list[ScoreLine] = []  # end-of-game bonuses: no care gap, budget kept, no missed deadline
-    finished: bool = False
-
-
-class CardRequest(Model):
-    card_id: str
-
-
-class CardPreview(Model):
-    card_id: str
-    statistics: list[Statistic]  # projected values if this card is played; UI shows the difference
-    pools: Pools
-    new_documents: list[Document]
-    new_issues: list[Issue]  # e.g. "budget drops below target in 2027-05"
-
-
-class PlayResult(Model):
-    state: GameState
-    combos: list[str]
-    chips: int
-    mult: Decimal
-    points: int  # chips x mult, added to the happiness stat
 
 
 class SimulationRequest(Model):
@@ -328,12 +281,13 @@ class CaseVerdict(Model):
     explain: list[Explain]
 
 
-# --- simulated gov services ---
+# --- simulated gov services (mObywatel, ZUS PUE/eZUS, USC) ---
 
 class Persona(Model):
     id: str
     name: str
     description: str
+    who: Who  # whose mObywatel identity it is
 
 
 class LoginRequest(Model):
@@ -362,13 +316,30 @@ class EZla(Model):
 
 
 class DebtCertificate(Model):
-    as_of: date
+    as_of: date  # the day the right to the first benefit arises
     debt: Decimal
-    blocks_benefits: bool
+    blocks_benefits: bool  # art. 2a: JDG debt above the threshold
+
+
+class FiledApplication(Model):
+    form: str  # the Document.form it answers, so /applications can mark that document done
+    who: Who
+    recipient: Recipient
+    filed_on: date
+    status: str
+
+
+class ZusAccount(Model):
+    persona: Persona
+    insurance: list[InsurancePeriod]  # empty = no insurance title on record
+    ezla: list[EZla]
+    debt: DebtCertificate
+    applications: list[FiledApplication]  # already filed, including those sent from this app
+    plan: Plan  # ZUS records plus the person's own entries (partner, planned leave), ready for the calculator
 
 
 class PueMessage(Model):
-    question: str
+    question: str = Field(min_length=1, max_length=2000)
 
 
 class PueReply(Model):
@@ -377,9 +348,10 @@ class PueReply(Model):
 
 
 class ApplicationIn(Model):
-    form: str
+    form: str = Field(min_length=1, max_length=200)
     who: Who
-    payload: dict[str, Any]
+    recipient: Recipient
+    payload: dict[str, str] = {}  # the filled-in form fields
 
 
 class ApplicationOut(Model):
@@ -389,9 +361,10 @@ class ApplicationOut(Model):
 
 
 class BirthCertificateRequest(Model):
-    child_name: str
+    who: Who  # the parent who needs it
+    child_name: str = Field(min_length=1, max_length=200)
     birth_date: date
-    full_copy: bool = False
+    full_copy: bool = False  # odpis zupełny instead of skrócony
 
 
 class Link(Model):
@@ -402,7 +375,10 @@ class Link(Model):
 class Charity(Model):
     name: str
     url: str
+    krs: str  # checked on the organisation's own site; see AGENTS.md
+    description: str
     helps_with: list[str]
+    phone: str = ""
 
 
 # --- admin ---

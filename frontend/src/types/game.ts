@@ -9,10 +9,7 @@ export type Source = Schemas["Source-Output"];
 export type DesignedCard = (typeof deck.cards)[number];
 // UI annotations stay separate from the executable API contract.
 export type Card = Schemas["Card-Output"] & { design?: DesignedCard };
-export type Stage = Schemas["Stage"];
+export type Stage = Omit<Schemas["Round"], "cards">; // a round's story: id, title, description
 export type Round = Omit<Schemas["Round"], "cards"> & { cards: Card[] };
 export type Statistic = Schemas["Statistic"];
 export type GamePreview = Omit<Schemas["Preview"], "rounds"> & { rounds: Round[] };
-export type GameState = Schemas["GameState"];
-export type CardPreview = Schemas["CardPreview"];
-export type PlayResult = Schemas["PlayResult"];

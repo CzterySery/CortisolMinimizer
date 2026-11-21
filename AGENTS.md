@@ -72,7 +72,21 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 - Post-update checks: 7 unit tests passed; 3 PostgreSQL integration tests skipped because `TEST_DATABASE_URL` was not set. Frontend typecheck and full deck/source authoring validation passed. The local Python environment now includes the migration's already-declared `psycopg[binary]` dependency.
 - Verification of this work: authoring validation passes for all 30 cards, 31 rules and 334 local links, including exact PDF quote pages and source hashes; new scripts pass ruff; backend 8/8 tests pass; frontend typecheck, lint and production build pass. Initial runs found missing local `python-multipart` and `openapi-fetch`; installing the already-declared dependencies resolved the checks. No application dependency contracts were expanded.
 
-**Step 3 (paperwork) is done. Step 4 (game engine) is next.**
+**Step 5 (simulated gov services) is done. Step 6 (admin deck + submissions) is next.**
+- `backend/app/api/gov_mock.py`: `GET /auth/personas`, `POST /auth/mobywatel` (token = persona id + HMAC with `SESSION_SECRET`, random per process if unset), `GET /zus/me` → `ZusAccount{persona, insurance, ezla, debt, applications, plan}` (replaces the three `/zus/me/*` stubs), `POST /applications` and `POST /usc/birth-certificate` (stored in `submissions`, Bearer optional), `POST /pue/messages` (canned replies from `data/pue.json`, numbers filled from the params in force, question logged).
+- Three fictional personas in `data/personas.json`, each a brief case: **anna** (UoP at a 12-person firm so ZUS pays, e-ZLA with code B, e-ZLA and Z-3 already filed), **magda** (JDG with a 150 zł debt that blocks benefits, base raised in pregnancy, partner on zlecenie without voluntary sickness), **ola** (fixed-term UoP ending before the birth, single mother, ZAM to ZUS after the contract). `test_gov.py` pins each persona's issue codes and checks that every filed form is among its plan's documents.
+- Charities (`data/charities.json`): six foundations checked on their own websites on 2026-11-21, each with its KRS number: Wcześniak Rodzice-Rodzicom, Warszawskie Hospicjum dla Dzieci, Gajusz (perinatal hospice), Nagle Sami (helpline 800 108 108), Fundacja Ernesta (miscarriage/stillbirth), Zdążyć z Pomocą. Rodzić po Ludzku was left out: its site shows no loss support. Add an organisation only after checking its site and KRS.
+- Paperwork fixes found with the personas: no documents for a zlecenie/JDG parent without voluntary sickness insurance; after `insured_until`, an employee files ZAM with ZUS and the former employer sends the Z-3; `Document` now has `start`/`end` for pre-filled forms.
+- Frontend: `/me` shows the account (insurance, debt certificate, e-ZLA, filed documents) with "Przelicz mój plan w kalkulatorze" and "Moje wnioski"; `/applications` ticks documents ZUS already has (matched on form + parent) and offers a pre-filled form for the rest (USC form for the birth certificate); `/help` shows the charities and renders PUE answers with links.
+- Tests: 110 unit (8 in `test_gov.py`, 2 new in `test_paperwork.py`) + 5 integration (submissions per persona); frontend typecheck, lint and build pass; live-checked against Postgres (test rows removed).
+
+**Step 4 (game) is done.** The teammate's replay engine (`POST /game/simulate`, commit `bfc1fe7`) is the game engine; this step finished around it.
+- Removed the never-implemented session game: `POST /game`, `GET /game/{id}`, preview/play/summary, `GET /game/scenarios`, their schemas (`GameState`, `NewGame`, `CardRequest`, `CardPreview`, `PlayResult`, `ScoreLine`) and the frontend `/game/[id]`, `/game/[id]/summary`, `use-game.ts`, `combo-toast.tsx`. The `Stage` alias is now `Omit<Round, "cards">` (openapi stopped emitting `Stage`).
+- **Applications no longer depend on the game.** `/applications` reads the plan the user saved from `/calculator` ("Przygotuj wnioski dla tego planu", `myPlan` in sessionStorage) and lists its documents from `POST /calc/plan`. Marking documents already filed with ZUS comes with the step-5 login.
+- The finished home game shows "Przelicz ten plan w kalkulatorze".
+- Coverage test (`test_game_engine.py`): three least-played-first walks per scenario must always find a playable card, and together play every card except the four gated ones through a legal five-card plan. Backend 101 unit + 4 integration tests; frontend typecheck, lint and build pass; live-checked.
+
+**Step 3 (paperwork) is done.**
 - `backend/app/calc/paperwork.py`: `documents(plan, params)`, wired into `POST /calc/plan` (`PlanResult.documents`). Every `Document` now carries `rule` and `note` (how to file, what to attach, who issues it). Payer per art. 61 (`plan.payer()`) is also explained per parent in `explain`.
 - Risks from the brief's part H are new `rules.py` issues: `insured-parent.not-yet-insured`, `insured-parent.started-in-pregnancy`, `insured-parent.ends-before-birth`, `base.raised-in-pregnancy`; plus the `transfer.notice` deadline. New facts/params: `Parent.insured_until`, `maternity.pregnancy_weeks`, `deadlines.maternity_takeover_notice_days` / `maternity_resign_notice_days`.
 - Sources: the brief itself names the forms (Z-3, Z-3a, ZAS-12, ZAS-53, ZAM) and lists the risks (part H); the 2026 documents regulation (`Documents/legal/benefit-documents.md`, cited "rozp. dok.") names no forms, only annexes; leave applications are `Documents/legal/leave-applications.md` ("rozp. wn.").
@@ -108,7 +122,7 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 - **Frontend:** `cd frontend && npm install && npm run dev`. Check with `npm run typecheck && npm run lint && npm run build`.
 - **API contract** lives in `backend/app/schemas.py`. Every model inherits `Model`, which sets `json_schema_serialization_defaults_required`, so defaulted fields are **required in responses and optional in requests**.
 - **After any schema change**, with the backend running: `cd frontend && npm run gen:api` (writes `src/lib/schema.d.ts`; never edit it), then typecheck.
-  - Models used both in requests and responses are split into `S["X-Input"]` / `S["X-Output"]` (e.g. `Plan-Input`, `Card-Output`, `Source-Output`). Others keep their plain name (`GameState`, `Statistic`, `Stage`, `Round`, `Preview`, `CardPreview`).
+  - Models used both in requests and responses are split into `S["X-Input"]` / `S["X-Output"]` (e.g. `Plan-Input`, `Card-Output`, `Source-Output`). Others keep their plain name (`GameSimulation`, `Statistic`, `Round`, `Preview`, `PlanResult`).
   - Board components import friendly aliases from `src/types/game.ts`; everything else uses `S[...]` from `src/lib/api.ts`.
 - **Persistence lives only in `backend/app/repositories.py`:** the card catalog (`shared/cards.json`, or `CARDS_DATA_PATH`) plus PostgreSQL via `psycopg` 3 (`DATABASE_URL`, default `postgresql://zp:zp@localhost:5432/zp` = the compose `db`). Tables `config` (versioned params, JSONB), `games` and `submissions` are created and seeded by `init()` at startup; there are no migrations yet (`CREATE TABLE IF NOT EXISTS`), so a column change needs a manual `ALTER` or a fresh volume. Callers use its functions, never SQL.
 - **Legal numbers live only in `backend/app/data/params.json`.** They are admin-editable and versioned by `effective_from`. Never hardcode a rate, duration or limit in code, and that includes the frontend.
@@ -128,7 +142,7 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
   - `cacheComponents` is off, so `useParams` pages don't need Suspense.
 - **Gotchas found during the merge:**
   - `frontend/next-env.d.ts` imports `.next/dev/types/*`, which only exists after `next dev`/`next build`, so `tsc` on a fresh clone can fail until one of them has run. Next rewrites this file, so expect diff churn.
-  - `/` is prerendered at **build** time from the local 30-card design and does not fetch the backend, regardless of `API_URL`. Server-driven sessions remain under `/game/[id]`.
+  - `/` is prerendered at **build** time from the local 30-card design; once in the browser it plays through `POST /game/simulate` and fails closed without a backend.
   - `outputFileTracingRoot`/`turbopack.root` is the repo root (the UI imports `../shared/cards.json`), so standalone output nests under `.next/standalone/frontend/server.js`, and **both Docker images build from the repo root** (`docker-compose.yml`, root `.dockerignore`).
   - `scripts/sync_cards.py` **overwrites** `shared/cards.json` and resets `sources`. Once cards carry sources or game mechanics, it must merge instead of overwrite, or stop being used.
 - **Language:** code and comments in English, UI in Polish. Every calculated amount carries an `Explain{text, rule}` citing the article.
@@ -146,17 +160,17 @@ backend/
     params.py          # Params model + active(on)
     api/               # catalog.py calc.py game.py cases.py gov_mock.py info.py admin.py  (todo(step) => 501)
     calc/              # base.py ✅  plan.py ✅  rules.py ✅  paperwork.py ✅
-    game/              # engine.py effects.py combos.py          (step 4, not created yet)
-    data/              # params.json links.json (+ scenarios.json personas.json charities.json samples.json later)
-  tests/               # test_api.py, test_base.py, test_plan.py, test_rules.py, test_paperwork.py (unit, no DB), test_repositories.py (integration, Postgres)
+    game/              # engine.py (stateless replay of the designed deck) ✅
+    data/              # params.json links.json scenarios.json personas.json charities.json pue.json (+ samples.json, step 7)
+  tests/               # test_api.py, test_base.py, test_plan.py, test_rules.py, test_paperwork.py, test_game_engine.py, test_gov.py (unit, no DB), test_repositories.py (integration, Postgres)
   Dockerfile (context: repo root)   .env.example
 frontend/
   src/app/             # page.tsx (/ preview board), game/[id], game/[id]/summary, calculator, cases, applications,
                        # help, login, me, admin/{,deck,submissions}, api/v1/[...path]/route.ts (proxy), globals.css
-  src/components/      # game/ (game-board, preview-game, round-track, decision-card, statistics, combo-toast),
+  src/components/      # game/ (game-board, preview-game, round-track, decision-card, statistics, card-artwork, deck-library),
                        # plan/ (plan-timeline, budget-chart, care-calendar, pools-meter, docs-checklist),
                        # forms/ (family-form, blocks-editor), site-header, site-footer, page-header, api-result, json-editor
-  src/hooks/           # use-game.ts, use-plan.ts
+  src/hooks/           # use-plan.ts
   src/lib/             # api.ts (openapi-fetch client), schema.d.ts (generated), game.ts (board preview loader),
                        # format.ts, labels.ts, session.ts
   src/types/game.ts    # aliases of generated game types
@@ -208,42 +222,28 @@ docker-compose.yml     .dockerignore                     Documents/
   - **Employees file with the employer** (leave applications from `rozp. wn.` with KP notice periods as `due_by`: pre-birth maternity part, maternity, handover + the mother's resignation, supplementary, paternity, parental + part-time, Z-15A). When ZUS pays, the employer adds a **Z-3** (sick only once the employer-paid 33/14 days are exceeded in a year; then ZAS-12 for further periods).
   - **Non-employees** send **ZAM** to whoever pays (before the first day for paternity/parental, before maternity ends for supplementary); a small contracting party adds a **Z-3a**; JDG sick → **ZAS-53**. ZUR/ZAO/Z-3b were merged into ZAM / abolished on 2026-10-24.
   - Also: e-ZLA per sick period (code B in pregnancy), ZNp-7 for rehab, the art. 30 ust. 3 documents for the job-loss benefit, the 81.5% request (birth + 21 days), the Za życiem certificate in the parental note. Birth certificate: when an employer pays a maternity-type benefit, one "Odpis skrócony aktu urodzenia" (recipient `usc`); when ZUS pays, the note says ZUS reads the registry (rozp. dok. § 13 ust. 2–3).
-  - No documents for a parent without insurance or for vacation. Identical documents are merged (same form, parent, recipient, due date and note); per-period ones carry their dates in the note.
+  - No documents for a parent without sickness insurance (no title, or zlecenie/JDG without voluntary sickness) or for vacation. After `insured_until` an employee no longer files with the employer: ZAM to ZUS, and the former employer sends the Z-3. Each document carries the `start`/`end` of its period. Identical documents are merged (same form, parent, recipient, due date and note); per-period ones carry their dates in the note.
   - Stillbirth / child death is calculator-only, **never a game card**.
 
-### 3. Game engine (`game/`)
-- **Cards** (`Card` in `schemas.py`) have two parts:
-  - catalog fields `{id, round_id, title, description, sources[Source{id,title,url,locator}]}` from `shared/cards.json`
-  - game fields `{tags[], requires: Requirement{fact, op, value}[], effects[], chips, combos[{with, name, check, mult}]}`, which are empty until step 4
-
-  The game deck **is** the catalog. Admin deck versions (step 6) get seeded from it.
-  - `requires` checks scenario facts only. **Legal feasibility comes from simulate + `rules.py`, not per-card code.**
-  - Effects are ~8 primitives: `add_block, set_rate_variant, set_flag, set_birth, reserve, mark_docs, transfer_maternity, add_care`. They use symbolic anchors: `birth | due-6w | after:maternity:mother | need:adaptation | need:emergency`.
-- **Rounds:** `Stage{id, title, description}` is a round's story; `Round` = `Stage` + its 3 cards. `GameState.stages` carries the scenario's stage texts (round-track labels + story panel).
-- **scenarios.json** (step 4) has ~5 stories: standard UoP family, premature birth + sick leave in pregnancy, zlecenie mother + JDG father, employer liquidation, Za życiem. Each holds family facts, `needs` (date ranges where the child needs care), a budget target and per-round stage texts.
-- **Hand:**
-  - With the 15-card deck, the hand is the round's 3 cards.
-  - Cards that `rules.py` rejects for this family should still show, **disabled with the reason**. That's an open UI item and teaches more than hiding them.
-  - With a bigger deck (cards_inspo), use the deal: filter → simulate + validate → lookahead → 3 with distinct tags, seeded RNG in state.
-- **Statistics** (sidebar, `Statistic{id, label, value, unit, max}`):
-  - `money` = lowest monthly family income in the plan (zł)
-  - `time` = days a parent is home while the story needs care; `max` = days needed, which fills the track
-  - `happiness` = score: Σ chips × (1 + Σ combo mult) plus end bonuses
-- **Card preview** returns `CardPreview{statistics (projected), pools, new_documents, new_issues}`. The board shows projected − current as delta badges.
-- **Play** returns `PlayResult{state, combos, chips, mult, points}`.
-  - Combo checks: `touching | overlap | budget_ok | docs_complete | covers_need`.
-  - End bonuses (`GameState.bonuses`): no care gap in year 1, budget never below target, no missed deadline.
-- Start a game from a scenario, a mObywatel persona, or custom `Family` facts (uses the generic story).
+### 3. Game engine (`game/engine.py`) ✅
+The teammate's stateless replay engine (see `docs/game-engine.md` for card-by-card scope). Sessions, combos and end bonuses from the original plan were dropped.
+- **Deck:** `shared/deck-design.json` (30 cards, six per round, declarative `effects`), built by `scripts/build_deck_design.py`. The legacy 15-card catalog (`shared/cards.json`, `/cards`, `/rounds`, `/game/preview`) only supplies round titles to the board; decide its fate with the admin deck (step 6).
+- **`POST /game/simulate {scenario_id, selected[]}`** replays every selected card id from round 1 into one `Plan` and returns `GameSimulation{scenario, plan, result, statistics, candidates[], reservations, horizon}`. Each candidate of the next round is tried on top: `available` + issues + projected statistics + pools. Nothing is stored, so the server stays authoritative without sessions, and a refresh restarts the game.
+- **Effects** resolve symbolic anchors (`after:maternity`, `need:adaptation`, `choice.*`, `params.*`, `derived.*`) against the scenario's sample choices; legal limits come only from `Params`, and every result goes through `compute_plan` (fixed horizon) + `rules.check`. A legal error makes a card unavailable with the reason; it stays visible in the hand.
+- **Scenarios** (`backend/app/data/scenarios.json`): one sample UoP family in three stories (standard, preterm hospitalization + e-ZLA, Za życiem) plus sample choices. **Gated cards** (always unavailable, with a reason): 1D rehab, 1F/2F adoption/foster, 3F end of insurance, because no story has those facts.
+- **Deal** is client-side (`preview-game.tsx`): three of the round's six, swapping one in if none is playable. The coverage test plus a one-off exhaustive search (all ~4 350 paths, ~100 s) show every reachable state has a playable card, so the swap always succeeds.
+- **Statistics:** `money` = lowest monthly income over the horizon vs. the parents' bases, `time` = covered care-need days (a day counts once, part-time counts its free fraction), `happiness` = the mean of both ratios × 100. No combos.
+- **The game never produces applications.** `simulate` leaves `documents` empty; paperwork belongs to the user's own plan (`/calculator` → `/applications`), because a real parent has usually filed some of it with ZUS already. The finished game offers "Przelicz ten plan w kalkulatorze" (`planHandoff`), where the sample family can be replaced with the user's own data.
 
 ### 4. REST API (all under `/api/v1`, see `/docs`)
 | Area | Endpoints | State |
 |---|---|---|
 | Catalog | `GET /health`, `/cards`, `/rounds`, `/rounds/{id}`, `/game/preview` | ✅ |
 | Calculator | `POST /calc/base` ✅, `POST /calc/plan` ✅ (months, calendar, pools, issues, documents, explain) | ✅ |
-| Game | `GET /game/scenarios`, `POST /game`, `GET /game/{id}`, `POST /game/{id}/preview`, `POST /game/{id}/play`, `GET /game/{id}/summary` | 501 (step 4) |
+| Game | `POST /game/simulate` (stateless replay) | ✅ |
 | Cases | `GET /cases/samples`, `POST /cases/parse` (PDF → `ParseResult`), `POST /cases/evaluate` (`CaseInput` → `CaseVerdict`) | 501 (step 7) |
-| Gov mocks | `GET /auth/personas`, `POST /auth/mobywatel`, `GET /zus/me/{insurance,ezla,debt-certificate}` (Bearer), `POST /pue/messages`, `POST /applications`, `POST /usc/birth-certificate` | 501 (step 5) |
-| Info | `GET /info/links` ✅, `GET /info/charities` (empty until curated) | partial |
+| Gov mocks | `GET /auth/personas`, `POST /auth/mobywatel`, `GET /zus/me` (Bearer), `POST /pue/messages`, `POST /applications`, `POST /usc/birth-certificate` (Bearer optional) | ✅ |
+| Info | `GET /info/links`, `GET /info/charities` (verified, with KRS) | ✅ |
 | Admin (Bearer `ADMIN_TOKEN`) | `GET/PUT /admin/params`, `GET /admin/params/versions` ✅; `GET/PUT /admin/deck`, `GET /admin/submissions` | partial (step 6) |
 
 ### 5. Case PDFs
@@ -253,7 +253,7 @@ docker-compose.yml     .dockerignore                     Documents/
 ## Frontend design
 
 ### Principles
-- **The server is authoritative.** The client holds no game rules and no money math. It renders `GameState` / `PlanResult` and asks the server for previews. The only local logic is the `/` preview walkthrough (`preview-game.tsx`).
+- **The server is authoritative.** The client holds no game rules and no money math. It renders `GameSimulation` / `PlanResult`. The only local game logic is the deal in `preview-game.tsx`.
 - **No extra libraries until a need is proven.** No state library, no chart library (CSS bars/lanes), no form library. `openapi-fetch` + generated types are the only additions.
 - **Accessibility target: WCAG 2.1 AA** (Polish public-sector requirement):
   - the board already has a keyboard/touch path ("Połóż na stole"), an `aria-live` announcement and `prefers-reduced-motion`
@@ -264,14 +264,12 @@ docker-compose.yml     .dockerignore                     Documents/
 ### Routes
 | Route | Purpose | Main pieces |
 |---|---|---|
-| `/` | Board preview from the local catalog (works without a backend) | `getGamePreview()` → `PreviewGame` → `GameBoard` |
-| `/game/[id]` | Server-driven game | `useGame` → `GameBoard mode="game"` (projected stats on hover/focus, `new_issues`, `ComboToast`) |
-| `/game/[id]/summary` | End screen: happiness score, combos, bonuses, plan, next steps | `PlanTimeline`; "Przygotuj wnioski", "Otwórz w kalkulatorze" (`planHandoff`), "Zagraj ponownie" |
-| `/calculator` | Integrated calculator, recomputed live | `FamilyForm`, rate variant, `BlocksEditor`, `usePlan` → `PlanTimeline` |
+| `/` | The game: designed deck, sample stories, every play replayed by the server | `getGamePreview()` → `PreviewGame` (`POST /game/simulate`) → `GameBoard`; at the end "Przelicz ten plan w kalkulatorze" (`planHandoff`) |
+| `/calculator` | Integrated calculator, recomputed live; starts with both parents | `FamilyForm`, rate variant, `BlocksEditor`, `usePlan` → `PlanTimeline`; "Przygotuj wnioski dla tego planu" (`myPlan`) |
 | `/cases` | Jury flow: upload a PDF or pick a sample → verdict | `cases/parse`, `cases/evaluate`; later reuses `FamilyForm` to review parsed fields |
-| `/applications` | Pre-filled documents from the plan → "send" to the employer or ZUS | `game/{id}/summary`, `POST /applications` |
-| `/login` → `/me` | Simulated mObywatel login → "Moje dane z ZUS" | `userToken` in sessionStorage |
-| `/help` | Charities, official links, simulated PUE question | `info/*`, `pue/messages` |
+| `/applications` | The user's own documents (never the game's), already-filed ones ticked from eZUS, the rest filled in and "sent" | `myPlan` → `POST /calc/plan` → `DocsChecklist`; `GET /zus/me`; `POST /applications`, `POST /usc/birth-certificate` |
+| `/login` → `/me` | Simulated mObywatel login → the eZUS account: insurance, debt certificate, e-ZLA, filed documents; buttons to the calculator (`planHandoff`) and applications (`myPlan`) | `userToken` in sessionStorage, `GET /zus/me` |
+| `/help` | Verified charities, official links, simulated PUE question (answer + links) | `info/*`, `pue/messages` |
 | `/admin`, `/admin/deck`, `/admin/submissions` | Params and deck JSON editors (new version per save), submitted applications | `admin/layout.tsx` holds the token + sub-nav, `JsonEditor` |
 
 ### Board (team UI) and how the skeleton plugs in
@@ -281,7 +279,7 @@ docker-compose.yml     .dockerignore                     Documents/
   - story section (stage title + description)
   - hand of 3 `DecisionCard`s (hover/focus lifts a card; drag onto the slot or press "Połóż na stole"; sources in a `<details>`)
   - decorative deck
-- **`GameBoard` is presentational.** Props: `mode`, `stages`, `currentRound` (null = complete), `statistics`, `projected`, `played`, `hand`, `onPlay`, `onFocusCard`, `onReset`, `summaryHref`. The caller owns state: `PreviewGame` (local) or `/game/[id]` (`useGame`). The preview shows the "Podgląd planszy" badge.
+- **`GameBoard` is presentational.** Props: `mode`, `stages`, `currentRound` (null = complete), `statistics`, `projected`, `played`, `hand`, `onPlay`, `onFocusCard`, `onReset`, `unavailable`, `belowHand`. `PreviewGame` is the only caller and owns state (`mode="preview"`; the `"game"` branches are unused since the session game was removed).
 - **Chrome:** `SiteHeader` (brand + nav) and `SiteFooter` are in the root layout; pages render their own `<main>` (`.page` + `PageHeader`).
 - **Next for the board (step F4/F6):** disabled-card state with the rule that blocks it, combo links between slots, a count-up animation on happiness, and real stat tracks.
 
@@ -295,22 +293,21 @@ Backend and frontend run in parallel once the contract exists. FE steps that dep
 | 2b ✅ | `calc/plan.py` (ledger, durations, rates, months, pools) + `POST /calc/plan` + tests | Calculator: salary history, hospitalization, adoption fields; presets; 422 → field errors *(unblocked)* |
 | 2c ✅ | `calc/rules.py` (legal validation → `issues`) + tests | Show issues linked to their evidence (`/sources/...` via the rule id in `Issue.code`) |
 | 3 ✅ | `paperwork.py` (payer, documents, deadlines) + brief-H risks in `rules.py` | Plan views: kind colours + legend, care gaps, issue styling |
-| 4 | Game: card mechanics in `shared/cards.json`, scenarios.json, deal/preview/play/combos/stats, coverage test | Board on real data (`/` creates a game when the API is up), disabled cards, summary *(needs BE4)* |
-| 5 | Gov mocks, personas, applications, PUE canned replies, charities (verified orgs only) | Login → /me, application forms, help page *(needs BE5)* |
+| 4 ✅ | Replay engine (teammate) + scenarios, session API removed, coverage test | Board on `POST /game/simulate`, disabled cards with reasons, end-of-game → calculator; `/applications` from the user's own plan |
+| 5 ✅ | Gov mocks, personas, applications, PUE canned replies, charities (verified orgs only) | Login → /me, application forms, help page |
 | 6 | Admin deck (versioned, seeded from the catalog) + submissions | Admin typed forms (grouped params with units, deck as card list) |
 | 7 | Cases parse/evaluate + golden tests (needs sample PDFs) | Cases review flow reusing `FamilyForm` *(needs BE7)* |
 | 8 | Deploy the backend container + Postgres (managed, or the compose `db` with a real `POSTGRES_PASSWORD`) | Deploy the frontend container (`API_URL` at runtime); contrast fix; Playwright happy path + mobile/desktop screenshots (needed for the submission); 3-min video |
 
 ## Verification
-- **Backend:** `uv run pytest` (unit, no DB: catalog, board preview, health, links, admin auth/validation, 501 stubs), the integration run above (seeding, versions, effective dates, admin round trip on Postgres) and `uv run ruff check app tests`. `test_base.py` covers the window, per-contribution rounding, exclusion/top-up incl. art. 38 ust. 3, shorter insurance, first month, the full-time floor, bonuses and the non-employee cap. `test_plan.py` covers month-by-month maternity, the averaged rate with the father's exclusive weeks at 70%, art. 31 ust. 3g + top-up, the floor (insured, full-leave days only), part-time, sick rates and the employer/ZUS split, rehab 90→75%, care, vacation, paternity, pool sizes and input errors. `test_rules.py`: a legal family plan must produce no issues, a parametrised table triggers every check by code, plus severities, deadlines (only with `today`), the supplementary entitlement table and the contract-end warning vs. error. `test_paperwork.py`: the art. 61 payer, exact document sets (form, parent, recipient, due date) for employees at small/big employers, non-employees (ZAM, Z-3a, ZAS-53), the maternity handover, sick pay past the employer days, part-time/supplementary/care/Za życiem, periods after the insurance ended, and the payer line in `explain`. Planned unit tests:
-  - `test_game`: every scenario always gets a full hand, never produces an invalid plan, uses every card, and combos score once
-- **Frontend:** `npm run typecheck && npm run lint && npm run build`. Then run both servers (`API_URL` set) and walk `/` → `/game/{id}` → summary → `/applications`, and `/calculator`, at 375px and 1280px.
+- **Backend:** `uv run pytest` (unit, no DB: catalog, board preview, health, links, admin auth/validation, 501 stubs), the integration run above (seeding, versions, effective dates, admin round trip on Postgres) and `uv run ruff check app tests`. `test_base.py` covers the window, per-contribution rounding, exclusion/top-up incl. art. 38 ust. 3, shorter insurance, first month, the full-time floor, bonuses and the non-employee cap. `test_plan.py` covers month-by-month maternity, the averaged rate with the father's exclusive weeks at 70%, art. 31 ust. 3g + top-up, the floor (insured, full-leave days only), part-time, sick rates and the employer/ZUS split, rehab 90→75%, care, vacation, paternity, pool sizes and input errors. `test_rules.py`: a legal family plan must produce no issues, a parametrised table triggers every check by code, plus severities, deadlines (only with `today`), the supplementary entitlement table and the contract-end warning vs. error. `test_gov.py`: login and signed tokens, the account, the debt certificate, filed applications coming back, PUE answers rendered from params, persona issue codes and filed forms vs. paperwork, charities with KRS. `test_paperwork.py`: the art. 61 payer, exact document sets (form, parent, recipient, due date) for employees at small/big employers, non-employees (ZAM, Z-3a, ZAS-53), the maternity handover, sick pay past the employer days, part-time/supplementary/care/Za życiem, periods after the insurance ended, and the payer line in `explain`. `test_game_engine.py`: shared pools across rounds, reservations, part-time, gating, preserved medical facts, derived happiness, round order, and the coverage walks (always a playable card; every ungated card completes a legal plan).
+- **Frontend:** `npm run typecheck && npm run lint && npm run build`. Then run both servers (`API_URL` set) and walk `/` (five plays → "Przelicz ten plan w kalkulatorze") → `/calculator` → "Przygotuj wnioski dla tego planu" → `/applications`, at 375px and 1280px.
 - **Proxy:** `curl localhost:3000/api/v1/health` must return the backend's body. Without `API_URL` it must return 503 while `/` still renders.
 - **Contract drift:** `npm run gen:api` then typecheck shows every UI spot that needs updating.
 - **Docker:** `docker compose up --build`, then `curl localhost:3000/api/v1/cards` must return 15 cards and `curl -H 'Authorization: Bearer dev' localhost:3000/api/v1/admin/params/versions` must list version 1 (proves frontend → backend → Postgres).
 
 ## Open items
-- **Deck decision:** 30 designed cards, six per stage (`cards-30.md`), with a three-card hand. Separate the pool from the hand in the contract before runtime integration. Some special scenarios cannot supply three legal options: show disabled alternatives with reasons, and never invent legal availability. Scenario coverage remains to be tested with the implemented engine.
+- **Deck decision:** 30 designed cards, six per stage (`cards-30.md`), with a three-card hand. Unavailable cards show with their reason; never invent legal availability. Open: a game for the user's own family or a mObywatel persona (today only the three sample stories), and enabling 1D/1F/2F/3F once a story has the facts.
 - **Szczęście:** authored game score, not a health metric. Shared time and fulfilled care goals are separate derived inputs to Aura Farming. Mode formulas are proposed in `docs/card-grounding.md` and need playtesting.
 - **Father's rate for non-exclusive parental leave under the mother's 81.5% application** (art. 30a ust. 3). Assumed 81.5%.
 - **Care allowance rules:** local guide pages PDF 37–40 and official Sejm articles 32–35 are linked in `Documents/legal/README.md`; implement the family-wide annual limit and event/household checks before activation.

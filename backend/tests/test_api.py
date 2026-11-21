@@ -38,7 +38,7 @@ def test_admin_rejects_invalid_params(client):
 
 
 def test_stubs_are_501_not_500(client):
-    assert client.get("/api/v1/game/scenarios").status_code == 501
+    assert client.get("/api/v1/cases/samples").status_code == 501
 
 
 def test_home_game_replays_and_rejects_exhausted_pool(client, monkeypatch):

@@ -32,6 +32,11 @@ def get_game_scenarios() -> dict:
     return json.loads((DATA / "scenarios.json").read_text(encoding="utf-8"))
 
 
+def get_personas() -> list[dict]:
+    """Fictional mObywatel identities with their simulated ZUS records."""
+    return json.loads((DATA / "personas.json").read_text(encoding="utf-8"))
+
+
 @contextmanager
 def db():
     # shortcut: one connection per call, fine for demo traffic; switch to psycopg_pool if load grows
@@ -88,3 +93,17 @@ def list_config(kind: str) -> list[dict]:
     with db() as c:
         return c.execute("SELECT version, effective_from, created_at FROM config WHERE kind = %s "
                          "ORDER BY version", (kind,)).fetchall()
+
+
+def add_submission(kind: str, payload: dict, status: str) -> int:
+    """Store a simulated filing (application, USC request, PUE question); returns its number."""
+    with db() as c:
+        return c.execute("INSERT INTO submissions (kind, payload, status) VALUES (%s, %s, %s) RETURNING id",
+                         (kind, Jsonb(payload), status)).fetchone()["id"]
+
+
+def list_submissions(persona: str) -> list[dict]:
+    """What one mObywatel identity sent from this app, newest first."""
+    with db() as c:
+        return c.execute("SELECT id, kind, payload, status, created_at FROM submissions "
+                         "WHERE payload->>'persona' = %s ORDER BY id DESC", (persona,)).fetchall()
