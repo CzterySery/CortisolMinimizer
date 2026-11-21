@@ -3,7 +3,7 @@ import type { CardSignals } from "@/lib/card-signals";
 
 const symbols = { money: "zł", time: "◷", knowledge: "i" };
 
-// Decorative balance of authored card effects, never calculator quantities.
+// Decorative balance of authored card effects (Money vs Time), never calculator quantities.
 export function Statistics({ statistics, simulation }: {
   statistics: Statistic[]; projected?: Statistic[];
   baseline?: Statistic[];
@@ -11,10 +11,11 @@ export function Statistics({ statistics, simulation }: {
   startAtMidpoint?: boolean;
   simulation?: { signals?: CardSignals; title?: string; hovering: boolean; balance?: Record<"money" | "time" | "knowledge", number> };
 }) {
+  const visibleStats = statistics.filter((stat) => stat.id !== "knowledge");
   return (
     <aside className="statistics" aria-labelledby="statistics-title">
-      <p className="eyebrow" id="statistics-title">Wasz plan</p>
-      {statistics.map((stat) => {
+      <p className="eyebrow" id="statistics-title">Bilans wyborów</p>
+      {visibleStats.map((stat) => {
         const signal = simulation?.signals?.[stat.id];
         const width = simulation?.balance?.[stat.id] ?? 50;
         return (

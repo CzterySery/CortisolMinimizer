@@ -370,17 +370,11 @@ dialog::backdrop { background: #18312788; }
 .landing-title em { font-style: italic; color: #527561; }
 .landing-subtitle { font-size: clamp(15px, 1.8vw, 17px); color: var(--muted); line-height: 1.65; max-width: 720px; margin: 0 auto; }
 
-.landing-animation-card { position: relative; width: 100%; max-width: 1220px; margin: 0 auto 30px; background: #fafbf9; border: 1px solid #e1e7dc; border-radius: 22px; padding: 22px 24px 20px; box-shadow: 0 10px 30px rgba(36, 60, 52, 0.04); overflow: hidden; }
-.landing-animation-viewport { position: relative; width: 100%; aspect-ratio: 1480 / 680; max-height: 440px; display: flex; align-items: center; justify-content: center; }
+.landing-animation-band { position: relative; width: 100%; margin: 0 auto 30px; background: #f5f7f2; border: 0; border-radius: 18px; padding: 20px 18px 16px; box-shadow: none; overflow: hidden; }
+.landing-animation-viewport { position: relative; width: 100%; aspect-ratio: 1480 / 640; max-height: 440px; display: flex; align-items: center; justify-content: center; }
 .landing-animation-svg { width: 100%; height: 100%; display: block; }
-.landing-milestones-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #e9eee7; }
-.milestone-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-.milestone-tab { display: inline-flex; align-items: center; gap: 7px; padding: 6px 14px; border: 1px solid #dde5d7; border-radius: 20px; background: #fff; font-size: 11px; color: var(--muted); cursor: pointer; transition: all 180ms ease; }
-.milestone-tab.active { background: #527561; color: #fff; border-color: #527561; font-weight: 600; box-shadow: 0 2px 8px rgba(82, 117, 97, 0.25); }
-.milestone-tab-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.animation-controls { display: flex; align-items: center; gap: 10px; }
-.replay-button { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 1px solid #ccd8c7; border-radius: 20px; background: #fff; font-size: 11px; color: var(--ink); cursor: pointer; transition: background 160ms; }
-.replay-button:hover { background: #f0f6ec; }
+.replay-button-subtle { position: absolute; right: 12px; bottom: 8px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 13px; border: 0; border-radius: 20px; background: rgba(255, 255, 255, 0.78); font-size: 11px; color: var(--muted); cursor: pointer; transition: background 160ms, color 160ms; }
+.replay-button-subtle:hover { background: #ffffff; color: var(--ink); }
 
 .landing-beckon-box { width: 100%; max-width: 900px; margin: 6px auto 40px; padding: 26px 30px; background: #ffffff; border: 1.5px solid #d4dfd0; border-radius: 22px; box-shadow: 0 10px 32px rgba(36, 60, 52, 0.05); text-align: center; transition: all 300ms ease; }
 .landing-beckon-box.is-finished { border-color: #7d9a70; box-shadow: 0 14px 40px rgba(82, 117, 97, 0.14); }
@@ -434,6 +428,38 @@ dialog::backdrop { background: #18312788; }
 .game-section-title { font-family: Georgia, serif; font-size: clamp(26px, 3.4vw, 36px); font-weight: 400; color: var(--ink); margin: 8px 0 10px; }
 .game-section-desc { font-size: 14px; color: var(--muted); line-height: 1.6; margin: 0; }
 
+/* ---- Decision Tree Prompt & Path ---- */
+.decision-tree-prompt { background: #f7faf5; border: 1px solid #dce6d6; border-radius: 16px; padding: 18px 22px; margin: 0 0 20px; }
+.decision-tree-path { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 11px; color: var(--green); margin-bottom: 10px; }
+.path-label { font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; font-size: 10px; color: var(--muted); margin-right: 4px; }
+.path-chip { display: inline-flex; align-items: center; gap: 6px; background: #ffffff; border: 1px solid #d5e1ce; padding: 3px 10px; border-radius: 14px; font-weight: 600; color: var(--ink); }
+.path-arrow { color: #87997f; font-weight: 400; }
+.decision-tree-question { font-family: Georgia, serif; font-size: clamp(20px, 2.5vw, 26px); font-weight: 400; color: var(--ink); margin: 0 0 6px; letter-spacing: -0.5px; }
+.decision-tree-subtitle { font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; }
+
+/* ---- Knowledge Explorer ("O czym chcesz się dowiedzieć?") ---- */
+.knowledge-explorer { margin: 44px 0 16px; padding: 32px 28px; background: #fafbf8; border: 1px solid #e2e8dd; border-radius: 22px; }
+.knowledge-explorer-header { margin-bottom: 18px; }
+.knowledge-explorer-title { font-family: Georgia, serif; font-size: clamp(22px, 3vw, 30px); font-weight: 400; color: var(--ink); margin: 6px 0 8px; }
+.knowledge-explorer-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0; max-width: 720px; }
+.knowledge-topic-pills { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 14px; }
+.knowledge-topic-pill { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 22px; border: 1px solid #d4dfd0; background: #ffffff; color: var(--ink); font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 160ms ease; }
+.knowledge-topic-pill:hover { background: #f0f6ec; border-color: #b7c8b0; }
+.knowledge-topic-pill.active { background: #527561; color: #ffffff; border-color: #527561; font-weight: 600; box-shadow: 0 4px 12px rgba(82, 117, 97, 0.24); }
+.topic-pill-badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; background: rgba(82, 117, 97, 0.14); color: inherit; }
+.knowledge-topic-pill.active .topic-pill-badge { background: rgba(255, 255, 255, 0.22); }
+.knowledge-topic-subtitle { font-size: 12px; color: var(--muted); margin: 0 0 18px; line-height: 1.5; }
+.knowledge-cards-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: stretch; }
+.knowledge-card-wrapper { display: flex; flex-direction: column; min-width: 0; gap: 8px; cursor: pointer; }
+.knowledge-card-wrapper .decision-card { flex: 1; transition: transform 180ms ease, border-color 180ms ease; }
+.knowledge-card-wrapper:hover .decision-card { transform: translateY(-4px); border-color: #b5c6ad; }
+.knowledge-card-wrapper.is-read .decision-card { background: #f6faf3; border-color: #bdd0b5; }
+.knowledge-card-actions { display: flex; gap: 8px; }
+.knowledge-open-btn { flex: 1; display: inline-flex; align-items: center; justify-content: space-between; gap: 6px; padding: 9px 12px; border: 1px solid #dce4d6; border-radius: 10px; background: #ffffff; color: var(--ink); font: inherit; font-size: 11px; font-weight: 500; cursor: pointer; }
+.knowledge-open-btn:hover { background: #f2f7ef; }
+.knowledge-mark-btn { padding: 9px 12px; border: 1px solid #dce4d6; border-radius: 10px; background: #ffffff; color: var(--muted); font: inherit; font-size: 11px; cursor: pointer; white-space: nowrap; }
+.knowledge-mark-btn.active { background: #e8f1e4; border-color: #9bb391; color: #365744; font-weight: 600; }
+
 .table-pending .round-track > li { opacity: 0; transform: translateY(28px) scale(0.92); }
 .hand-pending .hand-card { opacity: 0; }
 @media (prefers-reduced-motion: reduce) {
@@ -442,15 +468,17 @@ dialog::backdrop { background: #18312788; }
 }
 @media (max-width: 1024px) {
   .landing-features-grid { grid-template-columns: repeat(2, 1fr); }
+  .knowledge-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 768px) {
   .landing-features-grid { grid-template-columns: 1fr; }
   .landing-steps-grid { grid-template-columns: 1fr; }
+  .knowledge-cards-grid { grid-template-columns: minmax(0, 1fr); }
+  .knowledge-explorer { padding: 22px 16px; }
   .steps-cta-bar { flex-direction: column; align-items: flex-start; }
   .landing-beckon-box { padding: 22px 18px; }
   .landing-cta-actions { flex-direction: column; width: 100%; }
   .landing-cta-button { width: 100%; justify-content: center; }
-  .landing-milestones-bar { flex-direction: column; align-items: flex-start; }
 }
 /* Calculator: one focused step, with reports only after explicit calculation. */
 .calculator-page { max-width: 1060px; }

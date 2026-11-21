@@ -30,6 +30,7 @@ export interface GameBoardProps {
   finishedHand?: ReactNode;
   unavailable?: Record<string, string>;
   busy?: boolean;
+  decisionPrompt?: { question: string; subtitle: string; path: string[] };
 }
 
 // Presentational board. The home caller replays decisions through the API; sessions use /game/[id].
@@ -211,7 +212,24 @@ export function GameBoard(props: GameBoardProps) {
         </section>
         <RoundTrack stages={stages} currentRound={currentRound} playedCards={played} draggedId={draggedId} onPlayCard={playCard} />
         <section className="hand-section" aria-labelledby="hand-title">
-          <div className="section-heading hand-heading"><h2 id="hand-title">{complete ? "Twój profil" : "Twoja ręka"}</h2>{mode === "game" && <span>{complete ? `${played.length} zagranych kart` : `${handSize} karty · przeciągnij jedną na podświetlone miejsce`}</span>}
+          {!complete && props.decisionPrompt && (
+            <div className="decision-tree-prompt" aria-live="polite">
+              {props.decisionPrompt.path.length > 0 && (
+                <div className="decision-tree-path" aria-label="Twoja dotychczasowa ścieżka">
+                  <span className="path-label">Twoja ścieżka:</span>
+                  {props.decisionPrompt.path.map((stepTitle, i) => (
+                    <span key={i} className="path-chip">
+                      {i > 0 && <span className="path-arrow" aria-hidden="true">→</span>}
+                      <span>{stepTitle}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <h3 className="decision-tree-question">{props.decisionPrompt.question}</h3>
+              <p className="decision-tree-subtitle">{props.decisionPrompt.subtitle}</p>
+            </div>
+          )}
+          <div className="section-heading hand-heading"><h2 id="hand-title">{complete ? "Twój profil" : "Wybierz jedną z 3 wykluczających się opcji"}</h2>{mode === "game" && <span>{complete ? `${played.length} zagranych kart` : `${handSize} karty · przeciągnij jedną na podświetlone miejsce`}</span>}
             {onReset && <button className="deck-stack" ref={deckRef} onClick={resetBoard} disabled={props.busy} aria-label="Rozdaj karty ze stosu" title="Nowe rozdanie"><span /><span /><span><b>c.</b></span></button>}
           </div>
           <div className="hand-and-balance">
