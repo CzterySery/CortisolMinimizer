@@ -132,7 +132,6 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .stat-delta { margin-left: 6px; font-style: normal; font-size: 10px; padding: 1px 5px; border-radius: 4px; color: #fff; }
 .stat-delta.up { background: var(--green); }
 .stat-delta.down { background: var(--alert); }
-.combo-toast { position: fixed; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); padding: 12px 18px; border-radius: 10px; background: var(--ink); color: #fff; font-size: 13px; box-shadow: 0 12px 30px #263b2b33; animation: card-land 300ms ease-out; }
 .board-issues { list-style: none; margin: 0 auto 24px; padding: 12px 16px; max-width: 640px; border-left: 3px solid var(--warm); background: #faf1ed; font-size: 12px; color: var(--ink); }
 .page { padding: 38px 0 48px; display: flex; flex-direction: column; gap: 28px; }
 .page-header { max-width: 640px; }
@@ -205,7 +204,6 @@ cite { font-style: normal; color: var(--muted-strong); font-size: 11px; }
 @media (max-width: 1000px) { .calculator-layout { grid-template-columns: 1fr; } }
 @media (max-width: 800px) { .preview-board > .statistics { gap: 12px; margin-top: 18px; } .preview-board .stat { align-items: flex-start; flex-direction: column; } .preview-board .stat-symbol { width: 28px; height: 28px; } }
 @media (max-width: 800px) { .site-header { flex-wrap: wrap; padding: 16px 0; } .site-nav { justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 4px; } .plan-grid, .form-grid { grid-template-columns: 1fr; } .block-row { grid-template-columns: 1fr 1fr; } }
-@media (prefers-reduced-motion: reduce) { .combo-toast { animation: none; } }
 
 /* Authored deck preview and evidence. The server calculator remains authoritative. */
 .chapter-brand { flex-shrink: 0; white-space: nowrap; text-decoration: none; font: 400 clamp(18px, 4.3vw, 32px)/1.08 Georgia, 'Times New Roman', serif; letter-spacing: -1px; padding: 14px 0; }

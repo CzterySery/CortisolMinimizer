@@ -1,6 +1,6 @@
 # Silnik planszy
 
-Strona główna wysyła wszystkie wybrane identyfikatory kart do `POST /api/v1/game/simulate`. Backend odtwarza plan od początku, a następnie zwraca wynik oraz sprawdzone warianty sześciu kart kolejnej tury. Przeglądarka nie liczy kwot, nie zwiększa puli i nie może zatwierdzić niedozwolonego planu. Rozdanie jest lokalne i zapewnia przynajmniej jedną dostępną kartę; endpoint symulacji nie zapisuje sesji ani nie gwarantuje uczciwości rozgrywki konkursowej. Starsze endpointy sesji pozostają osobnym, niewdrożonym interfejsem.
+Strona główna wysyła wszystkie wybrane identyfikatory kart do `POST /api/v1/game/simulate`. Backend odtwarza plan od początku, a następnie zwraca wynik oraz sprawdzone warianty sześciu kart kolejnej tury. Przeglądarka nie liczy kwot, nie zwiększa puli i nie może zatwierdzić niedozwolonego planu. Rozdanie jest lokalne i zapewnia przynajmniej jedną dostępną kartę; endpoint symulacji nie zapisuje sesji ani nie gwarantuje uczciwości rozgrywki konkursowej. Gra nie tworzy wniosków: dokumenty powstają z własnego planu użytkownika w kalkulatorze.
 
 ## Jedno źródło obliczeń
 

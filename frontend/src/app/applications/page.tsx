@@ -1,43 +1,41 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { api, type S } from "@/lib/api";
 import { recipientLabel } from "@/lib/labels";
+import { myPlan } from "@/lib/session";
 import { ApiResult } from "@/components/api-result";
 import { PageHeader } from "@/components/page-header";
 import { DocsChecklist } from "@/components/plan/docs-checklist";
 
-// End of the game: the plan becomes pre-filled applications sent (simulated) to the employer or ZUS.
+// The user's own paperwork, from the plan they built in the calculator. The game teaches with sample families
+// and never produces applications. Documents already filed with ZUS get marked from ZUS data (simulated login).
 export default function Applications() {
-  return <Suspense><ApplicationsInner /></Suspense>;
-}
-
-function ApplicationsInner() {
-  const gameId = useSearchParams().get("game");
-  const [summary, setSummary] = useState<S["GameState"]>();
+  const [plan, setPlan] = useState<S["Plan-Input"]>();
+  const [documents, setDocuments] = useState<S["Document"][]>();
   const [out, setOut] = useState<{ data?: unknown; error?: unknown }>({});
 
   useEffect(() => {
-    if (!gameId) return;
-    api.GET("/api/v1/game/{game_id}/summary", { params: { path: { game_id: gameId } } })
-      .then(({ data, error }) => (error ? setOut({ error }) : setSummary(data)));
-  }, [gameId]);
+    const saved = myPlan.get() as S["Plan-Input"] | undefined;
+    if (!saved) return;
+    setPlan(saved); // eslint-disable-line react-hooks/set-state-in-effect -- one-time read of client-only storage
+    api.POST("/api/v1/calc/plan", { body: saved })
+      .then(({ data, error }) => (error ? setOut({ error }) : setDocuments(data.documents)));
+  }, []);
 
   const submit = async (doc: S["Document"]) =>
     setOut(await api.POST("/api/v1/applications", { body: { form: doc.form, who: doc.who, payload: {} } }));
 
-  const documents = summary?.result?.documents ?? [];
   return (
     <main className="page">
-      <PageHeader eyebrow="Wnioski" title="Plan gotowy." accent="Czas na papiery.">
-        Każda decyzja z gry ma swój dokument. Wypełnimy go za Ciebie i wyślemy do pracodawcy albo ZUS (symulacja).
+      <PageHeader eyebrow="Wnioski" title="Twoje dokumenty." accent="Co, gdzie i do kiedy.">
+        Lista dla Twojego planu z kalkulatora. Dokumenty złożone już w ZUS zobaczysz po zalogowaniu przez mObywatel.
       </PageHeader>
-      {!gameId && <p className="muted">Najpierw <Link href="/">zagraj partię</Link>, żeby przygotować wnioski.</p>}
-      {documents.length > 0 && <DocsChecklist documents={documents} />}
+      {!plan && <p className="muted">Najpierw <Link href="/calculator">policz swój plan w kalkulatorze</Link>, a potem wybierz „Przygotuj wnioski”.</p>}
+      {documents && <DocsChecklist documents={documents} />}
       <div className="actions">
-        {documents.map((d, i) => <button key={i} className="button" onClick={() => submit(d)}>Wyślij {d.form} · {recipientLabel[d.recipient]}</button>)}
+        {documents?.map((d, i) => <button key={i} className="button" onClick={() => submit(d)}>Wyślij {d.form} · {recipientLabel[d.recipient]}</button>)}
       </div>
       {(out.data || out.error) ? <ApiResult {...out} /> : null}
     </main>

@@ -222,61 +222,12 @@ class BaseResult(Model):
     steps: list[Explain]
 
 
-# --- game session (B4) ---
+# --- game (stateless replay, game/engine.py) ---
 
 class ScenarioSummary(Model):
     id: str
     title: str
     description: str
-
-
-class NewGame(Model):
-    scenario_id: str | None = None
-    persona_id: str | None = None
-    family: Family | None = None  # custom family facts => generic story
-
-
-class ScoreLine(Model):
-    label: str
-    points: int
-
-
-class GameState(Model):
-    id: str
-    scenario_id: str
-    seed: int
-    plan: Plan
-    current_round: int  # 1..total_rounds; finished games keep the last round
-    total_rounds: int = 5
-    hand_size: int = 3
-    stages: list[Stage]  # this scenario's story per round (round track labels + story panel)
-    statistics: list[Statistic]  # money / time / happiness, derived from the plan and score
-    table: list[Card]  # played cards, in round order
-    hand: list[Card]
-    combos_hit: list[str]
-    result: PlanResult | None = None
-    bonuses: list[ScoreLine] = []  # end-of-game bonuses: no care gap, budget kept, no missed deadline
-    finished: bool = False
-
-
-class CardRequest(Model):
-    card_id: str
-
-
-class CardPreview(Model):
-    card_id: str
-    statistics: list[Statistic]  # projected values if this card is played; UI shows the difference
-    pools: Pools
-    new_documents: list[Document]
-    new_issues: list[Issue]  # e.g. "budget drops below target in 2027-05"
-
-
-class PlayResult(Model):
-    state: GameState
-    combos: list[str]
-    chips: int
-    mult: Decimal
-    points: int  # chips x mult, added to the happiness stat
 
 
 class SimulationRequest(Model):

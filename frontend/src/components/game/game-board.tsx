@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import type { Card, Stage, Statistic } from "@/types/game";
@@ -24,7 +23,6 @@ export interface GameBoardProps {
   onUnfocusCard?: (cardId: string) => void;
   simulation?: { signals?: CardSignals; title?: string; hovering: boolean };
   onReset?: () => void;
-  summaryHref?: string;
   previewGoal?: string;
   dealKey?: number;
   belowHand?: ReactNode;
@@ -34,7 +32,7 @@ export interface GameBoardProps {
 
 // Presentational board. The home caller replays decisions through the API; sessions use /game/[id].
 export function GameBoard(props: GameBoardProps) {
-  const { mode, stages, currentRound, totalRounds, handSize, statistics, projected, played, hand, onPlay, onFocusCard, onReset, summaryHref } = props;
+  const { mode, stages, currentRound, totalRounds, handSize, statistics, projected, played, hand, onPlay, onFocusCard, onReset } = props;
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const [playingId, setPlayingId] = useState<string | null>(null);
@@ -171,7 +169,6 @@ export function GameBoard(props: GameBoardProps) {
           </div>
           <div className="board-controls">
             <p className="preview-note">{note}</p>
-            {complete && summaryHref && <Link className="button button-primary" href={summaryHref}>Zobacz plan rodziny</Link>}
             {played.length > 0 && onReset && <button className="reset-board" onClick={resetBoard}>Rozdaj od nowa</button>}
           </div>
           <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>

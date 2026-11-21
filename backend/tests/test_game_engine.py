@@ -1,4 +1,6 @@
 """Cross-round resource accounting; pure, no DB. Scenario values are explicit sample inputs."""
+from collections import Counter
+
 import pytest
 
 from app.game.engine import simulate
@@ -105,3 +107,24 @@ def test_rounds_cannot_be_skipped_or_duplicated():
     for selected in [("2A",), ("1A", "1B"), ("missing",)]:
         with pytest.raises(ValueError):
             run(*selected)
+
+
+GATED = {"1D", "1F", "2F", "3F"}  # rehab, adoption/foster, end of insurance: no scenario has those facts
+
+
+def test_every_hand_is_playable_and_every_ungated_card_completes_a_legal_plan():
+    """Three walks per scenario, each round playing the least-played available card. simulate() replays the
+    whole plan and raises on any legal error, so reaching round 5 proves the plan is legal. A one-off exhaustive
+    search of all ~4 350 paths (~100 s) found no round without a playable card and the same gated set."""
+    played = Counter()
+    for scenario in DATASET["scenarios"]:
+        for _ in range(3):
+            selected = []
+            while len(selected) < 5:
+                playable = [c.id for c in run(*selected, scenario=scenario).candidates if c.available]
+                assert playable, (scenario, selected)
+                pick = min(playable, key=lambda card_id: (played[card_id], card_id))
+                played[pick] += 1
+                selected.append(pick)
+            run(*selected, scenario=scenario)
+    assert {card["id"] for card in CARDS} - set(played) == GATED

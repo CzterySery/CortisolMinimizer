@@ -22,6 +22,6 @@ const localPreview: GamePreview = {
 };
 
 export function getGamePreview(): GamePreview {
-  // The home page always previews the current designed deck. Backend sessions use /game/[id].
+  // The home page always shows the designed deck; POST /game/simulate judges every play.
   return localPreview;
 }

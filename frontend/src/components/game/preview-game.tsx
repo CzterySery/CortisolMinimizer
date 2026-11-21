@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Card, GamePreview } from "@/types/game";
 import { api, type S } from "@/lib/api";
+import { planHandoff } from "@/lib/session";
 import { GameBoard } from "./game-board";
 import { DeckLibrary } from "./deck-library";
 import { CareCalendar } from "@/components/plan/care-calendar";
@@ -40,6 +42,7 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
   const [dealKey, setDealKey] = useState(0);
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState<string>();
+  const router = useRouter();
   const generation = useRef(0);
   const playing = useRef(false);
   const round = preview.rounds[played.length];
@@ -113,6 +116,9 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
       belowHand={<>
         {error && <p className="game-error" role="alert">{error}</p>}
         {busy && <p className="sr-only" role="status">Przeliczam wspólny plan rodziny.</p>}
+        {simulation && played.length === preview.total_rounds && <div className="actions">
+          <button className="button button-primary" onClick={() => { planHandoff.put(simulation.plan); router.push("/calculator"); }}>Przelicz ten plan w kalkulatorze</button>
+        </div>}
         <section className="deck-toolbar" aria-label="Talia i historia rodziny">
           <div><p className="eyebrow">Talia rodzicielskich decyzji</p><h2>30 kart. Wasz własny układ.</h2><p>5 etapów · po 6 kart w puli · 3 karty w ręce</p></div>
           <div className="deck-toolbar-actions"><button className="button" onClick={() => setLibrary(true)}>Przejrzyj 30 kart</button>

@@ -8,7 +8,7 @@ Gra edukacyjna na hackathon ZUS (HackNation 2026): **Python + FastAPI** oraz **R
 
 Strona główna to interaktywny podgląd pięciu rund. Karty wysuwają się po najechaniu myszką; przeciągnij jedną na podświetlone miejsce na stole lub użyj przycisku „Połóż na stole” (również na telefonie i klawiaturą). Po położeniu karty pojawia się ręka kolejnej rundy. Po pięciu decyzjach stół jest kompletny. „Rozdaj od nowa” czyści układ.
 
-Plansza wymaga backendu i `API_URL` dla przeliczania stanu; nie zapisuje jeszcze sesji, więc odświeżenie strony rozpoczyna plan od nowa. Kalkulator korzysta z tego samego kodu. Starsza gra z sesją (`/game/{id}`), sprawdzanie spraw i pozostałe niewdrożone endpointy zwracają `501` z numerem kroku planu. Ścieżki adopcji, rehabilitacji i ustania ubezpieczenia w grze są jawnie zablokowane do czasu uzupełnienia historii i modelu danych.
+Plansza wymaga backendu i `API_URL` dla przeliczania stanu; nie zapisuje jeszcze sesji, więc odświeżenie strony rozpoczyna plan od nowa. Kalkulator korzysta z tego samego kodu. Gra nie tworzy wniosków: lista dokumentów (`/applications`) powstaje z własnego planu z kalkulatora. Sprawdzanie spraw i pozostałe niewdrożone endpointy zwracają `501` z numerem kroku planu. Ścieżki adopcji, rehabilitacji i ustania ubezpieczenia w grze są jawnie zablokowane do czasu uzupełnienia historii i modelu danych.
 
 **AI:** aplikacja nie korzysta z AI. Kwoty i uprawnienia liczy deterministyczny kod, a stawki i limity są w `backend/app/data/params.json` (edytowalne w panelu administracyjnym).
 
