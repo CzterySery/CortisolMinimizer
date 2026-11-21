@@ -1,37 +1,15 @@
-export interface Source {
-  id: string;
-  title: string;
-  url: string;
-  locator?: string | null;
-}
+// Game types used by the board components. Aliases of the generated API contract (src/lib/schema.d.ts),
+// so they can't drift from the backend.
+import type { components } from "@/lib/schema";
 
-export interface Card {
-  id: string;
-  round_id: number;
-  title: string;
-  description: string;
-  sources: Source[];
-}
+type Schemas = components["schemas"];
 
-export interface Round {
-  id: number;
-  title: string;
-  description: string;
-  cards: Card[];
-}
-
-export interface Statistic {
-  id: "money" | "time" | "happiness";
-  label: string;
-  value: number | null;
-  unit: string;
-}
-
-export interface GamePreview {
-  mode: "preview";
-  current_round: number;
-  total_rounds: number;
-  hand_size: number;
-  statistics: Statistic[];
-  rounds: Round[];
-}
+export type Source = Schemas["Source-Output"];
+export type Card = Schemas["Card-Output"];
+export type Stage = Schemas["Stage"];
+export type Round = Schemas["Round"];
+export type Statistic = Schemas["Statistic"];
+export type GamePreview = Schemas["Preview"];
+export type GameState = Schemas["GameState"];
+export type CardPreview = Schemas["CardPreview"];
+export type PlayResult = Schemas["PlayResult"];

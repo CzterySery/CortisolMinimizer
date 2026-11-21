@@ -1,5 +1,5 @@
 import catalog from "../../../shared/cards.json";
-import type { GamePreview } from "@/types/game";
+import type { Card, GamePreview } from "@/types/game";
 
 const localPreview: GamePreview = {
   mode: "preview",
@@ -7,11 +7,12 @@ const localPreview: GamePreview = {
   total_rounds: 5,
   hand_size: 3,
   statistics: [
-    { id: "money", label: "Pieniądze", value: null, unit: "zł" },
-    { id: "time", label: "Czas", value: null, unit: "dni" },
-    { id: "happiness", label: "Szczęście", value: null, unit: "pkt" },
+    { id: "money", label: "Pieniądze", value: null, unit: "zł", max: null },
+    { id: "time", label: "Czas", value: null, unit: "dni", max: null },
+    { id: "happiness", label: "Szczęście", value: null, unit: "pkt", max: null },
   ],
-  rounds: catalog.rounds,
+  // The catalog JSON holds only card text; fill the game-mechanics defaults the API would add.
+  rounds: catalog.rounds.map((round) => ({ ...round, cards: round.cards.map((card): Card => ({ tags: [], requires: [], effects: [], chips: 0, combos: [], ...card })) })),
 };
 
 export async function getGamePreview(): Promise<GamePreview> {

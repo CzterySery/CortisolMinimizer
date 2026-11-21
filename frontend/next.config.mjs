@@ -5,6 +5,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 /** @type {import('next').NextConfig} */
 const config = {
+  output: "standalone", // minimal server.js for the Docker image (nested under frontend/, see Dockerfile)
   turbopack: { root },
   outputFileTracingRoot: root,
 };

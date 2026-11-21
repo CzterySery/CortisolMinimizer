@@ -1,6 +1,6 @@
-import { GameBoard } from "@/components/game/game-board";
+import { PreviewGame } from "@/components/game/preview-game";
 import { getGamePreview } from "@/lib/game";
 
 export default async function Home() {
-  return <GameBoard preview={await getGamePreview()} />;
+  return <PreviewGame preview={await getGamePreview()} />;
 }

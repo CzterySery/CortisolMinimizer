@@ -1,21 +1,21 @@
 import { useState } from "react";
-import type { Card, Round } from "@/types/game";
+import type { Card, Stage } from "@/types/game";
 
 interface RoundTrackProps {
-  rounds: Round[];
+  stages: Stage[];
   currentRound: number | null;
   playedCards: Card[];
   draggedId: string | null;
   onPlayCard: (id: string) => void;
 }
 
-export function RoundTrack({ rounds, currentRound, playedCards, draggedId, onPlayCard }: RoundTrackProps) {
+export function RoundTrack({ stages, currentRound, playedCards, draggedId, onPlayCard }: RoundTrackProps) {
   const [overRound, setOverRound] = useState<number | null>(null);
   return (
     <section className="rounds-section" aria-labelledby="rounds-title">
-      <div className="section-heading"><h2 id="rounds-title">Wasza historia</h2><span>{playedCards.length} / {rounds.length} decyzji na stole</span></div>
+      <div className="section-heading"><h2 id="rounds-title">Wasza historia</h2><span>{playedCards.length} / {stages.length} decyzji na stole</span></div>
       <ol className="round-track">
-        {rounds.map((round) => {
+        {stages.map((round) => {
           const card = playedCards.find((item) => item.round_id === round.id);
           const active = round.id === currentRound;
           return (
