@@ -3,6 +3,21 @@ import test from "node:test";
 import { readFile } from "node:fs/promises";
 import { getCardSignals } from "../src/lib/card-signals.ts";
 import { gameProfiles, gameScores } from "../src/lib/game-result.ts";
+import { ensurePlayable } from "../src/lib/deal.ts";
+
+test("an exhausted parental pool cannot leave a new or restored hand unplayable", () => {
+  const pool = ["5A", "5B", "5C", "5D", "5E", "5F"].map((id) => ({ id }));
+  const available = new Set(["5D", "5E", "5F"]);
+  for (let a = 0; a < 4; a++) for (let b = a + 1; b < 5; b++) for (let c = b + 1; c < 6; c++) {
+    const hand = [pool[a], pool[b], pool[c]];
+    const dealt = ensurePlayable(hand, pool, available);
+    assert.equal(dealt.length, 3);
+    assert.equal(new Set(dealt.map((card) => card.id)).size, 3);
+    assert.ok(dealt.some((card) => available.has(card.id)));
+    if (hand.some((card) => available.has(card.id))) assert.equal(dealt, hand);
+  }
+  assert.deepEqual(ensurePlayable([], pool, available), []);
+});
 
 const deck = JSON.parse(await readFile(new URL("../../shared/deck-design.json", import.meta.url), "utf8"));
 const legal = JSON.parse(await readFile(new URL("../../shared/legal-rules.json", import.meta.url), "utf8"));

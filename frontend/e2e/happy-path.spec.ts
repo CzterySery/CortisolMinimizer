@@ -21,7 +21,7 @@ test("game → calculator → applications → mObywatel → cases → help → 
   }
   await shot(page, info, "02-board-complete");
 
-  await page.getByRole("button", { name: "Przelicz ten plan w kalkulatorze" }).click();
+  await page.getByRole("button", { name: "Pokaż ten scenariusz w kalkulatorze" }).click();
   await expect(page).toHaveURL(/\/calculator/);
   await expect(page.getByText("Kwoty zasiłków")).toBeVisible();
   await shot(page, info, "03-calculator");

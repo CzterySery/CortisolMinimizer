@@ -7,6 +7,7 @@ import { api, type S } from "@/lib/api";
 import { planHandoff, savedGame } from "@/lib/session";
 import { getCardSignals } from "@/lib/card-signals";
 import { gameProfiles, gameScores } from "@/lib/game-result";
+import { ensurePlayable } from "@/lib/deal";
 import { GameBoard } from "./game-board";
 
 type Simulation = S["GameSimulation"];
@@ -54,12 +55,13 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
 
   const installHand = useCallback((data: Simulation, index: number) => {
     const pool = preview.rounds[index]?.cards ?? [];
-    // Pregnancy is the orientation round: deal only verified routes. Medical/adoption cards
-    // remain available in their matching stories and in the full library.
+    const available = new Set(data.candidates.filter((card) => card.available).map((card) => card.id));
+    // The first round contains available cards only; later hands retain unavailable
+    // alternatives for inspection but always include a playable route.
     const options = index === 0
       ? pool.filter((card) => data.candidates.some((item) => item.id === card.id && item.available))
       : pool;
-    const next = draw(options, preview.hand_size);
+    const next = ensurePlayable(draw(options, preview.hand_size), draw(pool, pool.length), available);
     setHand(next);
   }, [preview]);
 
@@ -94,7 +96,11 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
     load(selected, scenarioId).then((data) => { if (!cancelled) {
       setScenario(scenarioId); setSimulation(data); setBaseline(data.statistics);
       setPlayed(selected.map((id, index) => preview.rounds[index].cards.find((card) => card.id === id)!));
-      if (stored) setHand(stored.hand.map((id) => preview.rounds[selected.length].cards.find((card) => card.id === id)!));
+      if (stored) setHand(ensurePlayable(
+        stored.hand.map((id) => preview.rounds[selected.length].cards.find((card) => card.id === id)!),
+        preview.rounds[selected.length]?.cards ?? [],
+        new Set(data.candidates.filter((card) => card.available).map((card) => card.id)),
+      ));
       else installHand(data, 0);
       setReady(true); setBusy(false);
     } })

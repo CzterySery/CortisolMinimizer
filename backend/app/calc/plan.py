@@ -6,6 +6,7 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 from app.calc.base import benefit_base, money, percent, pln
+from app.calc.family import adoption_age_limit, adoption_pools, event_date
 from app.params import Params
 from app.schemas import (
     BaseRequest,
@@ -90,12 +91,12 @@ def pool_sizes(plan: Plan, p: Params) -> tuple[int, int]:
     multiple = f.children > 1
     parental = ((pp.weeks_za_zyciem_multiple if multiple else pp.weeks_za_zyciem_single) if f.za_zyciem
                 else (pp.weeks_multiple if multiple else pp.weeks_single))
-    return weeks[min(f.children, len(weeks)) - 1] * 7, parental * 7
+    return adoption_pools(plan, p, weeks[min(f.children, len(weeks)) - 1] * 7, parental * 7)
 
 
 def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = None) -> PlanResult:
     family = plan.family
-    birth = family.birth_date or family.due_date
+    birth = event_date(plan)
     parents = {"mother": family.mother} | ({"father": family.father} if family.father else {})
     if any(b.who not in parents for b in plan.blocks):
         raise ValueError("Plan zawiera okres taty, a rodzina nie ma drugiego rodzica.")
@@ -105,21 +106,24 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
     base = {who: parent_base(who, parent, min((b.start for b in blocks if b.who == who), default=birth), p, explain)
             for who, parent in parents.items()}
     days = {who: d for who, d in day_map(plan).items() if who in parents}
+    applicant = family.adoption.applicant if family.adoption else "mother"
+    other = "father" if applicant == "mother" else "mother"
 
     # The other parent's exclusive 9 weeks (counted from their first parental day) stay at 70% (art. 31 ust. 3f)
-    father_exclusive: set[date] = set()
-    left = Decimal(p.parental.exclusive_weeks * 7)
-    for d in sorted(days.get("father", {})):
-        b = days["father"][d]
+    father_exclusive: set[tuple[str, date]] = set()
+    prior_other = (getattr(family.adoption, f"previous_parental_{other}_days") if family.adoption else 0)
+    left = Decimal(max(0, p.parental.exclusive_weeks * 7 - prior_other))
+    for d in sorted(days.get(other, {})):
+        b = days[other][d]
         if b.kind == "parental" and left > 0:
-            father_exclusive.add(d)
+            father_exclusive.add((other, d))
             left -= ONE - b.work_fraction
 
     averaged = plan.rate_variant == "averaged"
     year_one_end = plus_years(birth, 1)
     # art. 31 ust. 3g/4: without a single averaged-rate parental day in year 1, parental drops to 70%
     # and the maternity period gets a one-off top-up to 100%
-    averaged_kept = averaged and any(b.kind == "parental" and birth <= d < year_one_end and d not in father_exclusive
+    averaged_kept = averaged and any(b.kind == "parental" and birth <= d < year_one_end and (who, d) not in father_exclusive
                                      for who in days for d, b in days[who].items())
 
     def rate(who: str, b: Block, d: date, rehab_day: int) -> Decimal:
@@ -128,14 +132,14 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
             # shortcut: the 81.5% variant covers the mother's maternity; a father taking over maternity
             # leave gets 100% (his own application) - confirm against the samples
             case "maternity":
-                return r.averaged if averaged and who == "mother" else r.maternity
+                return r.averaged if averaged and who == applicant else r.maternity
             case "parental":
-                return r.averaged if averaged_kept and d not in father_exclusive else r.parental
+                return r.averaged if averaged_kept and (who, d) not in father_exclusive else r.parental
             case "sick":
-                return r.sick_pregnancy if d < birth else r.sick
+                return r.sick_pregnancy if not family.adoption and d < birth else r.sick
             case "rehab":
                 # shortcut: no quarterly indexation of the base (art. 19 ust. 2), needs ZUS-published indices
-                if d < birth:
+                if not family.adoption and d < birth:
                     return r.rehab_pregnancy
                 return r.rehab_first_period if rehab_day <= p.rehab.first_period_days else r.rehab
             case "supplementary":
@@ -148,6 +152,8 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
                 return r.care
 
     floor_day = money(p.parental_benefit_floor / 30)
+    adoption_entitled = not family.adoption or pool_sizes(plan, p) != (0, 0)
+    adoption_limit = adoption_age_limit(plan, p)
     amount: dict[str, dict[date, Decimal]] = {}
     block_benefit: dict[int, Decimal] = {}  # id(block) -> benefit paid for it (what a ZUS decision shows)
     for who in parents:
@@ -156,6 +162,16 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
             b = days[who][d]
             if b.kind == "vacation" or not sickness_insured(parents[who]):  # paid leave / no sickness insurance
                 continue
+            if family.adoption and b.kind in MATERNITY_BENEFIT:
+                if not adoption_entitled or d < birth:
+                    continue
+                a = family.adoption
+                if b.kind == "paternity" and (a.kind != "adoption" or a.court_final_on is None
+                        or d < a.court_final_on or d >= plus_years(a.court_final_on, 1)
+                        or (adoption_limit and d >= adoption_limit)):
+                    continue
+                if b.kind == "parental" and adoption_limit and d >= adoption_limit:
+                    continue
             rehab_day += b.kind == "rehab"
             r = rate(who, b, d, rehab_day)
             daily = money(base[who] * r / 30)  # art. 36 ust. 3: one day = 1/30 of the monthly base
@@ -181,9 +197,9 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
             "Wariant uśredniony bez ani jednego dnia rodzicielskiego w pierwszym roku dziecka: rodzicielski 70%.",
             rule="art. 31 ust. 3, 3f" if averaged_kept else "art. 31 ust. 3g"))
     top_up = Decimal(0)
-    if averaged and not averaged_kept and base["mother"] > 0:
-        maternity_days = sum(1 for b in days["mother"].values() if b.kind == "maternity")
-        diff = money(base["mother"] * p.rates.maternity / 30) - money(base["mother"] * p.rates.averaged / 30)
+    if averaged and not averaged_kept and base.get(applicant, Decimal(0)) > 0:
+        maternity_days = sum(1 for b in days[applicant].values() if b.kind == "maternity")
+        diff = money(base[applicant] * p.rates.maternity / 30) - money(base[applicant] * p.rates.averaged / 30)
         top_up = money(diff * maternity_days)
         explain.append(Explain(text=f"Jednorazowe wyrównanie macierzyńskiego do 100% (na wniosek): {maternity_days} dni × "
                                     f"{pln(diff)} = {pln(top_up)}.", rule="art. 31 ust. 4"))
@@ -259,10 +275,13 @@ def _pools(plan: Plan, days: dict[str, dict[date, Block]], p: Params) -> Pools:
     maternity, parental = pool_sizes(plan, p)
     pp = p.parental
     care_per_year = Counter(d.year for w in days for d, b in days[w].items() if b.kind == "care")
+    prior = ({"mother": plan.family.adoption.previous_parental_mother_days,
+              "father": plan.family.adoption.previous_parental_father_days} if plan.family.adoption else {})
     return Pools(
         maternity_days_left=int(maternity - used("maternity", days)),
         parental_days_left=int(parental - used("parental", days)),
-        exclusive_days_left={w: int(max(Decimal(0), pp.exclusive_weeks * 7 - used("parental", [w]))) for w in days},
+        exclusive_days_left={w: int(max(Decimal(0), pp.exclusive_weeks * 7 - used("parental", [w]) - prior.get(w, 0)))
+                             for w in days},
         paternity_days_left=int(p.paternity.days - used("paternity", ["father"])),
         parental_parts_used=sum(1 for b in plan.blocks if b.kind == "parental"),
         care_days_left=p.care.days_per_year_child_under_14 - max(care_per_year.values(), default=0),

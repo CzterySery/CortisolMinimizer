@@ -122,6 +122,17 @@ class Game(BaseModel):
     budget_target_ratio: Decimal
 
 
+class AdoptionParams(BaseModel):
+    # KP art. 183 § 1–8; defaults keep existing stored parameter versions readable.
+    foster_age_years: int = Field(7, gt=0)
+    foster_deferred_age_years: int = Field(10, gt=0)
+    adoption_age_years: int = Field(14, gt=0)
+    short_parental_weeks: int = Field(38, gt=0)
+    short_parental_za_zyciem_weeks: int = Field(62, gt=0)
+    application_days: int = Field(7, ge=0)
+    start_days: int = Field(21, ge=0)
+
+
 class Params(BaseModel):
     effective_from: date
     contribution_deduction: Decimal = Field(ge=0, lt=1)
@@ -141,6 +152,7 @@ class Params(BaseModel):
     deadlines: Deadlines
     care: Care
     game: Game
+    adoption: AdoptionParams = Field(default_factory=AdoptionParams)
 
 
 def active(on: date | None = None) -> Params:

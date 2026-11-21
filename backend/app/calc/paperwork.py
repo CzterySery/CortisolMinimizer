@@ -9,6 +9,7 @@ from datetime import date, timedelta
 from functools import partial
 
 from app.calc.base import percent
+from app.calc.family import event_date
 from app.calc.plan import MATERNITY_BENEFIT, last_day, payer
 from app.params import Params
 from app.schemas import Block, Document, Parent, Plan
@@ -21,7 +22,7 @@ DAY = timedelta(days=1)
 
 def documents(plan: Plan, p: Params) -> list[Document]:
     f = plan.family
-    birth = f.birth_date or f.due_date
+    birth = event_date(plan)
     parents = {"mother": f.mother} | ({"father": f.father} if f.father else {})
     blocks = sorted((b for b in plan.blocks if b.who in parents), key=lambda b: b.start)
     maternity_end = max((last_day(b) for b in blocks if b.kind == "maternity"), default=None)
@@ -40,20 +41,21 @@ def documents(plan: Plan, p: Params) -> list[Document]:
             continue  # no sickness insurance, no benefit (rules.py flags it); paid leave needs no benefit paperwork
         _block(b, parent, parents, plan, p, birth, maternity_end, partial(add, order=b.start, start=b.start, end=last_day(b)))
 
-    mother = parents["mother"]
+    applicant = f.adoption.applicant if f.adoption else "mother"
+    mother = parents.get(applicant, parents["mother"])
     if plan.rate_variant == "averaged" and mother.employment != "none":
         ended = mother.insured_until is not None and mother.insured_until < birth
         employee = mother.employment == "employee" and not ended
-        add("mother", "Wniosek o zasiłek macierzyński w wysokości 81,5%",
+        add(applicant, "Wniosek o zasiłek macierzyński w wysokości 81,5%",
             "employer" if employee else "zus" if ended else payer(mother, p),
-            "art. 30a ust. 1", "Wniosek pisemny; obejmuje macierzyński i cały rodzicielski poza 9 tygodniami taty."
+            "art. 30a ust. 1–2", "Wniosek pisemny; obejmuje macierzyński i cały rodzicielski poza 9 tygodniami drugiego rodzica."
             + ("" if employee else " Zaznacz tę opcję we wniosku ZAM."),
             due=birth + timedelta(days=p.deadlines.averaged_request_days_after_birth))
 
     # an employer that pays a maternity-type benefit needs the birth certificate; ZUS fetches it (rozp. dok. § 13 ust. 2)
     by_employer = [b.who for b in blocks if b.kind in MATERNITY_BENEFIT and parents[b.who].employment != "none"
                    and _pays(b, parents[b.who], p) == "employer"]
-    if by_employer:
+    if by_employer and not f.adoption:
         add(by_employer[0], "Odpis skrócony aktu urodzenia", "usc", "rozp. dok. § 13 ust. 1 pkt 2; rozp. wn. § 22",
             "Zamów w USC po zgłoszeniu urodzenia; pracodawca, który wypłaca zasiłek, potrzebuje go do wniosku "
             "(chyba że ma go już w aktach osobowych).", order=birth)
@@ -75,6 +77,33 @@ def _block(b: Block, parent: Parent, parents: dict[str, Parent], plan: Plan, p: 
     pays = _pays(b, parent, p)
     registry = FROM_REGISTRY if pays == "zus" and kind in MATERNITY_BENEFIT else ""
     period = f"Okres {b.start.isoformat()} – {last_day(b).isoformat()}. "
+    adoption = plan.family.adoption
+    if adoption and kind in MATERNITY_BENEFIT:
+        registry = ""
+    if adoption and kind in {"maternity", "parental"}:
+        evidence = ("Oświadczenie o dacie przyjęcia i zaświadczenie sądu o dacie wystąpienia o przysposobienie "
+                    "z datą urodzenia dziecka lub poświadczona kopia wniosku do sądu."
+                    if adoption.kind == "adoption" else
+                    "Orzeczenie sądu o umieszczeniu dziecka w rodzinie zastępczej albo umowa ze starostą "
+                    "i dokument potwierdzający wiek dziecka.")
+        if adoption.school_deferred or any(c.school_deferred for c in adoption.children):
+            evidence += " Dołącz decyzję o odroczeniu obowiązku szkolnego."
+        if plan.family.za_zyciem:
+            evidence += " Dołącz zaświadczenie „Za życiem”."
+        if kind == "maternity":
+            add(who, "Wniosek o urlop na warunkach urlopu macierzyńskiego" if employee else
+                "ZAM: wniosek o zasiłek za urlop na warunkach macierzyńskiego",
+                "employer" if employee else pays, "KP art. 183 § 6; rozp. wn. § 18; rozp. dok. § 16",
+                period + evidence, due=birth + timedelta(days=p.adoption.application_days) if employee else b.start - DAY)
+        else:
+            add(who, "Wniosek o urlop rodzicielski" if employee else "ZAM: wniosek o zasiłek za urlop rodzicielski",
+                "employer" if employee else pays, "KP art. 183 § 4–5; rozp. dok. § 30–31",
+                period + evidence + " Podaj wykorzystane części i okresy drugiego rodzica.",
+                due=b.start - timedelta(days=p.deadlines.parental_notice_days) if employee else b.start - DAY)
+            if b.work_fraction and employee:
+                add(who, "Wniosek o łączenie urlopu rodzicielskiego z pracą", "employer", "KP art. 182¹e § 2",
+                    f"Praca na {percent(b.work_fraction)} etatu.",
+                    due=b.start - timedelta(days=p.deadlines.part_time_notice_days))
 
     if kind == "sick":
         add(who, "e-ZLA (zwolnienie lekarskie)", "zus", "rozp. dok. § 2",
@@ -95,7 +124,7 @@ def _block(b: Block, parent: Parent, parents: dict[str, Parent], plan: Plan, p: 
         add(who, "Z-15A: wniosek o zasiłek opiekuńczy", "employer" if employee else pays, "rozp. dok. § 34, § 36, zał. 7",
             period + "Dołącz e-ZLA na opiekę nad dzieckiem od lekarza albo dokument zdarzenia (np. oświadczenie o "
             "nieprzewidzianym zamknięciu żłobka). Za ten sam dzień zasiłek dostaje tylko jeden rodzic.")
-    elif kind == "maternity" and who == "mother":
+    elif kind == "maternity" and who == "mother" and not adoption:
         if not employee:
             add(who, "ZAM: wniosek o zasiłek macierzyński", pays, "rozp. dok. § 12, § 13, zał. 6",
                 ("Za okres przed porodem dołącz zaświadczenie lekarskie o przewidywanej dacie porodu."
@@ -106,7 +135,7 @@ def _block(b: Block, parent: Parent, parents: dict[str, Parent], plan: Plan, p: 
         else:
             add(who, "Wniosek o urlop macierzyński", "employer", "KP art. 180 § 1; rozp. dok. § 13",
                 "Jeśli rodzicielski zaczyna się zaraz po nim, wystarczy jeden wniosek o oba urlopy.")
-    elif kind == "maternity":  # the father takes over the rest of maternity leave (KP art. 180 § 4)
+    elif kind == "maternity" and not adoption:  # the father takes over the rest of maternity leave (KP art. 180 § 4)
         if employee:
             add(who, "Wniosek o pozostałą część urlopu macierzyńskiego", "employer", "KP art. 180 § 9; rozp. wn. § 5",
                 "Dołącz odpis skrócony aktu urodzenia i oświadczenie mamy o rezygnacji z pozostałej części urlopu.",
@@ -134,13 +163,14 @@ def _block(b: Block, parent: Parent, parents: dict[str, Parent], plan: Plan, p: 
     elif kind == "paternity":
         if employee:
             add(who, "Wniosek o urlop ojcowski", "employer", "KP art. 182^3 § 2; rozp. wn. § 17",
-                "Dołącz odpis skrócony aktu urodzenia (jeśli nie ma go w aktach osobowych) i oświadczenie o wcześniej "
-                "wykorzystanym urlopie ojcowskim.", due=b.start - timedelta(days=p.paternity.notice_days))
+                ("Dołącz prawomocne postanowienie o przysposobieniu i oświadczenie o wcześniej " if adoption else
+                 "Dołącz odpis skrócony aktu urodzenia (jeśli nie ma go w aktach osobowych) i oświadczenie o wcześniej ")
+                + "wykorzystanym urlopie ojcowskim.", due=b.start - timedelta(days=p.paternity.notice_days))
         else:
             add(who, "ZAM: wniosek o zasiłek za urlop ojcowski", pays, "rozp. dok. § 33 ust. 1",
                 "Złóż przed pierwszym dniem; dołącz oświadczenie, czy zasiłek za ten okres był pobrany z innego tytułu."
                 + registry, due=b.start - DAY)
-    elif kind == "parental":
+    elif kind == "parental" and not adoption:
         za_zyciem = " Dołącz zaświadczenie „Za życiem”." if plan.family.za_zyciem else ""
         if employee:
             add(who, "Wniosek o urlop rodzicielski", "employer", "KP art. 182^1d § 1; rozp. wn. § 15",

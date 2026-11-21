@@ -392,20 +392,179 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AdoptedChild */
+        "AdoptedChild-Input": {
+            /**
+             * Birth Date
+             * Format: date
+             */
+            birth_date: string;
+            /**
+             * School Deferred
+             * @default false
+             */
+            school_deferred?: boolean;
+        };
+        /** AdoptedChild */
+        "AdoptedChild-Output": {
+            /**
+             * Birth Date
+             * Format: date
+             */
+            birth_date: string;
+            /**
+             * School Deferred
+             * @default false
+             */
+            school_deferred: boolean;
+        };
         /** Adoption */
-        Adoption: {
+        "Adoption-Input": {
             /**
              * Kind
              * @enum {string}
              */
             kind: "adoption" | "foster";
             /** Child Age Years */
-            child_age_years: number;
+            child_age_years?: number | null;
             /**
              * Accepted On
              * Format: date
              */
             accepted_on: string;
+            /** Court Applied On */
+            court_applied_on?: string | null;
+            /** Court Final On */
+            court_final_on?: string | null;
+            /**
+             * School Deferred
+             * @default false
+             */
+            school_deferred?: boolean;
+            /**
+             * Professional Foster
+             * @default false
+             */
+            professional_foster?: boolean;
+            /**
+             * Applicant
+             * @default mother
+             * @enum {string}
+             */
+            applicant?: "mother" | "father";
+            /**
+             * Previous Maternity Days
+             * @default 0
+             */
+            previous_maternity_days?: number;
+            /**
+             * Previous Parental Mother Days
+             * @default 0
+             */
+            previous_parental_mother_days?: number;
+            /**
+             * Previous Parental Father Days
+             * @default 0
+             */
+            previous_parental_father_days?: number;
+            /**
+             * Children
+             * @default []
+             */
+            children?: components["schemas"]["AdoptedChild-Input"][];
+        };
+        /** Adoption */
+        "Adoption-Output": {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "adoption" | "foster";
+            /** Child Age Years */
+            child_age_years: number | null;
+            /**
+             * Accepted On
+             * Format: date
+             */
+            accepted_on: string;
+            /** Court Applied On */
+            court_applied_on: string | null;
+            /** Court Final On */
+            court_final_on: string | null;
+            /**
+             * School Deferred
+             * @default false
+             */
+            school_deferred: boolean;
+            /**
+             * Professional Foster
+             * @default false
+             */
+            professional_foster: boolean;
+            /**
+             * Applicant
+             * @default mother
+             * @enum {string}
+             */
+            applicant: "mother" | "father";
+            /**
+             * Previous Maternity Days
+             * @default 0
+             */
+            previous_maternity_days: number;
+            /**
+             * Previous Parental Mother Days
+             * @default 0
+             */
+            previous_parental_mother_days: number;
+            /**
+             * Previous Parental Father Days
+             * @default 0
+             */
+            previous_parental_father_days: number;
+            /**
+             * Children
+             * @default []
+             */
+            children: components["schemas"]["AdoptedChild-Output"][];
+        };
+        /** AdoptionParams */
+        AdoptionParams: {
+            /**
+             * Foster Age Years
+             * @default 7
+             */
+            foster_age_years?: number;
+            /**
+             * Foster Deferred Age Years
+             * @default 10
+             */
+            foster_deferred_age_years?: number;
+            /**
+             * Adoption Age Years
+             * @default 14
+             */
+            adoption_age_years?: number;
+            /**
+             * Short Parental Weeks
+             * @default 38
+             */
+            short_parental_weeks?: number;
+            /**
+             * Short Parental Za Zyciem Weeks
+             * @default 62
+             */
+            short_parental_za_zyciem_weeks?: number;
+            /**
+             * Application Days
+             * @default 7
+             */
+            application_days?: number;
+            /**
+             * Start Days
+             * @default 21
+             */
+            start_days?: number;
         };
         /** ApplicationIn */
         ApplicationIn: {
@@ -829,7 +988,7 @@ export interface components {
              */
             za_zyciem?: boolean;
             hospitalization?: components["schemas"]["Hospitalization"] | null;
-            adoption?: components["schemas"]["Adoption"] | null;
+            adoption?: components["schemas"]["Adoption-Input"] | null;
         };
         /** Family */
         "Family-Output": {
@@ -853,7 +1012,7 @@ export interface components {
              */
             za_zyciem: boolean;
             hospitalization: components["schemas"]["Hospitalization"] | null;
-            adoption: components["schemas"]["Adoption"] | null;
+            adoption: components["schemas"]["Adoption-Output"] | null;
         };
         /** FiledApplication */
         FiledApplication: {
@@ -1103,6 +1262,7 @@ export interface components {
             deadlines: components["schemas"]["Deadlines"];
             care: components["schemas"]["Care"];
             game: components["schemas"]["Game-Input"];
+            adoption?: components["schemas"]["AdoptionParams"];
         };
         /** Params */
         "Params-Output": {
@@ -1134,6 +1294,7 @@ export interface components {
             deadlines: components["schemas"]["Deadlines"];
             care: components["schemas"]["Care"];
             game: components["schemas"]["Game-Output"];
+            adoption?: components["schemas"]["AdoptionParams"];
         };
         /** Parent */
         "Parent-Input": {

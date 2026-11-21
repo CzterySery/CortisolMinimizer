@@ -1,5 +1,14 @@
 {
   "effective_from": "2026-01-01",
+  "adoption": {
+    "foster_age_years": 7,
+    "foster_deferred_age_years": 10,
+    "adoption_age_years": 14,
+    "short_parental_weeks": 38,
+    "short_parental_za_zyciem_weeks": 62,
+    "application_days": 7,
+    "start_days": 21
+  },
   "contribution_deduction": "0.1371",
   "employee_contributions": {"pension": "0.0976", "disability": "0.015", "sickness": "0.0245"},
   "min_wage": "4806.00",

@@ -105,7 +105,7 @@ CASES = {
     "rehab over 12 months": ([blk("father", "rehab", at(10), 400)], {}, "rehab.too-long"),
     "rehab without sickness": ([blk("father", "rehab", at(10), 30)], {}, "rehab.sick-not-exhausted"),
     "adoption": ([MATERNITY], {"adoption": Adoption(kind="adoption", child_age_years=3, accepted_on=BIRTH)},
-                 "adoption.not-checked"),
+                 "adoption.birth-date-missing"),
     "benefit before insurance": ([MATERNITY], {"mother": Parent(employment="employee", base_monthly=Decimal(6000),
                                                                 insured_since=at(10))}, "insured-parent.not-yet-insured"),
     "insured during pregnancy": ([MATERNITY], {"mother": Parent(employment="employee", base_monthly=Decimal(6000),

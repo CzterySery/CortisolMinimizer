@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from app import params
 from app.calc.base import benefit_base
+from app.calc.family import event_date
 from app.calc.paperwork import documents
 from app.calc.plan import compute_plan
 from app.calc.rules import check
@@ -22,7 +23,7 @@ def base(req: BaseRequest) -> BaseResult:
 def plan(req: Plan) -> PlanResult:
     try:
         # shortcut: one params version (in force on the birth date) for the whole multi-year plan
-        p = params.active(req.family.birth_date or req.family.due_date)
+        p = params.active(event_date(req))
         result = compute_plan(req, p)
         result.issues = check(req, result, p)
         result.documents = documents(req, p)

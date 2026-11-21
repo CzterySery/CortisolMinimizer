@@ -9,6 +9,7 @@ from itertools import pairwise
 from math import ceil
 
 from app.calc.base import pln
+from app.calc.family import adoption_age_limit, event_date, plus_years
 from app.calc.plan import (
     KIND,
     MATERNITY_BENEFIT,
@@ -41,7 +42,7 @@ def plus_months(d: date, n: int) -> date:
 
 def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
     f = plan.family
-    birth = f.birth_date or f.due_date
+    birth = event_date(plan)
     parents = {"mother": f.mother} | ({"father": f.father} if f.father else {})
     days = day_map(plan)
     issues: dict[str, Issue] = {}
@@ -53,8 +54,56 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
         return f"{WHO[b.who]}, {KIND[b.kind].lower()} {b.start.isoformat()} – {last_day(b).isoformat()}"
 
     if f.adoption:
-        add("adoption.not-checked", "info", "Przyjęcie dziecka: kwoty i wymiary są liczone jak przy urodzeniu, ale wiek "
-            "dziecka i terminy właściwe dla adopcji i pieczy nie są jeszcze sprawdzane.", "KP art. 183")
+        a = f.adoption
+        limit = adoption_age_limit(plan, p)
+        if a.applicant not in parents:
+            add("adoption.applicant-missing", "error", "Dodaj do rodziny rodzica wskazanego jako wnioskodawca.",
+                "art. 30a ust. 2")
+        if f.birth_date is None and not a.children:
+            add("adoption.birth-date-missing", "error", "Podaj dokładną datę urodzenia dziecka; sam wiek w latach "
+                "nie wystarcza do sprawdzenia granic uprawnienia.", "KP art. 183 § 1–3")
+        elif (f.birth_date and f.birth_date > a.accepted_on) or any(c.birth_date > a.accepted_on for c in a.children):
+            add("adoption.before-birth", "error", "Data przyjęcia nie może poprzedzać urodzenia dziecka.", "KP art. 183")
+        if (f.children > 1 and not a.children) or (a.children and len(a.children) != f.children):
+            add("adoption.children-missing", "error", "Przy wielu dzieciach podaj datę urodzenia i odroczenie "
+                "szkolne osobno dla każdego przyjętego dziecka.", "KP art. 183 § 1–3")
+        if a.kind == "adoption" and a.court_applied_on is None:
+            add("adoption.court-date-missing", "error", "Podaj datę wystąpienia do sądu o przysposobienie.",
+                "KP art. 183 § 1¹")
+        if a.court_final_on and a.court_applied_on and a.court_final_on < a.court_applied_on:
+            add("adoption.court-dates", "error", "Prawomocność przysposobienia nie może poprzedzać wniosku do sądu.",
+                "KP art. 182³ § 1 pkt 2")
+        if a.kind == "foster" and a.professional_foster:
+            add("adoption.professional-foster", "error", "Ta ścieżka nie obejmuje zawodowej rodziny zastępczej.",
+                "KP art. 183 § 1")
+        if limit and birth >= limit:
+            add("adoption.age-limit", "error", f"W dniu przyjęcia i spełnienia przesłanek dziecko osiągnęło już "
+                f"granicę wieku ({limit.isoformat()}).", "KP art. 183 § 1–3")
+        maternity = [b for b in plan.blocks if b.kind == "maternity"]
+        if maternity:
+            start = min(b.start for b in maternity)
+            if start < birth:
+                add("adoption.before-event", "error", "Urlop nie może zacząć się przed przyjęciem dziecka i, "
+                    "przy adopcji, wystąpieniem do sądu.", "KP art. 183 § 1, 1¹")
+            if (any(parents[b.who].employment == "employee" for b in maternity if b.who in parents)
+                    and start > birth + timedelta(days=p.adoption.start_days)):
+                add("adoption.start-too-late", "error", f"Urlop na warunkach macierzyńskiego rozpoczyna się "
+                    f"najpóźniej {p.adoption.start_days} dni od spełnienia przesłanek.", "KP art. 183 § 6")
+            if any(b.who != c.who and b.start <= last_day(c) and c.start <= last_day(b)
+                   for b in maternity for c in maternity):
+                add("adoption.maternity-overlap", "error", "Rodzice nie mogą jednocześnie korzystać z tej samej "
+                    "puli urlopu na warunkach macierzyńskiego.", "KP art. 183 § 2")
+            ordered = sorted(maternity, key=lambda b: b.start)
+            if len({b.who for b in ordered}) > 1:
+                first = ordered[0].who
+                taken = sum(b.days for b in ordered if b.who == first and b.start < next(
+                    x.start for x in ordered if x.who != first))
+                if taken < p.maternity.mother_personal_weeks * 7:
+                    add("transfer.before-14-weeks", "error", "W zwykłym przekazaniu urlopu na warunkach "
+                        "macierzyńskiego pierwszy opiekun wykorzystuje co najmniej 14 tygodni.", "KP art. 183 § 2")
+        if plan.today and plan.today > birth + timedelta(days=p.adoption.application_days):
+            add("adoption.application-late", "warning", f"Termin złożenia wniosku o urlop wynosi "
+                f"{p.adoption.application_days} dni od spełnienia przesłanek.", "KP art. 183 § 6")
 
     # --- one parent, one thing at a time; who may take what ---
     for who in parents:
@@ -97,14 +146,14 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
         if since and taken[0].start < since:
             add("insured-parent.not-yet-insured", "error", f"{span(taken[0])}: zaczyna się przed początkiem "
                 f"ubezpieczenia ({since.isoformat()}).", "art. 29 ust. 1")
-        if since and pregnancy < since <= birth:
+        if not f.adoption and since and pregnancy < since <= birth:
             add("insured-parent.started-in-pregnancy", "warning", f"{WHO[who]}: ubezpieczenie zaczęło się w czasie "
                 f"ciąży ({since.isoformat()}). ZUS może sprawdzić, czy umowa lub działalność nie jest pozorna; wtedy "
                 "stwierdzi niepodleganie ubezpieczeniu i zasiłki nie przysługują.", "zadanie ZUS, cz. H pkt 1")
         in_pregnancy = [m for m in parent.salary_history if f"{pregnancy:%Y-%m}" <= m.month <= f"{birth:%Y-%m}"]
         before = [m.gross for m in parent.salary_history if m.month < f"{pregnancy:%Y-%m}"]
         raised = [m for m in in_pregnancy if before and m.gross > max(before)]
-        if raised:
+        if raised and not f.adoption:
             add("base.raised-in-pregnancy", "warning", f"{WHO[who]}: w czasie ciąży wynagrodzenie (podstawa składek) "
                 f"wzrosło ({raised[0].month}: {pln(raised[0].gross)}). ZUS może sprawdzić, czy podwyżka nie miała "
                 "tylko podnieść zasiłku, i ustalić niższą podstawę.", "zadanie ZUS, cz. H pkt 2")
@@ -156,7 +205,7 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
 
     # --- maternity (KP art. 180) ---
     mother_maternity = sorted(d for d, b in days["mother"].items() if b.kind == "maternity")
-    if len([d for d in mother_maternity if d < birth]) > p.maternity.prebirth_max_weeks * 7:
+    if not f.adoption and len([d for d in mother_maternity if d < birth]) > p.maternity.prebirth_max_weeks * 7:
         add("prebirth.too-early", "error", f"Przed porodem można wykorzystać najwyżej {p.maternity.prebirth_max_weeks} "
             "tygodni urlopu macierzyńskiego.", "KP art. 180 § 2")
     if mother_maternity and not f.adoption:
@@ -166,7 +215,7 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
         if len(mother_maternity) != (mother_maternity[-1] - mother_maternity[0]).days + 1:
             add("maternity-pool.not-continuous", "error", "Urlop macierzyński mamy musi być ciągły.", "KP art. 180 § 3")
     father_maternity = sorted(d for d, b in days["father"].items() if b.kind == "maternity")
-    if father_maternity:
+    if father_maternity and not f.adoption:
         after_birth = [d for d in mother_maternity if birth <= d < father_maternity[0]]
         if len(after_birth) < p.maternity.mother_personal_weeks * 7:
             add("transfer.before-14-weeks", "error", f"Tata może przejąć macierzyński dopiero po "
@@ -204,7 +253,17 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
         if b.days < p.paternity.min_part_days:
             add("paternity.part-too-short", "error", f"{span(b)}: część urlopu ojcowskiego trwa co najmniej tydzień.",
                 "KP art. 182^3 § 1^1")
-        if last_day(b) >= plus_months(birth, p.paternity.use_by_child_months):
+        if f.adoption:
+            a = f.adoption
+            if a.kind != "adoption" or a.court_final_on is None:
+                add("adoption.paternity-no-final-order", "error", "Ojcowski wymaga prawomocnego przysposobienia; "
+                    "samo przyjęcie do pieczy lub wniosek do sądu nie wystarcza.", "KP art. 182³ § 1 pkt 2")
+            elif (b.start < a.court_final_on or last_day(b) >= min(
+                    plus_months(a.court_final_on, p.paternity.use_by_child_months),
+                    plus_years(f.birth_date or birth, p.adoption.adoption_age_years))):
+                add("paternity.too-late", "error", "Ojcowski musi przypadać po prawomocnym przysposobieniu, "
+                    "w ciągu 12 miesięcy od niego i przed ukończeniem 14 lat.", "KP art. 182³ § 1 pkt 2")
+        elif last_day(b) >= plus_months(birth, p.paternity.use_by_child_months):
             add("paternity.too-late", "error", f"{span(b)}: urlop ojcowski trzeba wykorzystać, zanim dziecko skończy "
                 f"{p.paternity.use_by_child_months} miesięcy.", "KP art. 182^3 § 1")
 
@@ -215,13 +274,18 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
         add("parental-parts.too-many", "error", f"Urlop rodzicielski można wziąć najwyżej w {p.parental.max_parts} "
             "częściach (liczą się wnioski obojga rodziców).", "KP art. 182^1c, 182^1d § 2")
     deadline = date(birth.year + p.parental.last_child_age_years, 12, 31)
+    if f.adoption:
+        limit = adoption_age_limit(plan, p)
+        deadline = limit - timedelta(days=1) if limit else birth
     if any(last_day(b) > deadline for b in parental):
         add("parental-pool.too-late", "error", f"Urlop rodzicielski trzeba wykorzystać do {deadline.isoformat()} (koniec "
-            f"roku, w którym dziecko kończy {p.parental.last_child_age_years} lat).", "KP art. 182^1c")
-    own_cap = parental_total - p.parental.exclusive_weeks * 7
+            "termin właściwy dla urodzenia lub przyjęcia dziecka).", "KP art. 182¹c; art. 183 § 4–5")
+    prior = ({"mother": f.adoption.previous_parental_mother_days, "father": f.adoption.previous_parental_father_days}
+             if f.adoption else {"mother": 0, "father": 0})
+    own_cap = max(0, parental_total + sum(prior.values()) - p.parental.exclusive_weeks * 7)
     for who in parents:
         used = sum((ONE - b.work_fraction for b in days[who].values() if b.kind == "parental"), Decimal(0))
-        if used > own_cap:
+        if used + prior[who] > own_cap:
             add("parental-pool.exclusive", "error", f"{WHO[who]} może wykorzystać najwyżej {own_cap} dni rodzicielskiego: "
                 f"{p.parental.exclusive_weeks} tygodni należy wyłącznie do drugiego rodzica.", "KP art. 182^1a § 4")
     part_time = [b for b in plan.blocks if b.work_fraction]
@@ -308,7 +372,7 @@ def _deadlines(plan: Plan, birth: date, days, p: Params, add) -> None:
             if b.start - timedelta(days=notice) < today:
                 add(code, "warning", f"{WHO[b.who]}: wniosek o {KIND[b.kind].lower()} od {b.start.isoformat()} trzeba "
                     f"złożyć co najmniej {notice} dni wcześniej; pracodawca może się zgodzić na krótszy termin.", rule)
-        if b.kind == "maternity" and b.who == "father" and b.start - timedelta(
+        if not plan.family.adoption and b.kind == "maternity" and b.who == "father" and b.start - timedelta(
                 days=d.maternity_takeover_notice_days) < today:
             add("transfer.notice", "warning", f"Wniosek taty o pozostałą część macierzyńskiego od {b.start.isoformat()} "
                 f"składa się co najmniej {d.maternity_takeover_notice_days} dni wcześniej, a rezygnację mamy co najmniej "

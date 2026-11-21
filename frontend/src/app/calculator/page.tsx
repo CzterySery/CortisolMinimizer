@@ -41,7 +41,7 @@ export default function Calculator() {
           <fieldset className="form-section">
             <legend>Wysokość zasiłku</legend>
             <label className="field-check"><input type="radio" name="rate" checked={plan.rate_variant !== "averaged"} onChange={() => setPlan({ ...plan, rate_variant: "standard" })} /> 100% macierzyński, 70% rodzicielski</label>
-            <label className="field-check"><input type="radio" name="rate" checked={plan.rate_variant === "averaged"} onChange={() => setPlan({ ...plan, rate_variant: "averaged" })} /> 81,5% za cały okres (wniosek do 21 dni po porodzie)</label>
+            <label className="field-check"><input type="radio" name="rate" checked={plan.rate_variant === "averaged"} onChange={() => setPlan({ ...plan, rate_variant: "averaged" })} /> 81,5% za cały okres (wniosek do 21 dni {plan.family.adoption ? "od przyjęcia i spełnienia przesłanek" : "po porodzie"})</label>
           </fieldset>
           <BlocksEditor value={plan.blocks ?? []} onChange={(blocks) => setPlan({ ...plan, blocks })} />
           <div className="actions"><Link href="/applications" className="button" onClick={() => myPlan.put(plan)}>Przygotuj wnioski dla tego planu</Link></div>

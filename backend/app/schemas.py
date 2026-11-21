@@ -114,15 +114,29 @@ class Parent(Model):
 
 
 class Hospitalization(Model):
-    pregnancy_week: int
-    birth_weight_g: int
-    hospital_days: int
+    pregnancy_week: int = Field(ge=1, le=45)
+    birth_weight_g: int = Field(gt=0)
+    hospital_days: int = Field(ge=0)  # qualifying days from the hospital certificate; the calculator caps weeks
+
+
+class AdoptedChild(Model):
+    birth_date: date
+    school_deferred: bool = False
 
 
 class Adoption(Model):
     kind: Literal["adoption", "foster"]
-    child_age_years: int
+    child_age_years: int | None = Field(None, ge=0)  # legacy; exact limits require Family.birth_date
     accepted_on: date
+    court_applied_on: date | None = None
+    court_final_on: date | None = None
+    school_deferred: bool = False
+    professional_foster: bool = False
+    applicant: Who = "mother"
+    previous_maternity_days: int = Field(0, ge=0)
+    previous_parental_mother_days: int = Field(0, ge=0)
+    previous_parental_father_days: int = Field(0, ge=0)
+    children: list[AdoptedChild] = []
 
 
 class Family(Model):

@@ -18,8 +18,16 @@ const GROUPS: Record<string, string> = {
   parental: "Urlop rodzicielski", paternity: "Urlop ojcowski", supplementary: "Uzupełniający urlop macierzyński",
   "supplementary.extreme": "Poród bardzo wcześnie albo masa do 1000 g", "supplementary.preterm": "Poród przedwczesny",
   "supplementary.term": "Poród o czasie", deadlines: "Terminy wniosków", care: "Zasiłek opiekuńczy", game: "Gra",
+  adoption: "Przyjęcie dziecka: adopcja i piecza niezawodowa",
 };
 const FIELDS: Record<string, [string, string]> = {
+  "adoption.foster_age_years": ["Granica wieku w pieczy niezawodowej", "lat"],
+  "adoption.foster_deferred_age_years": ["… z odroczeniem obowiązku szkolnego", "lat"],
+  "adoption.adoption_age_years": ["Granica wieku przy przysposobieniu", "lat"],
+  "adoption.short_parental_weeks": ["Rodzicielski po minimalnym 9-tygodniowym urlopie", "tyg."],
+  "adoption.short_parental_za_zyciem_weeks": ["… z zaświadczeniem „Za życiem”", "tyg."],
+  "adoption.application_days": ["Wniosek po spełnieniu przesłanek", "dni"],
+  "adoption.start_days": ["Rozpoczęcie urlopu po spełnieniu przesłanek", "dni"],
   effective_from: ["Obowiązuje od", ""],
   contribution_deduction: ["Odliczenie składek (osoby niebędące pracownikami, minimalna podstawa)", "%"],
   "employee_contributions.pension": ["Emerytalna", "%"], "employee_contributions.disability": ["Rentowa", "%"],
