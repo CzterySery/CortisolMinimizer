@@ -7,6 +7,7 @@ import { DecisionCard } from "./decision-card";
 import { RoundTrack } from "./round-track";
 import { Statistics } from "./statistics";
 import type { CardSignals } from "@/lib/card-signals";
+import { STRATEGIES } from "@/lib/decision-tree";
 
 export interface GameBoardProps {
   mode: "preview" | "game";
@@ -204,6 +205,22 @@ export function GameBoard(props: GameBoardProps) {
   return (
     <main className={`game-layout ${mode === "preview" ? "preview-board" : ""} ${tableInView ? "table-visible" : "table-pending"} ${canRevealHand ? "hand-visible" : "hand-pending"}`} ref={boardRef}>
       <div className="main-board">
+        {mode === "preview" && (
+          <section className="strategies-upfront" aria-label="Trzy strategie rodzicielskie w grze">
+            <div className="strategies-upfront-header">
+              <span className="eyebrow">3 strategie do wyboru · Oznaczenia na kartach</span>
+              <span className="strategies-upfront-hint">Każda karta w grze jest oznaczona strategią, do której prowadzi:</span>
+            </div>
+            <div className="strategies-upfront-grid">
+              {STRATEGIES.map((s) => (
+                <div key={s.id} className={`strategy-upfront-card strategy-upfront-${s.id}`}>
+                  <strong className="strategy-upfront-badge">{s.badge}</strong>
+                  <p className="strategy-upfront-desc">{s.shortDesc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
         <section className="board-context" aria-labelledby="story-title">
           <p className="eyebrow">{complete ? "Wasz plan jest na stole" : `Runda 0${stage.id} / 0${totalRounds} · ${stage.title}`}</p>
           <h1 id="story-title" className="sr-only">{complete ? "Wasz plan rodziny" : `Runda ${stage.id}: ${stage.title}`}</h1>
@@ -227,6 +244,9 @@ export function GameBoard(props: GameBoardProps) {
               )}
               <h3 className="decision-tree-question">{props.decisionPrompt.question}</h3>
               <p className="decision-tree-subtitle">{props.decisionPrompt.subtitle}</p>
+              <p className="decision-tree-click-hint">
+                <span aria-hidden="true">📖</span> Chcesz poznać przepisy przed ruchem? Kliknij przycisk <strong>„Kliknij, aby poznać szczegóły i przepisy ZUS”</strong> na dowolnej karcie.
+              </p>
             </div>
           )}
           <div className="section-heading hand-heading"><h2 id="hand-title">{complete ? "Twój profil" : "Wybierz jedną z 3 wykluczających się opcji"}</h2>{mode === "game" && <span>{complete ? `${played.length} zagranych kart` : `${handSize} karty · przeciągnij jedną na podświetlone miejsce`}</span>}

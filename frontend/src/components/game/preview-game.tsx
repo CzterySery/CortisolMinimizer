@@ -8,7 +8,7 @@ import { planHandoff, savedGame } from "@/lib/session";
 import { getCardSignals } from "@/lib/card-signals";
 import { gameScores } from "@/lib/game-result";
 import { ensurePlayable } from "@/lib/deal";
-import { getDecisionNodeForCard, getDecisionTreeRound } from "@/lib/decision-tree";
+import { getDecisionNodeForCard, getDecisionTreeRound, buildCalculatorHandoffPlan } from "@/lib/decision-tree";
 import { GameBoard } from "./game-board";
 import { KnowledgeExplorer } from "./knowledge-explorer";
 
@@ -25,7 +25,7 @@ function decoratePlayedCard(base: Card, roundIndex: number, playedIds: string[])
     ...base,
     title: node.title,
     description: node.description,
-    tags: [node.badge, node.branchTag],
+    tags: [node.badge, node.strategyBadge, node.branchTag, node.strategyId],
     design: base.design
       ? ({ ...base.design, title: node.title, description: node.description } as Card["design"])
       : undefined,
@@ -35,12 +35,12 @@ function decoratePlayedCard(base: Card, roundIndex: number, playedIds: string[])
 function decisionTreeProfiles(balance: { money: number; time: number }) {
   const diff = balance.time - balance.money;
   if (Math.abs(diff) <= 6) {
-    return [{ id: "balance", title: "Świadomy Balans Czasu i Budżetu" }];
+    return [{ id: "aura", title: "✨ Aura Farming (Świadomy Balans Czasu i Budżetu)" }];
   }
   if (diff > 6) {
-    return [{ id: "time", title: "Kortyzol Minimizer (Maksimum czasu z dzieckiem)" }];
+    return [{ id: "time", title: "🧘 Kortyzol Minimizer (Maksimum czasu z dzieckiem)" }];
   }
-  return [{ id: "money", title: "Zasiłki Maxing (Maksimum wsparcia budżetu)" }];
+  return [{ id: "money", title: "💰 Zasiłki Maxing (Maksimum wsparcia budżetu)" }];
 }
 
 // Authoritative replay: send every selected decision; the server recomputes a single plan.
@@ -180,7 +180,10 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
           <h2 id="game-result-title">{finalProfiles.map((profile) => profile.title).join(" + ")}</h2>
           <p>Wasza ścieżka: {played.map((c) => c.title).join(" → ")}.</p>
           <div className="actions">
-          <button className="button button-primary" onClick={() => { planHandoff.put(simulation.plan); router.push("/calculator"); }}>Pokaż ten scenariusz w kalkulatorze</button>
+          <button className="button button-primary" onClick={() => {
+            planHandoff.put(buildCalculatorHandoffPlan(simulation.plan, playedIds));
+            router.push("/calculator");
+          }}>Pokaż ten scenariusz w kalkulatorze</button>
           </div>
         </section>}
       belowHand={<>

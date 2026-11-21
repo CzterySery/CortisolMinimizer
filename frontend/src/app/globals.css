@@ -428,6 +428,28 @@ dialog::backdrop { background: #18312788; }
 .game-section-title { font-family: Georgia, serif; font-size: clamp(26px, 3.4vw, 36px); font-weight: 400; color: var(--ink); margin: 8px 0 10px; }
 .game-section-desc { font-size: 14px; color: var(--muted); line-height: 1.6; margin: 0; }
 
+/* ---- Upfront Strategies Legend & Card Strategy Badges ---- */
+.strategies-upfront { background: #fafbf9; border: 1px solid #e1e8dc; border-radius: 16px; padding: 16px 20px; margin: 0 0 22px; }
+.strategies-upfront-header { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.strategies-upfront-hint { font-size: 12px; color: var(--muted); }
+.strategies-upfront-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.strategy-upfront-card { background: #ffffff; border: 1px solid #dce4d6; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; }
+.strategy-upfront-kortyzol { border-left: 3px solid #527561; }
+.strategy-upfront-zasilki { border-left: 3px solid #a58754; }
+.strategy-upfront-aura { border-left: 3px solid #3b7a9c; }
+.strategy-upfront-badge { font-size: 12px; font-weight: 700; color: var(--ink); }
+.strategy-upfront-desc { font-size: 11px; color: var(--muted); line-height: 1.5; margin: 0; }
+
+.card-strategy-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 12px; font-size: 9px; font-weight: 700; letter-spacing: 0.4px; text-transform: none; line-height: 1.2; background: #f2f6ef; color: #3d5f4c; border: 1px solid #d4e0ce; }
+.card-strategy-badge.badge-kortyzol { background: #eef5ec; color: #365a45; border-color: #c7d9c2; }
+.card-strategy-badge.badge-zasilki { background: #fbf6eb; color: #7a5f2e; border-color: #e5d6b5; }
+.card-strategy-badge.badge-aura { background: #edf4f8; color: #2b5d78; border-color: #c2d9e6; }
+.card-strategy-badge.badge-sytuacja { background: #f3f5f1; color: #4c574e; border-color: #d7ddd4; }
+
+.card-learn-more-pill { display: inline-flex; align-items: center; gap: 6px; width: 100%; justify-content: center; margin: 0 0 14px; padding: 8px 11px; border: 1px solid #cddbc6; border-radius: 9px; background: #f4f8f1; color: #385845; font-size: 11px; font-weight: 600; cursor: pointer; text-decoration: none; transition: background 150ms, border-color 150ms; }
+.card-learn-more-pill:hover { background: #e7f0e2; border-color: #adc3a3; }
+.card-footer-hint { font-size: 9px; color: #6a7766; font-weight: 500; }
+
 /* ---- Decision Tree Prompt & Path ---- */
 .decision-tree-prompt { background: #f7faf5; border: 1px solid #dce6d6; border-radius: 16px; padding: 18px 22px; margin: 0 0 20px; }
 .decision-tree-path { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 11px; color: var(--green); margin-bottom: 10px; }
@@ -436,6 +458,13 @@ dialog::backdrop { background: #18312788; }
 .path-arrow { color: #87997f; font-weight: 400; }
 .decision-tree-question { font-family: Georgia, serif; font-size: clamp(20px, 2.5vw, 26px); font-weight: 400; color: var(--ink); margin: 0 0 6px; letter-spacing: -0.5px; }
 .decision-tree-subtitle { font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; }
+.decision-tree-click-hint { font-size: 12px; color: #43614e; background: #edf4ea; border-radius: 10px; padding: 8px 12px; margin: 12px 0 0; }
+
+/* ---- Calculator Handoff Final Adjustments Box ---- */
+.handoff-adjustments-box { background: #f6faf3; border: 1.5px solid #b8ccb0; border-radius: 16px; padding: 20px 24px; margin: 0 0 28px; }
+.handoff-adjustments-header h3 { font-family: Georgia, serif; font-size: 22px; font-weight: 400; margin: 6px 0 10px; color: var(--ink); }
+.handoff-adjustments-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 16px 0; }
+.handoff-adjustments-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding-top: 8px; }
 
 /* ---- Knowledge Explorer ("O czym chcesz się dowiedzieć?") ---- */
 .knowledge-explorer { margin: 44px 0 16px; padding: 32px 28px; background: #fafbf8; border: 1px solid #e2e8dd; border-radius: 22px; }
@@ -473,6 +502,7 @@ dialog::backdrop { background: #18312788; }
 @media (max-width: 768px) {
   .landing-features-grid { grid-template-columns: 1fr; }
   .landing-steps-grid { grid-template-columns: 1fr; }
+  .strategies-upfront-grid { grid-template-columns: 1fr; }
   .knowledge-cards-grid { grid-template-columns: minmax(0, 1fr); }
   .knowledge-explorer { padding: 22px 16px; }
   .steps-cta-bar { flex-direction: column; align-items: flex-start; }

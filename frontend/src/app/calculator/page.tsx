@@ -94,6 +94,18 @@ export default function Calculator() {
     }
     setStep(step + 1);
   };
+  const computeHandoffDirect = async () => {
+    if (busy) return;
+    setError(undefined);
+    const ctrl = new AbortController(); request.current = ctrl; setBusy(true);
+    try {
+      const response = await api.POST("/api/v1/calc/plan", { body: plan, signal: ctrl.signal });
+      if (ctrl.signal.aborted) return;
+      if (!response.data) throw new Error(typeof response.error?.detail === "string" ? response.error.detail : "Sprawdź daty i dane w poprzednich krokach.");
+      setResult(response.data); setStep(7);
+    } catch (e) { if (!ctrl.signal.aborted) setError(e instanceof Error ? e.message : "Nie udało się obliczyć planu."); }
+    finally { if (!ctrl.signal.aborted) setBusy(false); }
+  };
   const unknownBases = (["mother", "father"] as const).filter((who) => {
     const p = plan.family[who];
     return p && p.employment !== "none" && p.base_monthly == null && p.gross_monthly_estimate == null && !p.salary_history?.length;
@@ -114,9 +126,86 @@ export default function Calculator() {
       </li>)}
     </ol></nav>
     <section className="calculator-step" aria-labelledby="calculator-question">
+      {handoff && step < 7 && (
+        <div className="handoff-adjustments-box" aria-label="Ostatnie szlify przeniesionego scenariusza z gry">
+          <div className="handoff-adjustments-header">
+            <span className="eyebrow">Przeniesiono z gry OtwarteKarty · Ostatnie szlify</span>
+            <h3>Dopasuj swój scenariusz przed szczegółowym wyliczeniem</h3>
+            <p className="notice">
+              Wczytaliśmy Twoje wybory z drzewa decyzyjnego ({situation === "birth" ? "Urodzenie dziecka" : situation === "adoption" ? "Adopcja" : "Rodzina zastępcza"}, {plan.blocks?.length ?? 0} okresów urlopowych). Możesz od razu skorygować poniższe kwoty i zatwierdzić wyliczenie albo przejść przez kreator krok po kroku.
+            </p>
+          </div>
+          <div className="handoff-adjustments-grid">
+            <label className="field">
+              Podstawa zasiłku mamy z gry (zł/mies.)
+              <input
+                type="number"
+                min={0}
+                step="100"
+                value={plan.family.mother.base_monthly ?? ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setIncome({ ...income, mother: val ? "base" : "unknown" });
+                  family({ ...plan.family, mother: { ...plan.family.mother, base_monthly: val || null } });
+                }}
+              />
+            </label>
+            {withFather && plan.family.father && (
+              <label className="field">
+                Podstawa zasiłku drugiego rodzica z gry (zł/mies.)
+                <input
+                  type="number"
+                  min={0}
+                  step="100"
+                  value={plan.family.father.base_monthly ?? ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setIncome({ ...income, father: val ? "base" : "unknown" });
+                    family({ ...plan.family, father: { ...plan.family.father!, base_monthly: val || null } });
+                  }}
+                />
+              </label>
+            )}
+            <label className="field">
+              Wybrany wariant wypłaty zasiłku z gry
+              <select
+                value={plan.rate_variant ?? "standard"}
+                onChange={(e) => {
+                  const variant = e.target.value as "standard" | "averaged";
+                  const defaultDate = plan.family.birth_date || plan.family.due_date || plan.family.adoption?.accepted_on || "2027-03-01";
+                  update({
+                    ...plan,
+                    rate_variant: variant,
+                    averaged_request_on: variant === "averaged" ? (plan.averaged_request_on || defaultDate) : null,
+                  });
+                }}
+              >
+                <option value="standard">100% na start, 70% na rodzicielskim (standardowy)</option>
+                <option value="averaged">Stałe 81,5% przez cały rok (wniosek w 21 dni)</option>
+              </select>
+            </label>
+          </div>
+          <div className="handoff-adjustments-actions">
+            <button
+              type="button"
+              className="button button-primary"
+              disabled={busy}
+              onClick={() => void computeHandoffDirect()}
+            >
+              {busy ? "Obliczam…" : "Zatwierdź poprawki i oblicz wynik"}
+            </button>
+            <button
+              type="button"
+              className="button"
+              onClick={() => setStep(5)}
+            >
+              Edytuj ułożone okresy urlopowe ({plan.blocks?.length ?? 0})
+            </button>
+          </div>
+        </div>
+      )}
       <p className="eyebrow">Krok {step + 1} z {steps.length}</p>
       <h2 id="calculator-question" ref={heading} tabIndex={-1}>{titles[step]}</h2>
-      {handoff && step === 0 && <p className="notice">Wczytaliśmy przykładowy scenariusz z gry lub konta. Sprawdź jego dane w kolejnych krokach.</p>}
       <form key={step} onSubmit={(e) => { e.preventDefault(); void next(); }}>
         <div className="stack">
           {step === 0 && <>

@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { getCardSignals } from "../src/lib/card-signals.ts";
 import { gameProfiles, gameScores } from "../src/lib/game-result.ts";
 import { ensurePlayable } from "../src/lib/deal.ts";
-import { getDecisionTreeRound } from "../src/lib/decision-tree.ts";
+import { getDecisionTreeRound, buildCalculatorHandoffPlan } from "../src/lib/decision-tree.ts";
 
 test("an exhausted parental pool cannot leave a new or restored hand unplayable", () => {
   const pool = ["5A", "5B", "5C", "5D", "5E", "5F"].map((id) => ({ id }));
@@ -110,4 +110,32 @@ test("decision tree produces 3 mutually exclusive choices per round and branches
   assert.equal(r5WithReserve.cards.length, 3);
   assert.equal(r5Exhausted.cards.length, 3);
   assert.deepEqual(r5Exhausted.cards.map((c) => c.id), ["5D", "5E", "5F"]);
+
+  // Rounds 3 and 4 also adapt by situation (foster vs adoption vs birth) and tag strategies
+  const r3Birth = getDecisionTreeRound(2, ["1A", "2A"], stages);
+  const r3Foster = getDecisionTreeRound(2, ["1D", "2B"], stages);
+  assert.notEqual(r3Birth.cards[0].title, r3Foster.cards[0].title);
+  assert.deepEqual(r3Foster.activeNodes.map((n) => n.strategyId), ["kortyzol", "zasilki", "aura"]);
+
+  const r4Birth = getDecisionTreeRound(3, ["1A", "2A", "3B"], stages);
+  const r4Foster = getDecisionTreeRound(3, ["1D", "2B", "3B"], stages);
+  assert.notEqual(r4Birth.cards[0].title, r4Foster.cards[0].title);
+
+  // Handoff plan transfers situation, school deferral, za_zyciem and rate_variant
+  const basePlan = {
+    family: {
+      mother: { employment: "employee", base_monthly: "6000" },
+      father: { employment: "employee", base_monthly: "8000" },
+      due_date: "2027-03-01",
+      birth_date: null,
+      children: 1,
+    },
+    blocks: [],
+    rate_variant: "standard",
+  };
+  const fosterPlan = buildCalculatorHandoffPlan(basePlan, ["1D", "2B", "3B", "4D", "5A"]);
+  assert.equal(fosterPlan.family.adoption?.kind, "foster");
+  assert.equal(fosterPlan.family.adoption?.school_deferred, true);
+  assert.equal(fosterPlan.rate_variant, "averaged");
+  assert.equal(fosterPlan.averaged_request_on, "2027-03-01");
 });
