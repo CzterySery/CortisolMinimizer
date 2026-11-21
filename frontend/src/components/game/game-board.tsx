@@ -54,7 +54,11 @@ export function GameBoard(props: GameBoardProps) {
   // Observe when the round-track slots and the hand enter the viewport
   useEffect(() => {
     const board = boardRef.current;
-    if (!board || typeof IntersectionObserver === "undefined") return;
+    if (!board || typeof IntersectionObserver === "undefined") {
+      setTableInView(true);
+      setHandInView(true);
+      return;
+    }
     const roundsEl = board.querySelector<HTMLElement>(".rounds-section");
     const handEl = board.querySelector<HTMLElement>(".hand-section");
     const observer = new IntersectionObserver(
@@ -65,11 +69,21 @@ export function GameBoard(props: GameBoardProps) {
           if (entry.target === handEl) setHandInView(true);
         }
       },
-      { threshold: 0.22 },
+      { threshold: 0.05, rootMargin: "350px" },
     );
     if (roundsEl) observer.observe(roundsEl);
     if (handEl) observer.observe(handEl);
-    return () => observer.disconnect();
+
+    // Defensive fallback: guarantee reveal for tests and crawlers
+    const fallbackTimer = window.setTimeout(() => {
+      setTableInView(true);
+      setHandInView(true);
+    }, 1200);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fallbackTimer);
+    };
   }, []);
 
   // Dynamically animate the 5 table card slots when the table scrolls into view,
