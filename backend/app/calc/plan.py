@@ -6,7 +6,12 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 from app.calc.base import benefit_base, money, percent, pln
-from app.calc.family import adoption_age_limit, adoption_pools, event_date
+from app.calc.family import (
+    adoption_age_limit,
+    adoption_pools,
+    event_date,
+    maternity_end_after_death,
+)
 from app.params import Params
 from app.schemas import (
     BaseRequest,
@@ -104,7 +109,13 @@ def pool_sizes(plan: Plan, p: Params) -> tuple[int, int]:
     multiple = f.children > 1
     parental = ((pp.weeks_za_zyciem_multiple if multiple else pp.weeks_za_zyciem_single) if f.za_zyciem
                 else (pp.weeks_multiple if multiple else pp.weeks_single))
-    return adoption_pools(plan, p, weeks[min(f.children, len(weeks)) - 1] * 7, parental * 7)
+    maternity = weeks[min(f.children, len(weeks)) - 1] * 7
+    if end := maternity_end_after_death(plan, p):  # the mother's days before the birth stay hers (KP art. 180 § 2)
+        birth = event_date(plan)
+        prebirth = sum(max(0, min(b.days, (birth - b.start).days)) for b in plan.blocks
+                       if b.kind == "maternity" and b.who == "mother")
+        maternity = min(maternity, prebirth + (end - birth).days + 1)
+    return adoption_pools(plan, p, maternity, parental * 7)
 
 
 def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = None) -> PlanResult:

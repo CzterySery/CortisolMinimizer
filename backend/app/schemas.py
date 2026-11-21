@@ -145,6 +145,7 @@ class Family(Model):
     father: Parent | None = None
     due_date: date
     birth_date: date | None = None
+    child_died_on: date | None = None  # stillbirth = the birth date; caps maternity (KP art. 180^1)
     children: int = Field(1, ge=1)
     za_zyciem: bool = False
     hospitalization: Hospitalization | None = None

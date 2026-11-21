@@ -164,3 +164,19 @@ def test_supplementary_entitlement_table():
     assert weeks(39, 3200, 10) == 2  # at term
     assert weeks(39, 3200, 1) == 0  # at term, under 2 days
     assert supplementary_weeks(Plan(family=Family(mother=Parent(employment="employee"), due_date=BIRTH)), P) is None
+
+
+def test_child_death_caps_maternity_and_ends_child_care_periods():
+    still = {"birth_date": BIRTH, "child_died_on": BIRTH}
+    eight_weeks = blk("mother", "maternity", BIRTH, 56)
+    assert issues([eight_weeks], **still) == []
+    assert issues([blk("mother", "maternity", at(-14), 70)], **still) == []  # days before the birth stay hers
+    assert "maternity-pool.after-child-death" in codes([MATERNITY], **still)
+    assert {"paternity.after-child-death", "parental-pool.after-child-death"} <= codes(
+        [eight_weeks, blk("father", "paternity", BIRTH, 14), blk("mother", "parental", at(56), 30)], **still)
+    late = {"birth_date": BIRTH, "child_died_on": at(52)}  # 7 days from the death outlast the 8 weeks
+    assert issues([blk("mother", "maternity", BIRTH, 60)], **late) == []
+    assert "maternity-pool.after-child-death" in codes([blk("mother", "maternity", BIRTH, 61)], **late)
+    older = {"birth_date": BIRTH, "child_died_on": at(100)}  # after 8 weeks: 7 days from the death
+    assert issues([blk("mother", "maternity", BIRTH, 108)], **older) == []
+    assert "maternity-pool.after-child-death" in codes([MATERNITY], **older)

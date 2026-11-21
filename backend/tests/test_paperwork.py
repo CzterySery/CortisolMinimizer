@@ -130,3 +130,14 @@ def test_plan_explains_the_payer():
     family = Family(mother=parent(insured=25), due_date=BIRTH)
     explain = compute_plan(Plan(family=family, blocks=[blk("mother", "maternity", BIRTH, 140)]), P).explain
     assert any("płatnik składek, bo zgłasza" in e.text and e.rule.startswith("art. 61") for e in explain)
+
+
+def test_stillbirth_needs_its_own_birth_document():
+    found = {d.form: d for d in docs(blk("mother", "maternity", BIRTH, 56), birth_date=BIRTH, child_died_on=BIRTH,
+                                     mother=parent(insured=50))}  # a big employer pays and would want the birth copy
+    still = next(d for form, d in found.items() if "martwym urodzeniu" in form)
+    assert (still.who, still.recipient, still.rule) == ("mother", "employer", "rozp. dok. § 13 ust. 1 pkt 2")
+    assert "Odpis skrócony aktu urodzenia" not in found
+    jdg = docs(blk("mother", "maternity", BIRTH, 56), birth_date=BIRTH, child_died_on=BIRTH,
+               mother=parent("self_employed"))
+    assert any("martwym urodzeniu" in d.form and d.recipient == "zus" for d in jdg)

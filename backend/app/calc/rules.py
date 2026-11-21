@@ -9,7 +9,7 @@ from itertools import pairwise
 from math import ceil
 
 from app.calc.base import pln
-from app.calc.family import adoption_age_limit, event_date, plus_years
+from app.calc.family import adoption_age_limit, event_date, maternity_end_after_death, plus_years
 from app.calc.plan import (
     KIND,
     MATERNITY_BENEFIT,
@@ -126,6 +126,10 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
             rule_id, rule = AFTER_BIRTH[b.kind]
             add(f"{rule_id}.before-birth", "error", f"{span(b)}: ten okres może zacząć się dopiero po narodzinach "
                 "dziecka.", rule)
+        if b.kind in AFTER_BIRTH and f.child_died_on and last_day(b) > f.child_died_on:
+            rule_id, rule = AFTER_BIRTH[b.kind]
+            add(f"{rule_id}.after-child-death", "error", f"{span(b)}: ten okres służy opiece nad dzieckiem, więc nie "
+                "przysługuje po jego śmierci. Mamie zostaje urlop macierzyński (KP art. 180^1).", rule)
 
     # --- insurance: no title or no sickness insurance means no benefits (art. 2a, 4, 29); risks from brief part H ---
     pregnancy = f.due_date - timedelta(weeks=p.maternity.pregnancy_weeks)
@@ -195,7 +199,12 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
 
     # --- pools (KP art. 180, 182^1a, 182^3; ustawa art. 32) ---
     pools = result.pools
-    if pools.maternity_days_left < 0:
+    if pools.maternity_days_left < 0 and (end := maternity_end_after_death(plan, p)):
+        add("maternity-pool.after-child-death", "error", f"Po martwym urodzeniu lub śmierci dziecka urlop "
+            f"macierzyński trwa {p.maternity.stillbirth_weeks} tygodni po porodzie, nie krócej niż "
+            f"{p.maternity.after_death_min_days} dni od dnia zgonu: tu do {end:%d.%m.%Y}. Plan przekracza go o "
+            f"{-pools.maternity_days_left} dni.", "KP art. 180^1 § 1–2")
+    elif pools.maternity_days_left < 0:
         add("maternity-pool.exceeded", "error", f"Przekroczony wymiar urlopu macierzyńskiego o "
             f"{-pools.maternity_days_left} dni.", "KP art. 180 § 1")
     if pools.parental_days_left < 0:

@@ -47,6 +47,9 @@ export function FamilyForm({ value, onChange, section = "all", birthStatus }: {
             } } : {}),
           })} />
         </label>}
+        {!value.adoption && birthStatus !== "expected" && <label className="field">Jeśli dziecko urodziło się martwe lub zmarło: data (przy martwym urodzeniu data porodu)
+          <input type="date" value={value.child_died_on ?? ""} onChange={(e) => set({ child_died_on: e.target.value || null })} />
+        </label>}
         <label className="field">{value.adoption ? "Liczba dzieci przyjętych jednocześnie" : "Liczba dzieci przy porodzie"}
           <input type="number" min={1} value={value.children ?? 1} onChange={(e) => {
             const count = Number(e.target.value);

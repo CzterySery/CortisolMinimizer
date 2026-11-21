@@ -1013,6 +1013,8 @@ export interface components {
             due_date: string;
             /** Birth Date */
             birth_date?: string | null;
+            /** Child Died On */
+            child_died_on?: string | null;
             /**
              * Children
              * @default 1
@@ -1037,6 +1039,8 @@ export interface components {
             due_date: string;
             /** Birth Date */
             birth_date: string | null;
+            /** Child Died On */
+            child_died_on: string | null;
             /**
              * Children
              * @default 1
