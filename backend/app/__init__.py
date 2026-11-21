@@ -1,0 +1,1 @@
+"""API aplikacji Zasiłkowy Poker."""

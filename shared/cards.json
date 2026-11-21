@@ -1,0 +1,144 @@
+{
+  "rounds": [
+    {
+      "id": 1,
+      "title": "Ciąża",
+      "description": "Ola i Kuba czekają na dziecko. Przed nimi pierwsza decyzja: jak zaplanować czas przed porodem?",
+      "cards": [
+        {
+          "id": "1A",
+          "round_id": 1,
+          "title": "Pracuj do porodu.",
+          "description": "Zachowaj cały urlop macierzyński na okres po narodzinach.",
+          "sources": []
+        },
+        {
+          "id": "1B",
+          "round_id": 1,
+          "title": "Zacznij macierzyński 2 tygodnie wcześniej.",
+          "description": "Zyskujesz czas przed porodem i zużywasz część puli.",
+          "sources": []
+        },
+        {
+          "id": "1C",
+          "round_id": 1,
+          "title": "Zacznij macierzyński 6 tygodni wcześniej.",
+          "description": "Przenosisz przed poród maksymalną część urlopu.",
+          "sources": []
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Poród",
+      "description": "Dziecko jest już z Wami. Przed Wami plan pierwszych wspólnych tygodni.",
+      "cards": [
+        {
+          "id": "2A",
+          "round_id": 2,
+          "title": "Dwa tygodnie razem na starcie.",
+          "description": "Kuba bierze cały urlop ojcowski w pierwszych tygodniach.",
+          "sources": []
+        },
+        {
+          "id": "2B",
+          "round_id": 2,
+          "title": "Tydzień teraz, tydzień później.",
+          "description": "Kuba dzieli ojcowski na dwie części.",
+          "sources": []
+        },
+        {
+          "id": "2C",
+          "round_id": 2,
+          "title": "Zachowaj dwa tygodnie na później.",
+          "description": "Zaplanuj cały ojcowski przed ukończeniem przez dziecko 12 miesięcy.",
+          "sources": []
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Pierwszy miesiąc",
+      "description": "Poznajcie możliwości zaplanowania świadczeń i podziału opieki.",
+      "cards": [
+        {
+          "id": "3A",
+          "round_id": 3,
+          "title": "100% teraz, 70% później.",
+          "description": "Porównaj wyższą stawkę za okres macierzyńskiego z niższą za okres rodzicielskiego.",
+          "sources": []
+        },
+        {
+          "id": "3B",
+          "round_id": 3,
+          "title": "81,5% w wariancie uśrednionym.",
+          "description": "Złóż odpowiedni wniosek w ciągu 21 dni po porodzie. Gra pokazuje termin z konkretną datą.",
+          "sources": []
+        },
+        {
+          "id": "3C",
+          "round_id": 3,
+          "title": "Powrót Oli po 14 tygodniach od porodu.",
+          "description": "Zaplanuj przekazanie Kubie pozostałej części macierzyńskiego i porównaj dochód rodziny po zamianie.",
+          "sources": []
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Pierwszy rok",
+      "description": "Znajdźcie miejsce na opiekę, pracę i wspólny czas w pierwszym roku.",
+      "cards": [
+        {
+          "id": "4A",
+          "round_id": 4,
+          "title": "Opieka na zmianę.",
+          "description": "Ułóż rodzicielski po kolei, uwzględniając 9 tygodni przysługujących wyłącznie każdemu rodzicowi.",
+          "sources": []
+        },
+        {
+          "id": "4B",
+          "round_id": 4,
+          "title": "Część rodzicielskiego razem.",
+          "description": "Zyskujecie wspólny czas, a gra odejmuje tygodnie obojga ze wspólnej puli.",
+          "sources": []
+        },
+        {
+          "id": "4C",
+          "round_id": 4,
+          "title": "Rodzicielski i praca na pół etatu.",
+          "description": "Sprawdź, jak zmienią się dochód i długość urlopu przy połączeniu go z pracą u pracodawcy, który go udzielił.",
+          "sources": []
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Kolejne lata",
+      "description": "Zaplanujcie kolejne etapy i nowy rytm Waszej rodziny.",
+      "cards": [
+        {
+          "id": "5A",
+          "round_id": 5,
+          "title": "Cała reszta na start przedszkola.",
+          "description": "Wykorzystaj pozostały rodzicielski w jednym bloku.",
+          "sources": []
+        },
+        {
+          "id": "5B",
+          "round_id": 5,
+          "title": "Podziel resztę na dwie części.",
+          "description": "Zaplanuj np. adaptację w przedszkolu i późniejszą przerwę, jeśli zostały wolne części urlopu.",
+          "sources": []
+        },
+        {
+          "id": "5C",
+          "round_id": 5,
+          "title": "Rozłóż opiekę i pracę w czasie.",
+          "description": "Połącz pozostały rodzicielski z pracą i sprawdź, czy plan mieści się w terminie.",
+          "sources": []
+        }
+      ]
+    }
+  ]
+}
