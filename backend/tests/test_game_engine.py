@@ -67,6 +67,7 @@ def test_part_time_consumes_pool_once_for_extended_calendar():
 
 
 def test_medical_and_special_cards_need_facts():
+    assert candidate(run(), "1D").available
     assert not candidate(run(), "1C").available
     assert candidate(run(scenario="hospital"), "1C").available
     assert not candidate(run("1A"), "2D").available

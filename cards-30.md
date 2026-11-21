@@ -116,15 +116,15 @@ Uporządkuj chorobowe w ciąży na podstawie wystawionego zwolnienia.
 **Combo:** Kompletna teczka; partnerzy: [3D](#3d); warunek `docs_complete`; bonus mnożnika `0.50` po sprawdzeniu rzeczywistego planu.
 
 <a id="1d"></a>
-### 1D · Pomost rehabilitacyjny
+### 1D · Kto wypłaca świadczenie?
 
-Przygotuj sprawę o rehabilitacyjne, gdy chorobowe się wyczerpuje.
+Sprawdź, kto będzie płatnikiem zasiłku i jakie dane trzeba przygotować.
 
-**Kiedy:** Dalsza niezdolność i rokowanie wynikają ze scenariusza; wykluczenia ustawowe sprawdzone. Złożenie wniosku nie oznacza przyznania.
+**Kiedy:** Dostępna od początku w każdej historii. Płatnik zależy od tytułu ubezpieczenia i liczby ubezpieczonych; samo sprawdzenie nie oznacza przyznania świadczenia.
 
-**Pieniądze:** Pokaż prognozę warunkową oddzielnie; do pewnego budżetu wlicz dopiero przyznany okres i właściwie zwaloryzowaną podstawę.
+**Pieniądze:** Samo ustalenie płatnika nie zwiększa kwoty ani nie tworzy uprawnienia.
 
-**Czas:** Okres leczenia nie oznacza zdolności do osobistej opieki; brak fikcyjnych dodatkowych dni opieki.
+**Czas:** Bez zmiany urlopu i dostępnych dni; to informacja organizacyjna.
 
 **Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
 
@@ -136,32 +136,17 @@ Przygotuj sprawę o rehabilitacyjne, gdy chorobowe się wyczerpuje.
 [
   {
     "op": "set_flag",
-    "name": "rehab_application",
-    "value": "pending"
-  },
-  {
-    "op": "mark_docs",
-    "bundle": "rehab",
-    "only_if": "facts.documents_available"
-  },
-  {
-    "op": "add_block",
-    "who": "mother",
-    "kind": "rehab",
-    "start": "after:sick:mother",
-    "days": "facts.rehab.awarded_days",
-    "only_if": "facts.rehab.decision_granted"
+    "name": "payer_checked",
+    "value": true
   }
 ]
 ```
 
-**Podstawy:** [rehab](Documents/legal/rules.md#rehab), [base](Documents/legal/rules.md#base), [debt](Documents/legal/rules.md#debt).
+**Podstawy:** [payer](Documents/legal/rules.md#payer), [insured-parent](Documents/legal/rules.md#insured-parent).
 
-**Parametry:** wymagają uzupełnienia przed wdrożeniem.
+**Parametry:** `payer_threshold_insured`.
 
 **Combo:** Kompletna teczka; partnerzy: [3D](#3d); warunek `docs_complete`; bonus mnożnika `0.50` po sprawdzeniu rzeczywistego planu.
-
-**Warunek wdrożenia:** Wymaga nowych parametrów rehabilitacyjnego i waloryzacji; blokada uruchomienia do ich dodania.
 
 <a id="1e"></a>
 ### 1E · Sprawdź podstawę zasiłku

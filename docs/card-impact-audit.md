@@ -60,19 +60,19 @@ Wskaźnik czasu w tym podglądzie opisuje dostępność rodzica w wskazanej alte
 
 **Podstawy:** [sick-right](../Documents/legal/rules.md#sick-right), [sick-money](../Documents/legal/rules.md#sick-money), [sick-docs](../Documents/legal/rules.md#sick-docs), [base](../Documents/legal/rules.md#base), [debt](../Documents/legal/rules.md#debt).
 
-## 1D · Pomost rehabilitacyjny
+## 1D · Kto wypłaca świadczenie?
 
-**Porównanie:** Złożenie wniosku o rehabilitacyjne zamiast pozostawienia sprawy bez wniosku; decyzji jeszcze nie ma.
+**Porównanie:** Sprawdzenie, kto wypłaca należne świadczenie i jakie dane przygotować, zamiast pozostawienia płatnika nieustalonego.
 
-**Okres:** Etap wnioskowania.
+**Okres:** Przygotowanie przed złożeniem wniosku.
 
-**Pieniądze — bez zmiany:** Sam wniosek nie zwiększa potwierdzonego dochodu. Świadczenie można uwzględnić dopiero po przyznaniu, z właściwą waloryzacją podstawy.
+**Pieniądze — bez zmiany:** Ustalenie płatnika nie zmienia podstawy, stawki ani prawa do zasiłku.
 
-**Czas — bez zmiany:** Dalsza niezdolność jest faktem medycznym; karta nie oznacza sprawności do osobistej opieki.
+**Czas — bez zmiany:** Informacja organizacyjna nie tworzy bloku urlopu ani dni opieki.
 
-**Później:** Po przyznaniu możliwa wypłata za ustalony okres; sam złożony wniosek jej nie gwarantuje.
+**Później:** Dokumenty kieruje się do właściwego płatnika; prawo i wysokość świadczenia wymagają odrębnego sprawdzenia.
 
-**Podstawy:** [rehab](../Documents/legal/rules.md#rehab), [base](../Documents/legal/rules.md#base), [debt](../Documents/legal/rules.md#debt).
+**Podstawy:** [payer](../Documents/legal/rules.md#payer), [insured-parent](../Documents/legal/rules.md#insured-parent).
 
 ## 1E · Sprawdź podstawę zasiłku
 

@@ -70,8 +70,6 @@ def apply_card(plan: Plan, card: dict, p: Params, choices: dict, facts: dict, re
         raise Unavailable("Ta rodzina oczekuje narodzin; karta dotyczy adopcji lub pieczy.", "KP art. 183")
     if card_id == "1C" and not facts.get("sick_verified"):
         raise Unavailable("W tym scenariuszu nie ma stwierdzonej niezdolności do pracy ani e-ZLA.", "art. 6, 11")
-    if card_id == "1D":
-        raise Unavailable("Brak wyczerpanego okresu chorobowego i przesłanek rehabilitacji w tej historii.", "art. 18")
     if card_id in {"2D", "2E"} and not plan.family.hospitalization:
         raise Unavailable("W tej historii nie ma kwalifikującej hospitalizacji dziecka.", "KP art. 180^2")
     if card_id == "3E" and not plan.family.za_zyciem:

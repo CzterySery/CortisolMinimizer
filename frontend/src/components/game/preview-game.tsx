@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Card, GamePreview } from "@/types/game";
 import { api, type S } from "@/lib/api";
 import { GameBoard } from "./game-board";
@@ -31,7 +31,7 @@ function draw(pool: Card[], count: number): Card[] {
 // Authoritative replay: send every selected decision; the server recomputes a single plan.
 export function PreviewGame({ preview }: { preview: GamePreview }) {
   const [played, setPlayed] = useState<Card[]>([]);
-  const [hand, setHand] = useState(preview.rounds[0].cards.slice(0, preview.hand_size));
+  const [hand, setHand] = useState<Card[]>([]);
   const [scenario, setScenario] = useState<Scenario>("standard");
   const [simulation, setSimulation] = useState<Simulation>();
   const [mode, setMode] = useState(modes[0]);
@@ -51,16 +51,16 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
     return response.data;
   }
 
-  function installHand(data: Simulation, index: number) {
+  const installHand = useCallback((data: Simulation, index: number) => {
     const pool = preview.rounds[index]?.cards ?? [];
-    const next = draw(pool, preview.hand_size);
-    // Always deal at least one feasible path. Keep unavailable cards inspectable for learning.
-    if (next.length && !next.some((card) => data.candidates.find((item) => item.id === card.id)?.available)) {
-      const available = pool.find((card) => data.candidates.find((item) => item.id === card.id)?.available);
-      if (available) next[0] = available;
-    }
+    // Pregnancy is the orientation round: deal only verified routes. Medical/adoption cards
+    // remain available in their matching stories and in the full library.
+    const options = index === 0
+      ? pool.filter((card) => data.candidates.some((item) => item.id === card.id && item.available))
+      : pool;
+    const next = draw(options, preview.hand_size);
     setHand(next);
-  }
+  }, [preview]);
 
   async function restart(nextScenario: Scenario = scenario) {
     const current = ++generation.current;
@@ -77,10 +77,10 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
 
   useEffect(() => {
     let cancelled = false;
-    load([], "standard").then((data) => { if (!cancelled) { setSimulation(data); setBusy(false); } })
+    load([], "standard").then((data) => { if (!cancelled) { setSimulation(data); installHand(data, 0); setBusy(false); } })
       .catch(() => { if (!cancelled) { setError("Nie można połączyć się z kalkulatorem. Użyj przycisku Nowe rozdanie."); setBusy(false); } });
     return () => { cancelled = true; };
-  }, []);
+  }, [installHand]);
 
   async function play(cardId: string) {
     const card = hand.find((item) => item.id === cardId);

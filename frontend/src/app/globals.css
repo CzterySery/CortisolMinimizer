@@ -304,8 +304,9 @@ dialog::backdrop { background: #18312788; }
 
 /* The hand and balance share a row; the table keeps the full width above them. */
 .game-layout { display: block; }
-.hand-and-balance { display: grid; grid-template-columns: minmax(0, 1fr) 160px; gap: 30px; align-items: center; }
-.hand-and-balance .statistics { min-width: 0; margin: 0; padding: 0 0 0 18px; border-left: 1px solid var(--line); }
+.hand-and-balance { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 30px; align-items: center; }
+.hand-and-balance .statistics { min-width: 0; grid-column: 1; grid-row: 1; margin: 0; padding: 0 18px 0 0; border-right: 1px solid var(--line); }
+.hand-and-balance .hand { grid-column: 2; grid-row: 1; }
 .hand-and-balance .statistics > .eyebrow { margin-bottom: 25px; }
 .hand-and-balance .stat { margin-bottom: 27px; }
 .hand-and-balance .stat:last-child { margin-bottom: 0; }
@@ -343,7 +344,7 @@ dialog::backdrop { background: #18312788; }
 .game-plan-details > summary { cursor: pointer; color: var(--green); }
 .game-plan-details .budget-chart { margin-top: 20px; position: relative; }
 .game-plan-details .care-lanes { position: relative; }
-@media (max-width: 1100px) { .hand-and-balance { grid-template-columns: minmax(0, 1fr) 135px; gap: 20px; } .hand-and-balance .statistics { padding-left: 12px; } }
-@media (max-width: 800px) { .hand-and-balance { grid-template-columns: minmax(0, 1fr); gap: 24px; } .hand-and-balance .statistics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px 0 0; border-left: 0; border-top: 1px solid var(--line); } .hand-and-balance .statistics > .eyebrow { grid-column: 1 / -1; margin: 0; } .hand-and-balance .stat { margin: 0; } }
+@media (max-width: 1100px) { .hand-and-balance { grid-template-columns: 135px minmax(0, 1fr); gap: 20px; } .hand-and-balance .statistics { padding-right: 12px; } }
+@media (max-width: 800px) { .hand-and-balance { grid-template-columns: minmax(0, 1fr); gap: 24px; } .hand-and-balance .statistics { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px 0 0; border: 0; border-top: 1px solid var(--line); } .hand-and-balance .hand { grid-column: 1; grid-row: 1; } .hand-and-balance .statistics > .eyebrow { grid-column: 1 / -1; margin: 0; } .hand-and-balance .stat { margin: 0; } }
 @media (max-width: 560px) { .hand .card-0 { transform: rotate(-1.5deg); } .hand .card-2 { transform: rotate(1.5deg); } .round-slot.occupied { min-height: 125px; } .card-artwork.artwork-compact { width: 34px; height: 34px; } .artwork-compact svg { width: 29px; height: 29px; } }
 @media (prefers-reduced-motion: reduce) { .hand-and-balance .stat-track span { transition: none; } }

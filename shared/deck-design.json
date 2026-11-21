@@ -444,37 +444,24 @@
     {
       "id": "1D",
       "round_id": 1,
-      "title": "Pomost rehabilitacyjny",
-      "description": "Przygotuj sprawę o rehabilitacyjne, gdy chorobowe się wyczerpuje.",
-      "conditions": "Dalsza niezdolność i rokowanie wynikają ze scenariusza; wykluczenia ustawowe sprawdzone. Złożenie wniosku nie oznacza przyznania.",
+      "title": "Kto wypłaca świadczenie?",
+      "description": "Sprawdź, kto będzie płatnikiem zasiłku i jakie dane trzeba przygotować.",
+      "conditions": "Dostępna od początku w każdej historii. Płatnik zależy od tytułu ubezpieczenia i liczby ubezpieczonych; samo sprawdzenie nie oznacza przyznania świadczenia.",
       "effects": [
         {
           "op": "set_flag",
-          "name": "rehab_application",
-          "value": "pending"
-        },
-        {
-          "op": "mark_docs",
-          "bundle": "rehab",
-          "only_if": "facts.documents_available"
-        },
-        {
-          "op": "add_block",
-          "who": "mother",
-          "kind": "rehab",
-          "start": "after:sick:mother",
-          "days": "facts.rehab.awarded_days",
-          "only_if": "facts.rehab.decision_granted"
+          "name": "payer_checked",
+          "value": true
         }
       ],
       "stats": {
         "money": {
           "kind": "derived",
-          "explanation": "Pokaż prognozę warunkową oddzielnie; do pewnego budżetu wlicz dopiero przyznany okres i właściwie zwaloryzowaną podstawę."
+          "explanation": "Samo ustalenie płatnika nie zwiększa kwoty ani nie tworzy uprawnienia."
         },
         "time": {
           "kind": "derived",
-          "explanation": "Okres leczenia nie oznacza zdolności do osobistej opieki; brak fikcyjnych dodatkowych dni opieki."
+          "explanation": "Bez zmiany urlopu i dostępnych dni; to informacja organizacyjna."
         },
         "happiness": {
           "kind": "game_balance",
@@ -485,16 +472,16 @@
         "chips": 10
       },
       "tags": [
-        "health",
-        "documents",
-        "continuity"
+        "preparation",
+        "documents"
       ],
       "legal_rule_ids": [
-        "rehab",
-        "base",
-        "debt"
+        "payer",
+        "insured-parent"
       ],
-      "parameter_refs": [],
+      "parameter_refs": [
+        "payer_threshold_insured"
+      ],
       "combo": {
         "with": [
           "3D"
@@ -503,16 +490,15 @@
         "check": "docs_complete",
         "mult": "0.50"
       },
-      "notes": "Wymaga nowych parametrów rehabilitacyjnego i waloryzacji; blokada uruchomienia do ich dodania.",
+      "notes": "",
       "claims": [
         {
           "id": "1D.description",
           "field": "description",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "rehab",
-            "base",
-            "debt"
+            "payer",
+            "insured-parent"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -521,9 +507,8 @@
           "field": "conditions",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "rehab",
-            "base",
-            "debt"
+            "payer",
+            "insured-parent"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -532,9 +517,8 @@
           "field": "stats.money",
           "kind": "derived",
           "rule_ids": [
-            "rehab",
-            "base",
-            "debt"
+            "payer",
+            "insured-parent"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -543,11 +527,19 @@
           "field": "stats.time",
           "kind": "derived",
           "rule_ids": [
-            "rehab",
-            "base",
-            "debt"
+            "payer",
+            "insured-parent"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1D.param.payer_threshold_insured",
+          "field": "parameter:payer_threshold_insured",
+          "kind": "legal_parameter",
+          "parameter_ref": "payer_threshold_insured",
+          "rule_ids": [
+            "payer"
+          ]
         },
         {
           "id": "1D.happiness",
