@@ -3,6 +3,7 @@ TEST_DATABASE_URL=postgresql://zp:zp@localhost:5432/zp uv run pytest -m integrat
 Each test runs in a fresh `zp_test` schema, so pointing at the dev database leaves its tables alone."""
 import json
 import os
+from datetime import date
 
 import psycopg
 import pytest
@@ -31,8 +32,10 @@ def test_schema(monkeypatch):
 
 def test_init_seeds_once():
     repositories.init()  # second startup must not add a version
-    assert [v["version"] for v in repositories.list_config("params")] == [1]
+    assert [v["version"] for v in repositories.list_config("params")] == [-3, -2, -1, 1]  # history + current
     assert str(params.active().rates.parental) == SEED["rates"]["parental"]
+    assert str(params.active(date(2025, 6, 1)).min_wage) == "4666.00"  # a 2025 case uses 2025 figures
+    assert str(params.active(date(2024, 3, 1)).min_wage) == "4242.00"
 
 
 def test_init_refreshes_seed_version():
@@ -50,7 +53,7 @@ def test_versions_and_effective_dates():
     assert repositories.get_config("params", "2027-01-01")["rates"]["parental"] == "0.75"  # future one not in force yet
     assert repositories.get_config("params", "2099-06-01")["rates"]["parental"] == "0.80"
     with pytest.raises(LookupError):
-        repositories.get_config("params", "2000-01-01")
+        repositories.get_config("params", "2000-01-01")  # before the oldest seeded year
 
 
 def test_admin_params_roundtrip(monkeypatch):
@@ -64,7 +67,7 @@ def test_admin_params_roundtrip(monkeypatch):
         assert client.get("/api/v1/admin/params", headers=AUTH).json()["rates"]["parental"] == "0.75"
         del current["rates"]
         assert client.put("/api/v1/admin/params", json=current, headers=AUTH).status_code == 422
-        assert len(client.get("/api/v1/admin/params/versions", headers=AUTH).json()) == 2
+        assert [v["version"] for v in client.get("/api/v1/admin/params/versions", headers=AUTH).json()][-2:] == [1, 2]
 
 
 def test_submissions_are_listed_per_persona():

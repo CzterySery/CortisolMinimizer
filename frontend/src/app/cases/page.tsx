@@ -2,45 +2,120 @@
 
 import { useEffect, useState } from "react";
 import { api, type S } from "@/lib/api";
+import { month, pln } from "@/lib/format";
+import { whoLabel } from "@/lib/labels";
 import { ApiResult } from "@/components/api-result";
+import { BlocksEditor } from "@/components/forms/blocks-editor";
+import { FamilyForm } from "@/components/forms/family-form";
 import { PageHeader } from "@/components/page-header";
+import { PlanTimeline } from "@/components/plan/plan-timeline";
 
-// Jury flow: upload a ZUS form PDF (or pick a sample) -> review extracted fields -> verdict + amounts.
+type Sample = S["SampleCase"];
+const blank: S["Plan-Input"] = {
+  family: { mother: { employment: "employee" }, due_date: "2026-09-20" },
+  blocks: [{ who: "mother", kind: "maternity", start: "2026-09-20", days: 140 }],
+};
+
+// Jury flow: pick one of the transcribed ZUS sample cases or upload its PDF (recognized by hash), or type the data
+// from any case by hand. The verdict comes from the same calculator and rules as everything else.
 export default function Cases() {
-  const [samples, setSamples] = useState<S["CaseInput-Output"][]>();
-  const [out, setOut] = useState<{ data?: unknown; error?: unknown }>({});
+  const [samples, setSamples] = useState<Sample[]>([]);
+  const [sample, setSample] = useState<Sample>();
+  const [manual, setManual] = useState<S["Plan-Input"]>();
+  const [verdict, setVerdict] = useState<S["CaseVerdict"]>();
+  const [message, setMessage] = useState<string>();
+  const [error, setError] = useState<unknown>();
 
   useEffect(() => {
-    api.GET("/api/v1/cases/samples").then(({ data, error }) => (error ? setOut({ error }) : setSamples(data)));
+    api.GET("/api/v1/cases/samples").then(({ data, error }) => (error ? setError(error) : setSamples(data)));
   }, []);
 
+  const evaluate = async (plan: S["Plan-Input"], picked?: Sample) => {
+    setSample(picked); setVerdict(undefined); setError(undefined);
+    const { data, error } = await api.POST("/api/v1/cases/evaluate", { body: { plan } });
+    if (error) setError(error); else setVerdict(data);
+  };
+
   const upload = async (file: File) => {
+    setVerdict(undefined); setSample(undefined); setError(undefined);
     const { data, error } = await api.POST("/api/v1/cases/parse", {
       body: { file: file as unknown as string }, // generated type says string for binary; the serializer sends the File
       bodySerializer: (b) => { const fd = new FormData(); fd.append("file", b.file); return fd; },
     });
-    setOut({ data, error });
+    if (error) return setError(error);
+    setMessage(data.message);
+    if (data.sample) { setManual(undefined); void evaluate(data.sample.plan as S["Plan-Input"], data.sample); }
+    else setManual(blank);
   };
-
-  const evaluate = async (body: S["CaseInput-Input"]) => setOut(await api.POST("/api/v1/cases/evaluate", { body }));
 
   return (
     <main className="page">
       <PageHeader eyebrow="Sprawdź sprawę" title="Masz już dokumenty?" accent="Sprawdźmy je.">
-        Wgraj formularz (Z-3, Z-3a, ZAM, ZAS-53) albo wybierz przykład. Pokażemy, czy jest ubezpieczenie i ile wyniesie zasiłek.
+        Wybierz przykładową sprawę ZUS albo wgraj jej PDF. Inną sprawę wpiszesz ręcznie: aplikacja nie czyta skanów (bez OCR i bez AI).
       </PageHeader>
       <div className="stack">
-        <label className="dropzone">
-          <span>Wybierz plik PDF</span>
-          <input type="file" accept="application/pdf" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
-        </label>
-        {samples && samples.length > 0 && (
-          <div className="actions">
-            {samples.map((s, i) => <button key={i} className="button" onClick={() => evaluate(s)}>Przykład {i + 1}: {s.event}, {s.event_date}</button>)}
-          </div>
-        )}
-        {(out.data || out.error) ? <ApiResult {...out} /> : null}
+        <section className="choice-grid" aria-label="Przykładowe sprawy ZUS">
+          {samples.map((s) => (
+            <button key={s.id} className="choice" onClick={() => { setManual(undefined); setMessage(undefined); void evaluate(s.plan as S["Plan-Input"], s); }}>
+              <strong>{s.title}</strong><span>{s.source}</span>
+            </button>
+          ))}
+        </section>
+        <div className="actions">
+          <label className="dropzone">
+            <span>Wgraj PDF sprawy</span>
+            <input type="file" accept="application/pdf" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
+          </label>
+          <button className="button button-dashed" onClick={() => { setManual(blank); setSample(undefined); setVerdict(undefined); setMessage(undefined); }}>Wpisz dane ręcznie</button>
+        </div>
+        {message && <p className="notice">{message}</p>}
+        {manual && <div className="stack">
+          <FamilyForm value={manual.family} onChange={(family) => setManual({ ...manual, family })} />
+          <fieldset className="form-section">
+            <legend>Wysokość zasiłku</legend>
+            <label className="field-check"><input type="radio" name="case-rate" checked={manual.rate_variant !== "averaged"} onChange={() => setManual({ ...manual, rate_variant: "standard" })} /> 100% / 70%</label>
+            <label className="field-check"><input type="radio" name="case-rate" checked={manual.rate_variant === "averaged"} onChange={() => setManual({ ...manual, rate_variant: "averaged" })} /> 81,5%</label>
+          </fieldset>
+          <BlocksEditor value={manual.blocks ?? []} onChange={(blocks) => setManual({ ...manual, blocks })} />
+          <div className="actions"><button className="button button-primary" onClick={() => evaluate(manual)}>Sprawdź sprawę</button></div>
+        </div>}
+        {error ? <ApiResult error={error} /> : null}
+        {verdict && <Verdict verdict={verdict} sample={sample} />}
       </div>
     </main>
+  );
+}
+
+function Verdict({ verdict, sample }: { verdict: S["CaseVerdict"]; sample?: Sample }) {
+  const yes = (ok: boolean, good: string, bad: string) => <li className={ok ? "done" : "error"}>{ok ? good : bad}</li>;
+  return (
+    <section className="stack" aria-live="polite">
+      <section className="panel">
+        <h2 className="eyebrow">Wynik</h2>
+        <ul className="docs">
+          {yes(verdict.insured, "Ubezpieczenie chorobowe: jest", "Ubezpieczenie chorobowe: brak")}
+          {yes(verdict.waiting_period_ok, "Okres wyczekiwania: spełniony", "Okres wyczekiwania: niespełniony")}
+          {yes(!verdict.debt_block, "Zadłużenie składkowe: nie blokuje", "Zadłużenie składkowe: blokuje zasiłki")}
+          {yes(verdict.entitled, "Prawo do zasiłku: tak", "Prawo do zasiłku: nie (szczegóły w „Ryzyka i uwagi”)")}
+        </ul>
+        {sample && <>
+          <p><strong>Decyzja ZUS:</strong> {sample.zus_outcome} {sample.zus_entitled === verdict.entitled ? "Wynik kalkulatora jest zgodny." : "Wynik kalkulatora jest inny."}</p>
+          {sample.granted.map((g) => (
+            <div key={g.who} className="table-scroll"><table className="data-table">
+              <thead><tr><th>{whoLabel[g.who]}</th><th>ZUS</th><th>Kalkulator</th></tr></thead>
+              <tbody>
+                {g.base && <tr><td>Podstawa wymiaru</td><td>{pln(g.base)}</td><td>{pln(verdict.result.bases[g.who] ?? 0)}</td></tr>}
+                {Object.entries(g.months).map(([m, amount]) => <tr key={m}>
+                  <td>Wypłata za {month(m)}</td><td>{pln(amount)}</td>
+                  <td>{pln(verdict.result.months.find((row) => row.month === m)?.benefit[g.who] ?? 0)}</td>
+                </tr>)}
+              </tbody>
+            </table></div>
+          ))}
+          {sample.note && <p className="muted">{sample.note}</p>}
+        </>}
+      </section>
+      <PlanTimeline result={verdict.result} />
+    </section>
   );
 }

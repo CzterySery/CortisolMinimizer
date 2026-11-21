@@ -180,6 +180,7 @@ cite { font-style: normal; color: var(--muted-strong); font-size: 11px; }
 .docs li { padding: 8px 0 8px 26px; border-bottom: 1px solid #edf0e9; position: relative; }
 .docs li::before { content: "○"; position: absolute; left: 4px; color: #9aab87; }
 .docs li.done::before { content: "✓"; color: var(--green); }
+.docs li.error::before { content: "✕"; color: var(--alert); }
 .docs small { display: block; margin-top: 2px; color: var(--muted-strong); }
 .issues li.error strong { color: var(--alert); }
 .score-lines { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.9; }

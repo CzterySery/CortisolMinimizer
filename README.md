@@ -102,8 +102,9 @@ Wszystkie endpointy są pod `/api/v1`, a pełna lista jest w `/docs`. Działają
 | POST | `/api/v1/applications`, `/api/v1/usc/birth-certificate`, `/api/v1/pue/messages` | symulowane wysłanie wniosku, wniosek o odpis aktu urodzenia, pytanie do ZUS (gotowe odpowiedzi) |
 | GET/PUT | `/api/v1/admin/params` (+ `/versions`) | parametry prawne, każda zmiana to nowa wersja (nagłówek `Authorization: Bearer $ADMIN_TOKEN`) |
 | GET | `/api/v1/admin/submissions` | wszystko, co wysłano przez symulowane kanały |
+| GET/POST | `/api/v1/cases/samples`, `/api/v1/cases/parse`, `/api/v1/cases/evaluate` | przykładowe sprawy ZUS (same liczby), rozpoznanie wgranego PDF po skrócie SHA-256, ocena sprawy kalkulatorem |
 
-Pozostałe (sprawdzanie spraw z PDF) mają gotowy kontrakt i zwracają `501` do czasu implementacji.
+Przykładowe sprawy ZUS to skany bez warstwy tekstowej. Aplikacja ich nie odczytuje (nie używa OCR ani AI): rozpoznaje wgrany plik przykładowej sprawy po skrócie, a inną sprawę wpisuje się ręcznie. Same dokumenty spraw są tylko lokalnie (`Documents/Sprawy `, poza repozytorium).
 
 ## Karty i późniejsza baza
 
