@@ -303,6 +303,8 @@ class SampleCase(CaseInput):
 
 class ParseResult(Model):
     sample: SampleCase | None  # the upload is one of the ZUS sample bundles, recognized by its SHA-256
+    extracted: CaseInput | None = None  # read from the scan by the vision model; the user reviews it before trusting it
+    sha256: str | None = None  # of a non-sample upload; POST /cases/evaluate?upload= stores the user's corrections
     needs_manual_entry: bool
     message: str
 

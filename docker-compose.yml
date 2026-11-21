@@ -19,6 +19,7 @@ services:
   backend:
     build: { context: ., dockerfile: backend/Dockerfile }
     ports: ["8000:8000"]
+    env_file: [{ path: backend/.env, required: false }]  # e.g. GEMINI_API_KEY; `environment` below wins over it
     environment:
       ADMIN_TOKEN: ${ADMIN_TOKEN:-dev}
       DATABASE_URL: postgresql://otwartekarty:${POSTGRES_PASSWORD:-otwartekarty}@db:5432/otwartekarty
@@ -29,6 +30,7 @@ services:
   frontend:
     build: { context: ., dockerfile: frontend/Dockerfile }
     ports: ["3000:3000"]
+    env_file: [{ path: frontend/.env, required: false }]  # `environment` below wins over it
     environment:
       API_URL: http://backend:8000  # server-side only (Next proxy); runtime, so no rebuild per environment
     depends_on: [backend]

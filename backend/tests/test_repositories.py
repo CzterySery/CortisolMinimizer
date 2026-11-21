@@ -79,3 +79,15 @@ def test_submissions_are_listed_per_persona():
     assert [r["id"] for r in rows] == [second, first] and rows[1]["payload"]["form"] == "ZAM"
     assert repositories.list_submissions("magda") == []
     assert [r["kind"] for r in repositories.list_submissions()] == ["usc", "pue", "application"]  # admin: all
+
+
+def test_uploads_store_hash_and_reading():
+    assert repositories.upload_seen("abc") is None  # first sight: hash recorded, nothing read yet
+    assert repositories.upload_seen("abc") is None  # seen again, still unread (e.g. model off): read it then
+    repositories.save_reading("abc", {"title": "Zasiłek macierzyński"})
+    assert repositories.upload_seen("abc") == {"title": "Zasiłek macierzyński"}
+    repositories.save_reading("abc", {"title": "Poprawione"})  # the user's correction replaces the reading
+    assert repositories.upload_seen("abc") == {"title": "Poprawione"}
+    repositories.save_reading("never-uploaded", {"title": "x"})  # a correction cannot create a row
+    with repositories.db() as c:
+        assert c.execute("SELECT count(*) AS n FROM uploads").fetchone()["n"] == 1

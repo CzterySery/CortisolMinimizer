@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/page-header";
 import { PlanTimeline } from "@/components/plan/plan-timeline";
 
 type Sample = S["SampleCase"];
+type Uploaded = { sha256: string; title: string };
 const blank: S["Plan-Input"] = {
   family: { mother: { employment: "employee" }, due_date: "2026-09-20" },
   blocks: [{ who: "mother", kind: "maternity", start: "2026-09-20", days: 140 }],
@@ -22,6 +23,7 @@ export default function Cases() {
   const [samples, setSamples] = useState<Sample[]>([]);
   const [sample, setSample] = useState<Sample>();
   const [manual, setManual] = useState<S["Plan-Input"]>();
+  const [uploaded, setUploaded] = useState<Uploaded>(); // the uploaded PDF the manual form was read from
   const [verdict, setVerdict] = useState<S["CaseVerdict"]>();
   const [message, setMessage] = useState<string>();
   const [error, setError] = useState<unknown>();
@@ -30,33 +32,39 @@ export default function Cases() {
     api.GET("/api/v1/cases/samples").then(({ data, error }) => (error ? setError(error) : setSamples(data)));
   }, []);
 
-  const evaluate = async (plan: S["Plan-Input"], picked?: Sample) => {
+  // with `from`, the backend stores the checked (possibly corrected) case as that file's reading
+  const evaluate = async (plan: S["Plan-Input"], picked?: Sample, from?: Uploaded) => {
     setSample(picked); setVerdict(undefined); setError(undefined);
-    const { data, error } = await api.POST("/api/v1/cases/evaluate", { body: { plan } });
+    const { data, error } = await api.POST("/api/v1/cases/evaluate", {
+      body: { plan, title: from?.title }, params: { query: { upload: from?.sha256 } },
+    });
     if (error) setError(error); else setVerdict(data);
   };
 
   const upload = async (file: File) => {
-    setVerdict(undefined); setSample(undefined); setError(undefined);
+    setVerdict(undefined); setSample(undefined); setError(undefined); setManual(undefined); setUploaded(undefined);
+    setMessage("Odczytujemy plik… Skan bez warstwy tekstowej czyta model AI, co może potrwać kilka minut.");
     const { data, error } = await api.POST("/api/v1/cases/parse", {
       body: { file: file as unknown as string }, // generated type says string for binary; the serializer sends the File
       bodySerializer: (b) => { const fd = new FormData(); fd.append("file", b.file); return fd; },
     });
-    if (error) return setError(error);
+    if (error) { setMessage(undefined); return setError(error); }
     setMessage(data.message);
-    if (data.sample) { setManual(undefined); void evaluate(data.sample.plan as S["Plan-Input"], data.sample); }
+    if (data.sha256) setUploaded({ sha256: data.sha256, title: data.extracted?.title ?? "" });
+    if (data.sample) void evaluate(data.sample.plan as S["Plan-Input"], data.sample);
+    else if (data.extracted) { setManual(data.extracted.plan as S["Plan-Input"]); void evaluate(data.extracted.plan as S["Plan-Input"]); }
     else setManual(blank);
   };
 
   return (
     <main className="page">
       <PageHeader eyebrow="Sprawdź sprawę" title="Masz już dokumenty?" accent="Sprawdźmy je.">
-        Wybierz przykładową sprawę ZUS albo wgraj jej PDF. Inną sprawę wpiszesz ręcznie: aplikacja nie czyta skanów (bez OCR i bez AI).
+        Wybierz przykładową sprawę ZUS albo wgraj PDF sprawy. Skan odczyta model AI (Google Gemini), a odczytane dane sprawdzisz i poprawisz w formularzu. Prawo do zasiłku i kwoty liczy kalkulator, nie model.
       </PageHeader>
       <div className="stack">
         <section className="choice-grid" aria-label="Przykładowe sprawy ZUS">
           {samples.map((s) => (
-            <button key={s.id} className="choice" onClick={() => { setManual(undefined); setMessage(undefined); void evaluate(s.plan as S["Plan-Input"], s); }}>
+            <button key={s.id} className="choice" onClick={() => { setManual(undefined); setUploaded(undefined); setMessage(undefined); void evaluate(s.plan as S["Plan-Input"], s); }}>
               <strong>{s.title}</strong><span>{s.source}</span>
             </button>
           ))}
@@ -66,9 +74,9 @@ export default function Cases() {
             <span>Wgraj PDF sprawy</span>
             <input type="file" accept="application/pdf" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
           </label>
-          <button className="button button-dashed" onClick={() => { setManual(blank); setSample(undefined); setVerdict(undefined); setMessage(undefined); }}>Wpisz dane ręcznie</button>
+          <button className="button button-dashed" onClick={() => { setManual(blank); setUploaded(undefined); setSample(undefined); setVerdict(undefined); setMessage(undefined); }}>Wpisz dane ręcznie</button>
         </div>
-        {message && <p className="notice">{message}</p>}
+        {message && <p className="notice" role="status">{message}</p>}
         {manual && <div className="stack">
           <FamilyForm value={manual.family} onChange={(family) => setManual({ ...manual, family })} />
           <fieldset className="form-section">
@@ -77,7 +85,8 @@ export default function Cases() {
             <label className="field-check"><input type="radio" name="case-rate" checked={manual.rate_variant === "averaged"} onChange={() => setManual({ ...manual, rate_variant: "averaged" })} /> 81,5%</label>
           </fieldset>
           <BlocksEditor value={manual.blocks ?? []} onChange={(blocks) => setManual({ ...manual, blocks })} />
-          <div className="actions"><button className="button button-primary" onClick={() => evaluate(manual)}>Sprawdź sprawę</button></div>
+          {uploaded && <p className="muted">Po sprawdzeniu zapiszemy te dane (z Twoimi poprawkami) dla wgranego pliku: po ponownym wgraniu wrócą w tej postaci.</p>}
+          <div className="actions"><button className="button button-primary" onClick={() => evaluate(manual, undefined, uploaded)}>Sprawdź sprawę</button></div>
         </div>}
         {error ? <ApiResult error={error} /> : null}
         {verdict && <Verdict verdict={verdict} sample={sample} />}

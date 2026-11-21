@@ -67,7 +67,8 @@ Backend, z katalogu `backend/` (wariant z [uv](https://docs.astral.sh/uv/)):
 
 ```sh
 uv sync --extra dev
-ADMIN_TOKEN=dev uv run uvicorn app.main:app --reload --port 8000
+cp -n .env.example .env  # ustawienia opcjonalne, np. GEMINI_API_KEY; .env jest w .gitignore
+ADMIN_TOKEN=dev uv run uvicorn app.main:app --reload --port 8000 --env-file .env
 ```
 
 Bez uv, z katalogu głównego:
@@ -75,7 +76,7 @@ Bez uv, z katalogu głównego:
 ```sh
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e './backend[dev]'
-cd backend && ADMIN_TOKEN=dev uvicorn app.main:app --reload --port 8000
+cd backend && cp -n .env.example .env && ADMIN_TOKEN=dev uvicorn app.main:app --reload --port 8000 --env-file .env
 ```
 
 Dokumentacja API: http://127.0.0.1:8000/docs
@@ -88,7 +89,7 @@ npm install
 npm run dev
 ```
 
-Plansza: http://localhost:3000. Ilustracje i opisy korzystają z [talii 30 kart](shared/deck-design.json), a wyliczenia z API. `npm run dev` i `npm run build` przygotowują publiczne dokumenty źródłowe. Żeby plansza i pozostałe strony rozmawiały z FastAPI, utwórz `frontend/.env.local`:
+Plansza: http://localhost:3000. Ilustracje i opisy korzystają z [talii 30 kart](shared/deck-design.json), a wyliczenia z API. `npm run dev` i `npm run build` przygotowują publiczne dokumenty źródłowe. Żeby plansza i pozostałe strony rozmawiały z FastAPI, utwórz `frontend/.env` (wzór: [frontend/.env.example](frontend/.env.example)):
 
 ```dotenv
 API_URL=http://127.0.0.1:8000
@@ -127,9 +128,9 @@ Wszystkie endpointy są pod `/api/v1`, a pełna lista jest w `/docs`. Działają
 | POST | `/api/v1/applications`, `/api/v1/usc/birth-certificate`, `/api/v1/pue/messages` | symulowane wysłanie wniosku, wniosek o odpis aktu urodzenia, pytanie do ZUS (gotowe odpowiedzi) |
 | GET/PUT | `/api/v1/admin/params` (+ `/versions`) | parametry prawne, każda zmiana to nowa wersja (nagłówek `Authorization: Bearer $ADMIN_TOKEN`) |
 | GET | `/api/v1/admin/submissions` | wszystko, co wysłano przez symulowane kanały |
-| GET/POST | `/api/v1/cases/samples`, `/api/v1/cases/parse`, `/api/v1/cases/evaluate` | przykładowe sprawy ZUS (same liczby), rozpoznanie wgranego PDF po skrócie SHA-256, ocena sprawy kalkulatorem |
+| GET/POST | `/api/v1/cases/samples`, `/api/v1/cases/parse`, `/api/v1/cases/evaluate` | przykładowe sprawy ZUS (same liczby), rozpoznanie wgranego PDF po skrócie SHA-256 albo odczyt skanu modelem Gemini, ocena sprawy kalkulatorem |
 
-Przykładowe sprawy ZUS to skany bez warstwy tekstowej. Aplikacja ich nie odczytuje (nie używa OCR ani AI): rozpoznaje wgrany plik przykładowej sprawy po skrócie, a inną sprawę wpisuje się ręcznie. Same dokumenty spraw są tylko lokalnie (`Documents/Sprawy `, poza repozytorium).
+Przykładowe sprawy ZUS to skany bez warstwy tekstowej. Wgrany plik przykładowej sprawy aplikacja rozpoznaje po skrócie. Inny skan odczytuje model AI Google Gemini (`backend/app/vision.py`, `GEMINI_API_KEY`, domyślnie `GEMINI_MODEL=gemini-3.8-flash`): przepisuje fakty z dokumentów (tytuł ubezpieczenia, wynagrodzenia lub podstawy, okresy z wniosku) do formularza, który użytkownik sprawdza i poprawia. Prawo do zasiłku i kwoty liczy zawsze deterministyczny kalkulator, nie model. Bez klucza albo gdy odczyt się nie uda, sprawę wpisuje się ręcznie. Darmowy poziom Gemini może używać przesłanych danych do ulepszania usług Google, więc do prawdziwych dokumentów potrzebny jest płatny klucz. Same dokumenty spraw są tylko lokalnie (`Documents/Sprawy `, poza repozytorium).
 
 ## Karty i późniejsza baza
 

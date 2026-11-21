@@ -22,7 +22,8 @@ async function proxy(request: Request, { params }: { params: Promise<{ path: str
       headers,
       body: request.method === "GET" || request.method === "HEAD" ? undefined : await request.arrayBuffer(),
       cache: "no-store",
-      signal: AbortSignal.timeout(15000),
+      // reading a scanned case with the vision model takes up to the backend's 280 s limit
+      signal: AbortSignal.timeout(path.join("/") === "cases/parse" ? 300000 : 15000),
     });
     // Only content-type is copied: fetch already decoded the body, so content-encoding/length would lie.
     return new Response(upstream.body, {
