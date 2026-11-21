@@ -105,6 +105,7 @@ class Parent(Model):
     insured_since: date | None = None
     base_monthly: Decimal | None = None   # podstawa wymiaru; derived from salary_history when absent
     salary_history: list[MonthPay] = []
+    full_time: bool = True  # art. 45 floor when the base is computed from salary_history
     payer_insured_count: int = 0          # >threshold => employer pays benefits
     age: int = 30
     vacation_days_left: int = 26
@@ -207,8 +208,10 @@ class PlanResult(Model):
 
 class BaseRequest(Model):
     employment: Employment
-    event_date: date
-    months: list[MonthPay]
+    event_date: date  # start of the incapacity / birth; the 12-month window ends the month before
+    months: list[MonthPay] = []  # pay (employee) or declared contribution base (non-employee) per month
+    full_time: bool = True  # the minimum-wage floor (art. 45) applies to full-time employees only
+    contract_monthly: Decimal | None = None  # monthly pay from the contract, used when no full month exists (art. 37)
 
 
 class BaseResult(Model):

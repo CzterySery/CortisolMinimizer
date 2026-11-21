@@ -573,8 +573,18 @@ export interface components {
              * Format: date
              */
             event_date: string;
-            /** Months */
-            months: components["schemas"]["MonthPay-Input"][];
+            /**
+             * Months
+             * @default []
+             */
+            months?: components["schemas"]["MonthPay-Input"][];
+            /**
+             * Full Time
+             * @default true
+             */
+            full_time?: boolean;
+            /** Contract Monthly */
+            contract_monthly?: number | string | null;
         };
         /** BaseResult */
         BaseResult: {
@@ -885,6 +895,8 @@ export interface components {
         Deadlines: {
             /** Averaged Request Days After Birth */
             averaged_request_days_after_birth: number;
+            /** Parental Notice Days */
+            parental_notice_days: number;
             /** Part Time Notice Days */
             part_time_notice_days: number;
             /** Supplementary Notice Days Before Maternity End */
@@ -940,6 +952,30 @@ export interface components {
             end: string;
             /** Code B */
             code_b: boolean;
+        };
+        /**
+         * EmployeeContributions
+         * @description Contributions withheld from an employee's pay, each rounded on its own by payroll (art. 3 pkt 3).
+         */
+        "EmployeeContributions-Input": {
+            /** Pension */
+            pension: number | string;
+            /** Disability */
+            disability: number | string;
+            /** Sickness */
+            sickness: number | string;
+        };
+        /**
+         * EmployeeContributions
+         * @description Contributions withheld from an employee's pay, each rounded on its own by payroll (art. 3 pkt 3).
+         */
+        "EmployeeContributions-Output": {
+            /** Pension */
+            pension: string;
+            /** Disability */
+            disability: string;
+            /** Sickness */
+            sickness: string;
         };
         /** Explain */
         Explain: {
@@ -1204,6 +1240,7 @@ export interface components {
             effective_from: string;
             /** Contribution Deduction */
             contribution_deduction: number | string;
+            employee_contributions: components["schemas"]["EmployeeContributions-Input"];
             /** Min Wage */
             min_wage: number | string;
             /** Voluntary Base Cap */
@@ -1216,6 +1253,7 @@ export interface components {
             debt_threshold_pct_min_wage: number | string;
             rates: components["schemas"]["Rates-Input"];
             sick: components["schemas"]["Sick"];
+            rehab: components["schemas"]["Rehab"];
             maternity: components["schemas"]["Maternity"];
             parental: components["schemas"]["Parental-Input"];
             paternity: components["schemas"]["Paternity"];
@@ -1233,6 +1271,7 @@ export interface components {
             effective_from: string;
             /** Contribution Deduction */
             contribution_deduction: string;
+            employee_contributions: components["schemas"]["EmployeeContributions-Output"];
             /** Min Wage */
             min_wage: string;
             /** Voluntary Base Cap */
@@ -1245,6 +1284,7 @@ export interface components {
             debt_threshold_pct_min_wage: string;
             rates: components["schemas"]["Rates-Output"];
             sick: components["schemas"]["Sick"];
+            rehab: components["schemas"]["Rehab"];
             maternity: components["schemas"]["Maternity"];
             parental: components["schemas"]["Parental-Output"];
             paternity: components["schemas"]["Paternity"];
@@ -1274,6 +1314,11 @@ export interface components {
              * @default []
              */
             salary_history?: components["schemas"]["MonthPay-Input"][];
+            /**
+             * Full Time
+             * @default true
+             */
+            full_time?: boolean;
             /**
              * Payer Insured Count
              * @default 0
@@ -1317,6 +1362,11 @@ export interface components {
              */
             salary_history: components["schemas"]["MonthPay-Output"][];
             /**
+             * Full Time
+             * @default true
+             */
+            full_time: boolean;
+            /**
              * Payer Insured Count
              * @default 0
              */
@@ -1359,6 +1409,10 @@ export interface components {
             part_time_cap_weeks_single: number;
             /** Part Time Cap Weeks Multiple */
             part_time_cap_weeks_multiple: number;
+            /** Part Time Cap Weeks Za Zyciem Single */
+            part_time_cap_weeks_za_zyciem_single: number;
+            /** Part Time Cap Weeks Za Zyciem Multiple */
+            part_time_cap_weeks_za_zyciem_multiple: number;
         };
         /** Parental */
         "Parental-Output": {
@@ -1382,6 +1436,10 @@ export interface components {
             part_time_cap_weeks_single: number;
             /** Part Time Cap Weeks Multiple */
             part_time_cap_weeks_multiple: number;
+            /** Part Time Cap Weeks Za Zyciem Single */
+            part_time_cap_weeks_za_zyciem_single: number;
+            /** Part Time Cap Weeks Za Zyciem Multiple */
+            part_time_cap_weeks_za_zyciem_multiple: number;
         };
         /** ParseResult */
         ParseResult: {
@@ -1563,6 +1621,12 @@ export interface components {
             averaged: number | string;
             /** Care */
             care: number | string;
+            /** Rehab First Period */
+            rehab_first_period: number | string;
+            /** Rehab */
+            rehab: number | string;
+            /** Rehab Pregnancy */
+            rehab_pregnancy: number | string;
         };
         /** Rates */
         "Rates-Output": {
@@ -1584,6 +1648,19 @@ export interface components {
             averaged: string;
             /** Care */
             care: string;
+            /** Rehab First Period */
+            rehab_first_period: string;
+            /** Rehab */
+            rehab: string;
+            /** Rehab Pregnancy */
+            rehab_pregnancy: string;
+        };
+        /** Rehab */
+        Rehab: {
+            /** First Period Days */
+            first_period_days: number;
+            /** Max Months */
+            max_months: number;
         };
         /** Requirement */
         Requirement: {

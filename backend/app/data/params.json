@@ -1,6 +1,7 @@
 {
   "effective_from": "2026-01-01",
   "contribution_deduction": "0.1371",
+  "employee_contributions": {"pension": "0.0976", "disability": "0.015", "sickness": "0.0245"},
   "min_wage": "4806.00",
   "voluntary_base_cap": "20321.30",
   "parental_benefit_floor": "1000.00",
@@ -15,7 +16,14 @@
     "job_loss": "1.00",
     "parental": "0.70",
     "averaged": "0.815",
-    "care": "0.80"
+    "care": "0.80",
+    "rehab_first_period": "0.90",
+    "rehab": "0.75",
+    "rehab_pregnancy": "1.00"
+  },
+  "rehab": {
+    "first_period_days": 90,
+    "max_months": 12
   },
   "sick": {
     "employer_days": 33,
@@ -46,7 +54,9 @@
     "last_child_age_years": 6,
     "part_time_max_fraction": "0.5",
     "part_time_cap_weeks_single": 82,
-    "part_time_cap_weeks_multiple": 86
+    "part_time_cap_weeks_multiple": 86,
+    "part_time_cap_weeks_za_zyciem_single": 130,
+    "part_time_cap_weeks_za_zyciem_multiple": 134
   },
   "paternity": {
     "days": 14,
@@ -62,6 +72,7 @@
   },
   "deadlines": {
     "averaged_request_days_after_birth": 21,
+    "parental_notice_days": 21,
     "part_time_notice_days": 21,
     "supplementary_notice_days_before_maternity_end": 21
   },
