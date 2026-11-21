@@ -16,3 +16,6 @@ out/
 # ZUS sample cases: HackNation-only, must not be redistributed
 Documents/Przykładowe sprawy/
 Documents/*sprawy*/
+
+# IDE
+.idea/
