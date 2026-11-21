@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "test:cards": "node --experimental-strip-types --test tests/card-signals.test.mjs",
     "lint": "eslint .",
-    "gen:api": "openapi-typescript ${API_URL:-http://localhost:8000}/openapi.json -o src/lib/schema.d.ts --default-non-nullable false"
+    "gen:api": "openapi-typescript ${API_URL:-http://localhost:8000}/openapi.json -o src/lib/schema.d.ts --default-non-nullable false",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "next": "^16.0.0",
@@ -23,6 +24,7 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

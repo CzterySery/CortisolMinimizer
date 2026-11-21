@@ -1,0 +1,22 @@
+# Production overrides: only the frontend is published; secrets are required.
+#   POSTGRES_PASSWORD=... ADMIN_TOKEN=... SESSION_SECRET=... \
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Put TLS in front of port 3000 (a reverse proxy or the host's load balancer). The browser only talks to the
+# frontend; the backend and Postgres stay on the internal compose network.
+services:
+  db:
+    ports: !reset []
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    restart: unless-stopped
+
+  backend:
+    ports: !reset []
+    environment:
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?set ADMIN_TOKEN}
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET}
+      DATABASE_URL: postgresql://zp:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/zp
+    restart: unless-stopped
+
+  frontend:
+    restart: unless-stopped

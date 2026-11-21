@@ -21,6 +21,7 @@ export default function Applications() {
   const [account, setAccount] = useState<S["ZusAccount"]>();
   const [filed, setFiled] = useState<Set<string>>(new Set());
   const [error, setError] = useState<unknown>();
+  const [sent, setSent] = useState<string>();
   const token = userToken.get();
   const auth = token ? { Authorization: `Bearer ${token}` } : undefined;
 
@@ -47,6 +48,7 @@ export default function Applications() {
       </PageHeader>
       {!plan && <p className="muted">Najpierw <Link href="/calculator">policz swój plan w kalkulatorze</Link> albo otwórz <Link href="/me">Moje dane</Link>, a potem wybierz „Przygotuj wnioski”.</p>}
       {error ? <ApiResult error={error} /> : null}
+      {sent && <p className="notice" role="status">{sent}</p>}
       {shown && <DocsChecklist documents={shown} />}
       {todo.length > 0 && <section className="stack">
         <h2 className="eyebrow">Wypełnij i wyślij (symulacja)</h2>
@@ -54,7 +56,7 @@ export default function Applications() {
           <ApplicationForm key={`${key(d)}|${d.start}|${d.due_by}|${account?.persona.id}`} doc={d} auth={auth}
             name={account && account.persona.who === d.who ? account.persona.name : ""}
             birth={plan?.family.birth_date ?? plan?.family.due_date ?? ""}
-            onSent={() => setFiled((f) => new Set(f).add(key(d)))} />
+            onSent={(id) => { setFiled((f) => new Set(f).add(key(d))); setSent(`Wysłano (symulacja): ${d.form} → ${recipientLabel[d.recipient]}, numer ${id}.`); }} />
         ))}
       </section>}
     </main>
@@ -62,7 +64,7 @@ export default function Applications() {
 }
 
 function ApplicationForm({ doc, auth, name, birth, onSent }: {
-  doc: Doc; auth?: Record<string, string>; name: string; birth: string; onSent: () => void;
+  doc: Doc; auth?: Record<string, string>; name: string; birth: string; onSent: (id: number) => void;
 }) {
   const [fields, setFields] = useState({ name, child: "", birth, fullCopy: false, notes: doc.note });
   const [out, setOut] = useState<{ data?: unknown; error?: unknown }>({});
@@ -77,7 +79,7 @@ function ApplicationForm({ doc, auth, name, birth, onSent }: {
           form: doc.form, who: doc.who, recipient: doc.recipient,
           payload: { imie_nazwisko: fields.name, okres_od: doc.start ?? "", okres_do: doc.end ?? "", uwagi: fields.notes } } });
     setOut(result);
-    if (result.data && !(usc && fields.fullCopy)) onSent();
+    if (result.data && !(usc && fields.fullCopy)) onSent(result.data.id);
   };
 
   return (

@@ -19,3 +19,7 @@ Documents/*[Ss]prawy*/
 
 # IDE
 .idea/
+
+# Playwright output
+frontend/test-results/
+frontend/playwright-report/

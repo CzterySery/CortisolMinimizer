@@ -86,6 +86,15 @@ Oba serwisy w kontenerach, z katalogu głównego:
 docker compose up --build
 ```
 
+Produkcyjnie (publiczny jest tylko frontend na porcie 3000; TLS zapewnia reverse proxy albo load balancer hosta):
+
+```sh
+POSTGRES_PASSWORD=... ADMIN_TOKEN=... SESSION_SECRET=... \
+  docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
+
+Bez tych trzech zmiennych polecenie się nie uruchomi. Baza i backend nie mają publicznych portów.
+
 ## API
 
 Wszystkie endpointy są pod `/api/v1`, a pełna lista jest w `/docs`. Działają już:
@@ -124,8 +133,11 @@ Trwałe dane są w [repositories.py](backend/app/repositories.py): katalog kart 
 cd backend && uv run pytest && uv run ruff check app tests   # testy jednostkowe, bez bazy
 TEST_DATABASE_URL=postgresql://zp:zp@localhost:5432/zp uv run pytest -m integration   # SQL na prawdziwym PostgreSQL (schemat zp_test)
 cd frontend && npm run typecheck && npm run lint && npm run build
+cd frontend && npx playwright install chromium && npm run e2e   # ścieżka jurora na działającym stosie (docker compose up --build)
 ```
+
+`npm run e2e` przechodzi grę, kalkulator, wnioski, logowanie mObywatel, sprawdzanie sprawy, pomoc i panel admina w widoku komputera (1280 px) i telefonu (375 px). Sprawdza, że żadna strona nie wychodzi poza szerokość ekranu, i zapisuje zrzuty do [docs/screenshots](docs/screenshots/).
 
 Po zmianie modeli w `backend/app/schemas.py` (przy działającym backendzie) wygeneruj typy frontendu: `cd frontend && npm run gen:api`.
 
-Przykładowe sprawy ZUS są wyłącznie do użytku HackNation i **nie mogą trafić do repozytorium** (`.gitignore` obejmuje `Documents/Przykładowe sprawy/`).
+Przykładowe sprawy ZUS są wyłącznie do użytku HackNation i **nie mogą trafić do repozytorium** (`.gitignore` obejmuje `Documents/*[Ss]prawy*/`, a `.dockerignore` cały katalog `Documents/` poza źródłami prawnymi).

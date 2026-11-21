@@ -21,6 +21,7 @@ services:
     environment:
       ADMIN_TOKEN: ${ADMIN_TOKEN:-dev}
       DATABASE_URL: postgresql://zp:${POSTGRES_PASSWORD:-zp}@db:5432/zp
+      SESSION_SECRET: ${SESSION_SECRET:-}  # mObywatel mock tokens; empty = random per start
     depends_on:
       db: { condition: service_healthy }
 

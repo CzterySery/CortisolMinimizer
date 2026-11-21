@@ -14,7 +14,7 @@ export function PlanTimeline({ result }: { result: S["PlanResult"] }) {
   return (
     <div className="plan-grid">
       <Panel title="Kwoty zasiłków">
-        <p>{Object.entries(result.bases).map(([who, base]) => `${whoLabel[who as keyof typeof whoLabel]}: podstawa ${pln(base)}`).join(" · ")}</p>
+        <p>{Object.entries(result.bases).filter(([, base]) => Number(base) > 0).map(([who, base]) => `${whoLabel[who as keyof typeof whoLabel]}: podstawa ${pln(base)}`).join(" · ")}</p>
         <div className="table-scroll"><table className="data-table">
           <thead><tr><th>Kto</th><th>Okres</th><th>Od – do</th><th>Kwota</th></tr></thead>
           <tbody>{result.calendar.map((c, i) => <tr key={i}>
