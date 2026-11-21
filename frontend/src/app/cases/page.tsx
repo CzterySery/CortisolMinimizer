@@ -59,7 +59,7 @@ export default function Cases() {
   return (
     <main className="page">
       <PageHeader eyebrow="Sprawdź sprawę" title="Masz już dokumenty?" accent="Sprawdźmy je.">
-        Wybierz przykładową sprawę ZUS albo wgraj PDF sprawy. Skan odczyta model AI (Google Gemini), a odczytane dane sprawdzisz i poprawisz w formularzu. Prawo do zasiłku i kwoty liczy kalkulator, nie model.
+        Wybierz przykładową sprawę ZUS albo wgraj PDF sprawy. Skan odczyta model AI, a odczytane dane sprawdzisz i poprawisz w formularzu. Prawo do zasiłku i kwoty liczy kalkulator, nie model.
       </PageHeader>
       <div className="stack">
         <section className="choice-grid" aria-label="Przykładowe sprawy ZUS">

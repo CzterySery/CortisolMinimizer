@@ -1,8 +1,8 @@
 """Jury flow: pick or upload a ZUS case, then evaluate it with the same calculator and rules.
 
 The case bundles are scans without a text layer. An upload is first matched by SHA-256 against the sample cases
-transcribed into data/samples.json (numbers only). Any other bundle is read by a Gemini model (app/vision.py) when
-GEMINI_API_KEY is set, and the user reviews the extracted facts; otherwise, or if reading fails, it is typed in.
+transcribed into data/samples.json (numbers only). Any other bundle is read by the configured model (app/vision.py, app/llm.py)
+when one is set up, and the user reviews the extracted facts; otherwise, or if reading fails, it is typed in.
 Each unknown upload's hash (never the file) is stored with what the model read, so the same file is read once;
 the user's corrections replace that reading."""
 import hashlib
@@ -12,7 +12,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, UploadFile
 
-from app import repositories, vision
+from app import llm, repositories, vision
 from app.api.calc import plan as calculate
 from app.repositories import DATA
 from app.schemas import CaseInput, CaseVerdict, ParseResult, SampleCase
@@ -57,12 +57,12 @@ async def parse(file: UploadFile) -> ParseResult:
     try:
         case = await vision.read_case(data)
     except Exception:  # provider error, timeout, refusal or output outside the CaseInput contract
-        log.exception("Gemini could not read the uploaded case")
+        log.exception("The model could not read the uploaded case")
         return ParseResult(sample=None, sha256=digest, needs_manual_entry=True,
                            message=f"Model AI nie odczytał tego skanu, więc {manual}")
     repositories.save_reading(digest, case.model_dump(mode="json"))
     return ParseResult(sample=None, extracted=case, sha256=digest, needs_manual_entry=False,
-                       message=f"Dane odczytał ze skanu model AI ({vision.MODEL}): {case.title or 'sprawa'}. Sprawdź je "
+                       message=f"Dane odczytał ze skanu model AI ({llm.provider().label}): {case.title or 'sprawa'}. Sprawdź je "
                                "w formularzu i popraw błędy odczytu; prawo do zasiłku i kwoty liczy kalkulator, nie model.")
 
 

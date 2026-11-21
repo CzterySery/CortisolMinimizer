@@ -8,7 +8,7 @@ Plan projektu, konwencje i stan prac: [AGENTS.md](AGENTS.md).
 
 ```text
 przeglądarka ──/api/v1/*──▶ Next.js (frontend/, port 3000) ──API_URL──▶ FastAPI (backend/, port 8000) ──▶ PostgreSQL
-                                                                              └──▶ Gemini (tylko odczyt skanów spraw)
+                                                                              └──▶ model AI (tylko odczyt skanów spraw)
 ```
 
 - **Przeglądarka nie woła FastAPI bezpośrednio.** Strony wołają `/api/v1/...` na serwerze Next.js, a [proxy](frontend/src/app/api/v1/[...path]/route.ts) przekazuje żądanie pod `API_URL` (zmienna tylko serwerowa, czytana w czasie działania). Bez `API_URL` te żądania zwracają `503`.
@@ -16,7 +16,7 @@ przeglądarka ──/api/v1/*──▶ Next.js (frontend/, port 3000) ──API_
 - **Jeden deterministyczny kalkulator** (`backend/app/calc/`, czyste funkcje) liczy grę, kalkulator i ocenę spraw: plan rodziny = fakty + okresy (bloki), z których wynikają kwoty, kalendarz opieki, pule, dokumenty i ryzyka.
 - **Parametry prawne** (stawki, limity, terminy) są tylko w [params.json](backend/app/data/params.json) i [params-history.json](backend/app/data/params-history.json), wersjonowane w PostgreSQL i edytowalne w panelu administracyjnym.
 - **Trwałe dane** są tylko w [repositories.py](backend/app/repositories.py). Tabele `config`, `games`, `submissions` i `uploads` backend tworzy sam przy starcie; nie ma migracji.
-- **AI:** wyłącznie odczyt wgranych skanów spraw modelem Google Gemini ([vision.py](backend/app/vision.py)). Model przepisuje fakty do formularza, który użytkownik sprawdza; prawo do zasiłku i kwoty liczy kalkulator. Bez `GEMINI_API_KEY` sprawę wpisuje się ręcznie.
+- **AI:** wyłącznie odczyt wgranych skanów spraw ([vision.py](backend/app/vision.py)). Model przepisuje fakty do formularza, który użytkownik sprawdza; prawo do zasiłku i kwoty liczy kalkulator. Dostawca jest wymienny ([llm.py](backend/app/llm.py), `LLM_PROVIDER`): Google Gemini albo dowolne API zgodne z OpenAI, także model lokalny lub open-weight (Ollama, vLLM, LM Studio) i europejski (Mistral). Nowy dostawca to jedna klasa. Bez skonfigurowanego dostawcy sprawę wpisuje się ręcznie.
 
 ```text
 backend/
@@ -25,7 +25,8 @@ backend/
     schemas.py        # kontrakt API
     repositories.py   # katalog kart (JSON) + PostgreSQL
     params.py         # model parametrów prawnych
-    vision.py         # odczyt skanów spraw (Gemini)
+    vision.py         # odczyt skanów spraw: polecenie, schemat, walidacja
+    llm.py            # wymienny dostawca modelu: Gemini albo API zgodne z OpenAI
     api/              # catalog, calc, game, cases, gov_mock, info, admin
     calc/             # base, plan, rules, paperwork, family: kalkulator
     game/             # engine: odtwarzanie zagranych kart w jeden plan
@@ -55,7 +56,7 @@ Wymagane: Python 3.11+, Node.js 20.9+ z npm (22.6+ dla `npm run test:cards`), Do
 Z katalogu głównego:
 
 ```sh
-cp -n backend/.env.example backend/.env    # opcjonalnie GEMINI_API_KEY, GEMINI_MODEL
+cp -n backend/.env.example backend/.env    # opcjonalnie dostawca modelu AI (LLM_PROVIDER, GEMINI_API_KEY, LLM_BASE_URL...)
 docker compose up --build
 ```
 

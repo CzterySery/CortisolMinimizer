@@ -1,22 +1,15 @@
-"""Reads an uploaded ZUS case bundle (a scanned PDF) with a Gemini model into a CaseInput.
+"""Reads an uploaded ZUS case bundle (a scanned PDF) into a CaseInput with whichever model app/llm.py is configured for.
 
 The model only transcribes facts from the documents; entitlement and amounts still come from the deterministic
-calculator and rules (POST /cases/evaluate). Off unless GEMINI_API_KEY is set. Gemini's free tier may use inputs
-to improve Google's products, so real case documents need a paid-tier key."""
-import os
-from functools import cache
-
-from google import genai
-from google.genai import types
-
+calculator and rules (POST /cases/evaluate). Off when no provider is configured. Free tiers of hosted models may use
+inputs for training, so real case documents need a paid tier or a local model."""
+from app import llm
 from app.schemas import CaseInput
 
-MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.8-flash")
-TIMEOUT_MS = 280_000  # a 30-page scan took >150 s at default thinking; stays under the proxy's 300 s for /cases/parse
 # Constrained decoding may reject these; CaseInput.model_validate_json re-checks every constraint afterwards.
 UNSUPPORTED = {"pattern", "default", "exclusiveMinimum", "exclusiveMaximum"}
 
-PROMPT = """The PDF is one Polish ZUS benefit case: scanned, often handwritten applications (ZAM, wniosek o urlop/
+PROMPT = """The document (a PDF or its pages as images) is one Polish ZUS benefit case: scanned, often handwritten applications (ZAM, wniosek o urlop/
 zasiłek), employer pay certificates (Z-3, Z-3a), insurance confirmations, ZUS decisions and system printouts.
 Transcribe the facts into the JSON schema. Code downstream decides entitlement and amounts, so copy what the
 documents state; never compute a benefit and never encode ZUS's decision as a fact.
@@ -49,7 +42,7 @@ documents state; never compute a benefit and never encode ZUS's decision as a fa
 
 
 def enabled() -> bool:
-    return bool(os.environ.get("GEMINI_API_KEY"))
+    return llm.provider() is not None
 
 
 def _schema(node):
@@ -60,19 +53,7 @@ def _schema(node):
     return node
 
 
-@cache
-def _client() -> genai.Client:
-    return genai.Client(http_options=types.HttpOptions(timeout=TIMEOUT_MS))
-
-
 async def read_case(pdf: bytes) -> CaseInput:
     """Raises on provider errors, refusals and output that does not fit CaseInput."""
-    response = await _client().aio.models.generate_content(
-        model=MODEL,
-        contents=[types.Part.from_bytes(data=pdf, mime_type="application/pdf"), PROMPT],
-        config=types.GenerateContentConfig(response_mime_type="application/json",
-                                           response_json_schema=_schema(CaseInput.model_json_schema()),
-                                           # transcription, not reasoning: default thinking made scans time out
-                                           thinking_config=types.ThinkingConfig(thinking_level="LOW")),
-    )
-    return CaseInput.model_validate_json(response.text or "")
+    text = await llm.provider().json_from_pdf(pdf, PROMPT, _schema(CaseInput.model_json_schema()))
+    return CaseInput.model_validate_json(text)
