@@ -12,3 +12,7 @@ out/
 .env
 .env.local
 .env.*.local
+*.db
+# ZUS sample cases: HackNation-only, must not be redistributed
+Documents/Przykładowe sprawy/
+Documents/*sprawy*/
