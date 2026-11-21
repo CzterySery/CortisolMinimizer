@@ -21,6 +21,7 @@ export interface GameBoardProps {
   onFocusCard?: (cardId: string) => void;
   onReset?: () => void;
   summaryHref?: string;
+  previewGoal?: string;
 }
 
 // Presentational board. State lives in the caller: PreviewGame (local, no backend) or /game/[id] (server game).
@@ -55,19 +56,21 @@ export function GameBoard(props: GameBoardProps) {
     <main className="game-layout">
       <Statistics statistics={statistics} projected={projected} />
       <div className="main-board">
-        <RoundTrack stages={stages} currentRound={currentRound} playedCards={played} draggedId={draggedId} onPlayCard={playCard} />
-        <section className="story" aria-labelledby="story-title">
+        <section className="board-context" aria-labelledby="story-title">
           {mode === "preview" && <span className="preview-badge"><span />Podgląd planszy</span>}
           <p className="eyebrow">{complete ? "Wasz plan jest na stole" : `Runda 0${stage.id} / 0${totalRounds} · ${stage.title}`}</p>
-          <h1 id="story-title">{complete ? <>Pięć decyzji.<br /><span>Wasza historia.</span></> : <>Nowy rozdział.<br /><span>Wasze zasady.</span></>}</h1>
+          <h1 id="story-title" className="sr-only">{complete ? "Wasz plan rodziny" : `Runda ${stage.id}: ${stage.title}`}</h1>
           <p>{complete ? "Wszystkie miejsca są już zajęte. Możesz rozłożyć karty jeszcze raz i sprawdzić inny układ." : stage.description}</p>
+          {props.previewGoal && <p className="goal-note">Wasz cel: {props.previewGoal}</p>}
         </section>
+        <RoundTrack stages={stages} currentRound={currentRound} playedCards={played} draggedId={draggedId} onPlayCard={playCard} />
         <section className="hand-section" aria-labelledby="hand-title">
           <div className="section-heading"><h2 id="hand-title">{complete ? "Kompletny stół" : "Twoja ręka"}</h2><span>{complete ? `${played.length} zagranych kart` : `${handSize} karty · przeciągnij jedną na podświetlone miejsce`}</span></div>
           {!complete && <div className="hand" key={stage.id}>{hand.map((card, index) => (
             <div className={`hand-card ${draggedId === card.id ? "is-dragging" : ""}`} key={card.id} draggable
               onPointerEnter={() => onFocusCard?.(card.id)} onFocus={() => onFocusCard?.(card.id)}
               onDragStart={(event) => {
+                if ((event.target as HTMLElement).closest("button, a, dialog, summary")) { event.preventDefault(); return; }
                 event.dataTransfer.setData("application/x-zus-card", card.id);
                 event.dataTransfer.setData("text/plain", card.id);
                 event.dataTransfer.effectAllowed = "move";
@@ -85,7 +88,7 @@ export function GameBoard(props: GameBoardProps) {
           <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
         </section>
       </div>
-      <div className="deck" aria-hidden="true"><span /><span /><span><b>z.</b></span><small>Talia decyzji</small></div>
+      <div className="deck" aria-hidden="true"><span /><span /><span><b>c.</b></span><small>{mode === "preview" ? "30 kart decyzji" : "Talia decyzji"}</small></div>
     </main>
   );
 }

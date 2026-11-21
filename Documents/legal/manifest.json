@@ -1,0 +1,56 @@
+[
+  {
+    "id": "labour-code",
+    "title": "Kodeks pracy — wyciąg",
+    "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+    "sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+    "markdown": "Documents/legal/labour-code.md",
+    "pdf_pages": 10,
+    "extraction": "pypdf"
+  },
+  {
+    "id": "parents-guide",
+    "title": "Poradnik dla rodziców ZUS 2026",
+    "source_file": "Documents/Materiały dla uczestników/Poradnik dla rodziców, ZUS 2026.pdf",
+    "sha256": "0563cb35f54a84d2f3e1681f52fd614fac1efd29d0716968054285ad62a04dcf",
+    "markdown": "Documents/legal/parents-guide.md",
+    "pdf_pages": 42,
+    "extraction": "pypdf"
+  },
+  {
+    "id": "benefits-table",
+    "title": "Zestawienie okresów i podstaw świadczeń",
+    "source_file": "Documents/Materiały dla uczestników/Załącznik_ maksymalny czas trwania zasiłków, wysokość, podstawa wymiaru.docx",
+    "sha256": "2808b441d4a84d14187240ccf76ea57358d5db9897ae0f893d53f3c0a706ae48",
+    "markdown": "Documents/legal/benefits-table.md",
+    "pdf_pages": null,
+    "extraction": "docx-xml"
+  },
+  {
+    "id": "benefit-documents",
+    "title": "Rozporządzenie — dokumenty do zasiłków",
+    "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+    "sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+    "markdown": "Documents/legal/benefit-documents.md",
+    "pdf_pages": 16,
+    "extraction": "pypdf"
+  },
+  {
+    "id": "leave-applications",
+    "title": "Rozporządzenie — wnioski o urlopy",
+    "source_file": "Documents/Materiały dla uczestników/rozporządzenie w sprawie wniosków dot. uprawnień pracowników związanych z rodzicielstwem .pdf",
+    "sha256": "af34d9dbb36e12b4a3b20fff528a89e87e9dbbaa0b38ad4fee743839154e6b87",
+    "markdown": "Documents/legal/leave-applications.md",
+    "pdf_pages": 11,
+    "extraction": "pypdf"
+  },
+  {
+    "id": "benefits-act",
+    "title": "Ustawa zasiłkowa — wyciąg",
+    "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+    "sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+    "markdown": "Documents/legal/benefits-act.md",
+    "pdf_pages": 23,
+    "extraction": "pypdf"
+  }
+]

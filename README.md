@@ -1,4 +1,6 @@
-# Zasiłkowy Poker
+# Cortisol Minimizer
+
+Strona główna pokazuje [30 kart, po 6 na etap](cards-30.md), rozdaje trzy karty i pozwala sprawdzić ich efekty oraz podstawy prawne. Przycisk „Przejrzyj 30 kart” otwiera całą talię. Opis, warunki i statystyki otwierają wyjaśnienia z cytatami i oryginalnymi PDF-ami. [Mechanika i grounding](docs/card-grounding.md), [źródła prawne w Markdownzie](Documents/legal/README.md). Wyliczenia i prawna kwalifikacja pozostają do wdrożenia; podgląd nie nalicza fikcyjnych kwot ani punktów. Backendowy katalog nadal zawiera wcześniejsze 15 kart. Kontrola projektu: `python scripts/build_deck_design.py --check`.
 
 Gra edukacyjna na hackathon ZUS (HackNation 2026): **Python + FastAPI** oraz **React + Next.js (App Router) + TypeScript**. Jasna plansza nawiązuje do szkicu: statystyki po lewej, pięć miejsc na decyzje na górze, talia w lewym dolnym rogu i trzy karty w ręce. Na telefonie karty układają się pionowo.
 
@@ -68,7 +70,7 @@ npm install
 npm run dev
 ```
 
-Plansza: http://localhost:3000. Bez konfiguracji działa tylko podgląd z [lokalnego katalogu](shared/cards.json). Żeby pozostałe strony rozmawiały z FastAPI, utwórz `frontend/.env.local`:
+Plansza: http://localhost:3000. Podgląd 30 kart korzysta zawsze z [projektu talii](shared/deck-design.json), również przy skonfigurowanym API. `npm run dev` i `npm run build` przygotowują publiczne dokumenty źródłowe. Żeby pozostałe strony rozmawiały z FastAPI, utwórz `frontend/.env.local`:
 
 ```dotenv
 API_URL=http://127.0.0.1:8000

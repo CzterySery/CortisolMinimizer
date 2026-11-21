@@ -1,1 +1,1 @@
-"""API aplikacji Zasiłkowy Poker."""
+"""API for the Cortisol Minimizer application."""

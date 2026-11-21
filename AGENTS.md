@@ -1,4 +1,4 @@
-# Zasiłkowy Poker: project plan & agent guide
+# Cortisol Minimizer: project plan & agent guide
 
 > Keep this file current: any change to code, structure, tooling or the plan, and any non-obvious discovery, gets recorded here in the same piece of work.
 
@@ -9,6 +9,8 @@ The product is a responsive web app. Future parents play a card game with Balatr
 
 - **Active deck:** `cards.md` → `shared/cards.json` (15 cards, 3 per round).
 - **Design reference:** `cards_inspo.md` (30 richer cards with conditions and combos), not the active deck.
+- **Current designed deck:** `cards-30.md` / `shared/deck-design.json`: 30 cards, six per stage, three in a hand. This is a design specification, not the executable deck; the runtime engine is still unimplemented. `cards_inspo.md` is historical inspiration.
+- **Grounding:** `Documents/legal/` holds page-preserving transcriptions of all six supplied public reference documents. `shared/legal-rules.json` / `Documents/legal/rules.md` map 31 rules to exact legal locators, checked quotes, Markdown anchors, PDF pages and source SHA-256. Each designed card has per-field claims and individually grounded parameter references. See `docs/card-grounding.md`.
 
 **Jury weights:** challenge fit 25%, idea 20%, originality 15%, completeness/UX 25%, deployability 15%.
 
@@ -24,6 +26,7 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 - **Backend:** Python 3.11+ + FastAPI + PostgreSQL 17 (Docker image `postgres:17-alpine`).
 - **Frontend:** Next.js 16 (App Router, `src/`) with plain CSS.
 - **No AI inside the app.** All rules are deterministic. Say so in the submission.
+- **Naming:** use Cortisol Minimizer in code, UI metadata and new artifacts. The earlier gambling-related working name is retired.
 - **Contract-first REST under `/api/v1`.** Pydantic models are described in OpenAPI, and the frontend generates its types from them.
 - **The UI design comes from the team's board** (commit `0219fc3`/`1f0d26a`, pitygiusz). Every other screen follows its look.
 
@@ -33,6 +36,24 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 - Cards only add blocks or set flags. Recomputing after each play updates the whole table, and nothing gets double-counted.
 
 ## Status (2026-11-21)
+**The home page now previews all 30 designed cards with evidence UI; executable mechanics remain unimplemented.**
+- Board layout: the shared header now displays “Nowy rozdział. Wasze zasady.” instead of the logo/product-name/tagline. Round context is compact and sits above the table; `RoundTrack` is immediately followed by the hand, keeping drag targets near the cards. The board retains a screen-reader h1 for the current stage.
+- UI integration: `getGamePreview()` always maps `shared/deck-design.json` into UI-only card annotations, independent of `API_URL`. Backend API catalog remains at 15 cards and its contract is unchanged. Never attach new design metadata to old backend cards by ID: several IDs have different meanings.
+- `PreviewGame` has three planning-goal choices, random three-of-six hands, reset and a complete 30-card library (`deck-library.tsx`). Goal selection changes guidance only, not computed scores. No legal eligibility filtering or fictitious money/time/score is applied in this preview.
+- `card-grounding.tsx` exposes description, conditions, money/time effects, authored score and per-parameter references via native modal dialogs. Hover hints supplement click/touch/keyboard access. The library and evidence dialogs use native focus containment and Escape behavior.
+- `/sources/[id]` prerenders six allowlisted transcriptions with legal-unit/page anchors. `scripts/prepare-legal-assets.mjs` runs before frontend dev/build, verifies source SHA-256 and exports only public manifest-listed originals and Markdown to ignored `frontend/public/legal/`. Docker now includes only legal transcriptions/public participant references from Documents; restricted sample cases remain excluded. No extra dependencies added.
+- Designed 30 cards with conditions, declarative effects, derived money/time, authored happiness points and validated cross-round combos. No changes to the other product flows except replacing the retired brand in shared header/metadata/API title.
+- Modes: Cortisol Minimizer, Zasiłki Maxing, Aura Farming use the same legal calculator; only objective scoring changes. Detailed proposed formulas and fairness rules are in `docs/card-grounding.md`.
+- Authoring data lives in `scripts/build_deck_design.py`; run it to rebuild `cards-30.md`, `shared/deck-design.json`, `shared/legal-rules.json`, and `Documents/legal/rules.md`. `--check` verifies generated artifacts, 30 unique cards / six per stage, exact excerpts within their legal units, source hashes, parameter paths, unique anchors and reciprocal combo consistency.
+- `scripts/extract_legal_sources.py` requires `scripts/requirements-legal.txt` (pypdf, authoring-only). It reads only the public reference-material directory, never restricted case files. DOCX is read via standard-library XML; its table layout is not reconstructed. Original filenames use decomposed Unicode: resolve actual paths, do not invent normalized filesystem paths.
+- Source caveats: supplied act includes future-effective 2027 provisions; guide is dated 2026-04-01 and has older form names; act extract omits care articles 32–35. Care is grounded in the local guide and verified against the official Sejm consolidated text. See legal README for URLs and temporal caveats; `checked_against_supplied_file` is evidence validation, not legal certification.
+- Discovered parameter/contract gaps are listed in `docs/card-grounding.md`: rehabilitation rate/cap/indexation, Za życiem part-time caps 130/134, adoption/foster ages and 38/62-week cases, transfer/parental application notices, precise hospital intervals, family-wide care counters, employment-end facts and hourly care. Existing `params.json` values were not silently changed. Missing legal configuration blocks runtime activation of the affected cards.
+- Important state invariants: baseline maternity/acceptance plan exists independently of drawing a card; reservations are not benefits or covered care; consume them exactly once; no salary after an ended employment; sickness is not proof of ability to care. Zero money/time delta for paperwork is valid. Serious loss events remain outside scored gameplay.
+- System `/usr/bin/git` fails through the Xcode selector, but `/Library/Developer/CommandLineTools/usr/bin/git` works directly; use that binary without changing global developer settings.
+- Main was fast-forwarded to `d77862e` (PostgreSQL storage migration). All local card-design, legal-source and branding edits were preserved and reapplied without conflicts. A named safety stash (`Preserve card design and legal sources before main update`) remains as a backup; no push was performed. Docker has since been rebuilt with the 30-card UI and PostgreSQL; the previous SQLite volume was not deleted.
+- Post-update checks: 7 unit tests passed; 3 PostgreSQL integration tests skipped because `TEST_DATABASE_URL` was not set. Frontend typecheck and full deck/source authoring validation passed. The local Python environment now includes the migration's already-declared `psycopg[binary]` dependency.
+- Verification of this work: authoring validation passes for all 30 cards, 31 rules and 334 local links, including exact PDF quote pages and source hashes; new scripts pass ruff; backend 8/8 tests pass; frontend typecheck, lint and production build pass. Initial runs found missing local `python-multipart` and `openapi-fetch`; installing the already-declared dependencies resolved the checks. No application dependency contracts were expanded.
+
 **Step 1 (skeleton) is done and merged onto the team's UI.**
 - **Backend:** catalog endpoints (`/cards`, `/rounds`, `/game/preview`), `/health`, `/info/links` and `/admin/params*` work. Every other endpoint returns **501 with its build step**. 7 unit tests (no database) and 3 Postgres integration tests pass; ruff is clean.
 - **Frontend:**
@@ -40,7 +61,8 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
   - Every other route, the plan views, forms, hooks and the typed API client exist. They render backend errors until their endpoints land.
   - Typecheck, lint and build all pass.
 - **Docker:** `docker compose up --build` runs `db` (Postgres), `backend` and `frontend`. The frontend reaches the backend through the proxy, and the backend waits for a healthy database.
-- **The visual pages haven't been checked in a browser.** No headless browser was available, so do a manual pass at 375px and 1280px.
+- The card library has been exercised in the integrated browser (30 unique cards across five stages, evidence modal and live PDF response). The local home loader is synchronous and has no network work. Hidden background browser tabs can retain Next's streamed loading fallback, so a full visual mobile/desktop pass should be repeated in an active tab; other product pages also still need their manual layout pass.
+- UI integration checks: frontend typecheck and lint pass, production Docker build passes, source page and original PDF return 200, frontend → backend → PostgreSQL params query succeeds, all 10 backend unit/integration tests pass, and authoring validation still checks 30 cards / 31 rules / 334 local links. No runtime money or score calculations were added.
 
 ## Conventions
 - **Backend:**
@@ -73,7 +95,7 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
   - `cacheComponents` is off, so `useParams` pages don't need Suspense.
 - **Gotchas found during the merge:**
   - `frontend/next-env.d.ts` imports `.next/dev/types/*`, which only exists after `next dev`/`next build`, so `tsc` on a fresh clone can fail until one of them has run. Next rewrites this file, so expect diff churn.
-  - `/` is prerendered at **build** time from the local catalog. If `API_URL` is set during a build, the build fetches `/api/v1/game/preview` and fails when the backend is down; the Dockerfile deliberately leaves it unset.
+  - `/` is prerendered at **build** time from the local 30-card design and does not fetch the backend, regardless of `API_URL`. Server-driven sessions remain under `/game/[id]`.
   - `outputFileTracingRoot`/`turbopack.root` is the repo root (the UI imports `../shared/cards.json`), so standalone output nests under `.next/standalone/frontend/server.js`, and **both Docker images build from the repo root** (`docker-compose.yml`, root `.dockerignore`).
   - `scripts/sync_cards.py` **overwrites** `shared/cards.json` and resets `sources`. Once cards carry sources or game mechanics, it must merge instead of overwrite, or stop being used.
 - **Language:** code and comments in English, UI in Polish. Every calculated amount carries an `Explain{text, rule}` citing the article.
@@ -258,9 +280,8 @@ Backend and frontend run in parallel once the contract exists. FE steps that dep
 - **Docker:** `docker compose up --build`, then `curl localhost:3000/api/v1/cards` must return 15 cards and `curl -H 'Authorization: Bearer dev' localhost:3000/api/v1/admin/params/versions` must list version 1 (proves frontend → backend → Postgres).
 
 ## Open items
-- **Deck:** keep the 15 fixed cards (3 per round, from `cards.md`), or move to the 30-card dealt deck from `cards_inspo.md`? The engine supports both; decide before step 4.
-- **What "Szczęście" means:** assumed to be the game score. Alternatively it could measure shared family time (e.g. both parents home).
+- **Deck decision:** 30 designed cards, six per stage (`cards-30.md`), with a three-card hand. Separate the pool from the hand in the contract before runtime integration. Some special scenarios cannot supply three legal options: show disabled alternatives with reasons, and never invent legal availability. Scenario coverage remains to be tested with the implemented engine.
+- **Szczęście:** authored game score, not a health metric. Shared time and fulfilled care goals are separate derived inputs to Aura Farming. Mode formulas are proposed in `docs/card-grounding.md` and need playtesting.
 - **Father's rate for non-exclusive parental leave under the mother's 81.5% application** (art. 30a ust. 3). Assumed 81.5%.
-- **Care allowance rules:** art. 32–35 aren't in the provided extract, so check the Poradnik.
-- **Part-time extension caps for Za życiem:** KP art. 182¹f.
-- **Name and tone:** "Poker" suggests gambling, so consider whether the jury (ZUS) will like it. The mechanics don't depend on the name.
+- **Care allowance rules:** local guide pages PDF 37–40 and official Sejm articles 32–35 are linked in `Documents/legal/README.md`; implement the family-wide annual limit and event/household checks before activation.
+- **Part-time extension caps for Za życiem:** supplied KP art. 182¹f § 1¹ explicitly gives 130/134; extend parameter contract before implementing those scenarios.

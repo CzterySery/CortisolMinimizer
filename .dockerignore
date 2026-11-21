@@ -1,5 +1,13 @@
 .git
-Documents
+Documents/**
+!Documents/legal/
+!Documents/legal/**
+!Documents/Materiały*/
+!Documents/Materiały*/Kodeks*.pdf
+!Documents/Materiały*/Poradnik*.pdf
+!Documents/Materiały*/rozporza*.pdf
+!Documents/Materiały*/wycia*.pdf
+!Documents/Materiały*/Zała*.docx
 **/node_modules
 **/.next
 **/.venv

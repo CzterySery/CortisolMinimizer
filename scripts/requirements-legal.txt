@@ -1,0 +1,2 @@
+# Authoring tools only; not an application runtime dependency.
+pypdf>=5,<7

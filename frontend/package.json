@@ -6,6 +6,8 @@
     "node": ">=20.9.0"
   },
   "scripts": {
+    "predev": "node ../scripts/prepare-legal-assets.mjs",
+    "prebuild": "node ../scripts/prepare-legal-assets.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

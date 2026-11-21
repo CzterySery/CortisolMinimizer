@@ -1,0 +1,4302 @@
+{
+  "schema_version": 1,
+  "status": "design_only_not_runtime_deck",
+  "hand_size": 3,
+  "rounds": 5,
+  "cards_per_round": 6,
+  "legal_rules_file": "shared/legal-rules.json",
+  "parameters_file": "backend/app/data/params.json",
+  "cards": [
+    {
+      "id": "1A",
+      "round_id": 1,
+      "title": "Macierzyński od narodzin",
+      "description": "Zachowaj całą dostępną pulę macierzyńskiego na czas po porodzie.",
+      "conditions": "Ścieżka urodzenia; brak rozpoczętego macierzyńskiego. Praca do porodu tylko przy braku stwierdzonej niezdolności; karta nie kasuje e-ZLA.",
+      "effects": [
+        {
+          "op": "set_flag",
+          "name": "maternity_start",
+          "value": "birth"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Przed porodem pozostaje dochód z faktycznej sytuacji; po porodzie zasiłek według podstawy i wariantu."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Brak dodatkowych dni przed porodem; cała pula pozostaje po narodzinach."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "reserve",
+        "continuity"
+      ],
+      "legal_rule_ids": [
+        "maternity-pool",
+        "insured-parent",
+        "standard-rates",
+        "base"
+      ],
+      "parameter_refs": [
+        "maternity.weeks_by_children"
+      ],
+      "combo": {
+        "with": [
+          "3C"
+        ],
+        "name": "Zmiana warty",
+        "check": "touching",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "1A.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "maternity-pool",
+            "insured-parent",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1A.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "maternity-pool",
+            "insured-parent",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1A.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "maternity-pool",
+            "insured-parent",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1A.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "maternity-pool",
+            "insured-parent",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1A.param.maternity.weeks_by_children",
+          "field": "parameter:maternity.weeks_by_children",
+          "kind": "legal_parameter",
+          "parameter_ref": "maternity.weeks_by_children",
+          "rule_ids": [
+            "maternity-pool",
+            "adoption"
+          ]
+        },
+        {
+          "id": "1A.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "1B",
+      "round_id": 1,
+      "title": "Chwila przed porodem",
+      "description": "Rozpocznij macierzyński wcześniej i przygotuj się na narodziny.",
+      "conditions": "Pracownica, zaświadczenie o przewidywanym terminie, wybrany początek w dopuszczalnym oknie. Nie nakładaj macierzyńskiego na chorobowe tej samej osoby.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "mother",
+          "kind": "maternity",
+          "start": "choice.prebirth_start",
+          "days": "until:birth",
+          "merge_into": "baseline.maternity"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Zasiłek zastępuje wynagrodzenie za wybrane dni; nie zakładamy z góry wzrostu dochodu."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Wcześniejsze wolne zużywa tę samą pulę; mniej macierzyńskiego zostaje po porodzie."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "preparation",
+        "shared"
+      ],
+      "legal_rule_ids": [
+        "prebirth",
+        "maternity-pool",
+        "standard-rates",
+        "base"
+      ],
+      "parameter_refs": [
+        "maternity.prebirth_max_weeks",
+        "rates.maternity"
+      ],
+      "combo": {
+        "with": [
+          "2A"
+        ],
+        "name": "Wspólny start",
+        "check": "overlap",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "1B.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "prebirth",
+            "maternity-pool",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1B.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "prebirth",
+            "maternity-pool",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1B.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "prebirth",
+            "maternity-pool",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1B.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "prebirth",
+            "maternity-pool",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1B.param.maternity.prebirth_max_weeks",
+          "field": "parameter:maternity.prebirth_max_weeks",
+          "kind": "legal_parameter",
+          "parameter_ref": "maternity.prebirth_max_weeks",
+          "rule_ids": [
+            "prebirth"
+          ]
+        },
+        {
+          "id": "1B.param.rates.maternity",
+          "field": "parameter:rates.maternity",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.maternity",
+          "rule_ids": [
+            "standard-rates"
+          ]
+        },
+        {
+          "id": "1B.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "1C",
+      "round_id": 1,
+      "title": "Zdrowie na pierwszym miejscu",
+      "description": "Uporządkuj chorobowe w ciąży na podstawie wystawionego zwolnienia.",
+      "conditions": "Niezdolność jest faktem z e-ZLA; ubezpieczenie, wyczekiwanie albo wyjątek i pozostały okres muszą być potwierdzone. Karta nie pozwala wybrać choroby.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "mother",
+          "kind": "sick",
+          "start": "facts.ezla.start",
+          "days": "facts.ezla.days"
+        },
+        {
+          "op": "mark_docs",
+          "bundle": "sick",
+          "only_if": "facts.documents_available"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Przelicz wynagrodzenie chorobowe i zasiłek właściwe dla tytułu; uwzględnij podstawę i wykorzystane dni."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Dni niezdolności nie są automatycznie dniami zdolności do opieki; przed porodem nie zwiększają pokrycia potrzeb dziecka."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "health",
+        "documents",
+        "continuity"
+      ],
+      "legal_rule_ids": [
+        "sick-right",
+        "sick-money",
+        "sick-docs",
+        "base",
+        "debt"
+      ],
+      "parameter_refs": [
+        "rates.sick_pregnancy",
+        "sick.period_days_pregnancy",
+        "sick.waiting_days_mandatory",
+        "sick.waiting_days_voluntary",
+        "sick.employer_days",
+        "sick.employer_days_50plus"
+      ],
+      "combo": {
+        "with": [
+          "3D"
+        ],
+        "name": "Kompletna teczka",
+        "check": "docs_complete",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "1C.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "sick-right",
+            "sick-money",
+            "sick-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1C.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "sick-right",
+            "sick-money",
+            "sick-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1C.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "sick-right",
+            "sick-money",
+            "sick-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1C.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "sick-right",
+            "sick-money",
+            "sick-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1C.param.rates.sick_pregnancy",
+          "field": "parameter:rates.sick_pregnancy",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.sick_pregnancy",
+          "rule_ids": [
+            "sick-money"
+          ]
+        },
+        {
+          "id": "1C.param.sick.period_days_pregnancy",
+          "field": "parameter:sick.period_days_pregnancy",
+          "kind": "legal_parameter",
+          "parameter_ref": "sick.period_days_pregnancy",
+          "rule_ids": [
+            "sick-money"
+          ]
+        },
+        {
+          "id": "1C.param.sick.waiting_days_mandatory",
+          "field": "parameter:sick.waiting_days_mandatory",
+          "kind": "legal_parameter",
+          "parameter_ref": "sick.waiting_days_mandatory",
+          "rule_ids": [
+            "sick-right"
+          ]
+        },
+        {
+          "id": "1C.param.sick.waiting_days_voluntary",
+          "field": "parameter:sick.waiting_days_voluntary",
+          "kind": "legal_parameter",
+          "parameter_ref": "sick.waiting_days_voluntary",
+          "rule_ids": [
+            "sick-right"
+          ]
+        },
+        {
+          "id": "1C.param.sick.employer_days",
+          "field": "parameter:sick.employer_days",
+          "kind": "legal_parameter",
+          "parameter_ref": "sick.employer_days",
+          "rule_ids": [
+            "sick-money"
+          ]
+        },
+        {
+          "id": "1C.param.sick.employer_days_50plus",
+          "field": "parameter:sick.employer_days_50plus",
+          "kind": "legal_parameter",
+          "parameter_ref": "sick.employer_days_50plus",
+          "rule_ids": [
+            "sick-money"
+          ]
+        },
+        {
+          "id": "1C.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "1D",
+      "round_id": 1,
+      "title": "Pomost rehabilitacyjny",
+      "description": "Przygotuj sprawę o rehabilitacyjne, gdy chorobowe się wyczerpuje.",
+      "conditions": "Dalsza niezdolność i rokowanie wynikają ze scenariusza; wykluczenia ustawowe sprawdzone. Złożenie wniosku nie oznacza przyznania.",
+      "effects": [
+        {
+          "op": "set_flag",
+          "name": "rehab_application",
+          "value": "pending"
+        },
+        {
+          "op": "mark_docs",
+          "bundle": "rehab",
+          "only_if": "facts.documents_available"
+        },
+        {
+          "op": "add_block",
+          "who": "mother",
+          "kind": "rehab",
+          "start": "after:sick:mother",
+          "days": "facts.rehab.awarded_days",
+          "only_if": "facts.rehab.decision_granted"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Pokaż prognozę warunkową oddzielnie; do pewnego budżetu wlicz dopiero przyznany okres i właściwie zwaloryzowaną podstawę."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Okres leczenia nie oznacza zdolności do osobistej opieki; brak fikcyjnych dodatkowych dni opieki."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "health",
+        "documents",
+        "continuity"
+      ],
+      "legal_rule_ids": [
+        "rehab",
+        "base",
+        "debt"
+      ],
+      "parameter_refs": [],
+      "combo": {
+        "with": [
+          "3D"
+        ],
+        "name": "Kompletna teczka",
+        "check": "docs_complete",
+        "mult": "0.50"
+      },
+      "notes": "Wymaga nowych parametrów rehabilitacyjnego i waloryzacji; blokada uruchomienia do ich dodania.",
+      "claims": [
+        {
+          "id": "1D.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "rehab",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1D.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "rehab",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1D.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "rehab",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1D.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "rehab",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1D.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "1E",
+      "round_id": 1,
+      "title": "Dochód po likwidacji firmy",
+      "description": "Zabezpiecz szczególną ścieżkę świadczenia przed porodem po utracie zatrudnienia.",
+      "conditions": "Stosunek pracy ustał w ciąży wskutek śmierci, upadłości lub likwidacji pracodawcy; nie zapewniono innego zatrudnienia; dokumenty potwierdzają przesłanki.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "mother",
+          "kind": "job_loss_benefit",
+          "start": "facts.employment_end_next_day",
+          "days": "until:birth",
+          "only_if": "facts.job_loss.entitled"
+        },
+        {
+          "op": "mark_docs",
+          "bundle": "job_loss_before_birth",
+          "only_if": "facts.documents_available"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Prognozuj należne świadczenie za okres przed porodem; nie dodawaj równolegle pensji z zakończonej pracy."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Brak zużycia podstawowego macierzyńskiego przed porodem; okres nie zwiększa jeszcze pokrycia opieki po narodzinach."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "security",
+        "documents",
+        "continuity"
+      ],
+      "legal_rule_ids": [
+        "job-loss-before",
+        "base",
+        "payer"
+      ],
+      "parameter_refs": [
+        "rates.job_loss"
+      ],
+      "combo": {
+        "with": [
+          "3F"
+        ],
+        "name": "Ciągłość wypłat",
+        "check": "touching",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "1E.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "job-loss-before",
+            "base",
+            "payer"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1E.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "job-loss-before",
+            "base",
+            "payer"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1E.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "job-loss-before",
+            "base",
+            "payer"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1E.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "job-loss-before",
+            "base",
+            "payer"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1E.param.rates.job_loss",
+          "field": "parameter:rates.job_loss",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.job_loss",
+          "rule_ids": [
+            "job-loss-before"
+          ]
+        },
+        {
+          "id": "1E.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "1F",
+      "round_id": 1,
+      "title": "Przygotuj rodzinny start",
+      "description": "Przygotuj plan i dokumenty na przyjęcie dziecka w adopcji albo pieczy niezawodowej.",
+      "conditions": "Wyłącznie scenariusz przyjęcia. Rozdziel adopcję i pieczę; przyszłe zdarzenie nie tworzy dzisiejszego uprawnienia.",
+      "effects": [
+        {
+          "op": "set_flag",
+          "name": "acceptance_plan",
+          "value": "prepared"
+        },
+        {
+          "op": "reserve",
+          "pool": "on_maternity_terms",
+          "who": "choice.parent",
+          "start": "event:acceptance",
+          "days": "derived.acceptance_entitlement",
+          "provisional": true
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Tylko prognoza przyszłego świadczenia po spełnieniu przesłanek; bieżący pewny dochód bez zmiany."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Rezerwacja nie jest wykorzystaniem urlopu ani dniem zapewnionej opieki; pokazuje przyszły plan."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "adoption",
+        "preparation",
+        "documents"
+      ],
+      "legal_rule_ids": [
+        "adoption",
+        "insured-parent",
+        "standard-rates",
+        "base"
+      ],
+      "parameter_refs": [
+        "maternity.weeks_by_children",
+        "maternity.adoption_min_weeks"
+      ],
+      "combo": {
+        "with": [
+          "2F"
+        ],
+        "name": "Gotowi na przyjęcie",
+        "check": "docs_complete",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "1F.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "adoption",
+            "insured-parent",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1F.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "adoption",
+            "insured-parent",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1F.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "adoption",
+            "insured-parent",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1F.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "adoption",
+            "insured-parent",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "1F.param.maternity.weeks_by_children",
+          "field": "parameter:maternity.weeks_by_children",
+          "kind": "legal_parameter",
+          "parameter_ref": "maternity.weeks_by_children",
+          "rule_ids": [
+            "maternity-pool",
+            "adoption"
+          ]
+        },
+        {
+          "id": "1F.param.maternity.adoption_min_weeks",
+          "field": "parameter:maternity.adoption_min_weeks",
+          "kind": "legal_parameter",
+          "parameter_ref": "maternity.adoption_min_weeks",
+          "rule_ids": [
+            "adoption"
+          ]
+        },
+        {
+          "id": "1F.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "2A",
+      "round_id": 2,
+      "title": "Razem na starcie",
+      "description": "Zaplanuj cały dostępny ojcowski we wspólnym bloku po narodzinach.",
+      "conditions": "Uprawniony ojciec, dostępna pełna pula, osiągalny termin wniosku i wykorzystania. Początek nie musi być dniem porodu.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "father",
+          "kind": "paternity",
+          "start": "choice.early_paternity_start",
+          "days": "params.paternity.days"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Za blok zastąp wynagrodzenie świadczeniem od podstawy ojca; stawka ojcowskiego jest niezależna od wariantu matki."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Zużyj pulę ojcowskiego; wspólne dni licz raz do pokrycia opieki, osobno do wspólnego czasu."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "shared",
+        "early"
+      ],
+      "legal_rule_ids": [
+        "paternity",
+        "standard-rates",
+        "base",
+        "payer"
+      ],
+      "parameter_refs": [
+        "paternity.days",
+        "paternity.notice_days",
+        "paternity.use_by_child_months",
+        "rates.paternity"
+      ],
+      "combo": {
+        "with": [
+          "1B",
+          "4B"
+        ],
+        "name": "Wspólny start",
+        "check": "overlap",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "2A.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base",
+            "payer"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2A.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base",
+            "payer"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2A.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base",
+            "payer"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2A.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base",
+            "payer"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2A.param.paternity.days",
+          "field": "parameter:paternity.days",
+          "kind": "legal_parameter",
+          "parameter_ref": "paternity.days",
+          "rule_ids": [
+            "paternity"
+          ]
+        },
+        {
+          "id": "2A.param.paternity.notice_days",
+          "field": "parameter:paternity.notice_days",
+          "kind": "legal_parameter",
+          "parameter_ref": "paternity.notice_days",
+          "rule_ids": [
+            "paternity"
+          ]
+        },
+        {
+          "id": "2A.param.paternity.use_by_child_months",
+          "field": "parameter:paternity.use_by_child_months",
+          "kind": "legal_parameter",
+          "parameter_ref": "paternity.use_by_child_months",
+          "rule_ids": [
+            "paternity"
+          ]
+        },
+        {
+          "id": "2A.param.rates.paternity",
+          "field": "parameter:rates.paternity",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.paternity",
+          "rule_ids": [
+            "standard-rates"
+          ]
+        },
+        {
+          "id": "2A.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "2B",
+      "round_id": 2,
+      "title": "Tydzień teraz, reszta później",
+      "description": "Wykorzystaj pierwszą część ojcowskiego i zachowaj drugą na konkretną potrzebę.",
+      "conditions": "Pełna pula i dwie dostępne części; oba terminy mieszczą się w ograniczeniach i mają osiągalne terminy wniosków.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "father",
+          "kind": "paternity",
+          "start": "choice.first_paternity_start",
+          "days": "params.paternity.min_part_days"
+        },
+        {
+          "op": "reserve",
+          "who": "father",
+          "pool": "paternity",
+          "start": "need:paternity_later",
+          "days": "derived.paternity_remaining"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Teraz rozlicz tylko pierwszą część; za rezerwację brak wypłaty do czasu zaplanowania rzeczywistego bloku."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Wpisz pierwszą część; pozostałe dni pozostają dostępne i nie są jeszcze pokrytą opieką."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "reserve",
+        "shared",
+        "flexibility"
+      ],
+      "legal_rule_ids": [
+        "paternity",
+        "standard-rates",
+        "base"
+      ],
+      "parameter_refs": [
+        "paternity.min_part_days",
+        "paternity.max_parts",
+        "paternity.notice_days",
+        "rates.paternity"
+      ],
+      "combo": {
+        "with": [
+          "4E"
+        ],
+        "name": "Wykorzystana rezerwa",
+        "check": "covers_need",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "2B.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2B.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2B.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2B.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2B.param.paternity.min_part_days",
+          "field": "parameter:paternity.min_part_days",
+          "kind": "legal_parameter",
+          "parameter_ref": "paternity.min_part_days",
+          "rule_ids": [
+            "paternity"
+          ]
+        },
+        {
+          "id": "2B.param.paternity.max_parts",
+          "field": "parameter:paternity.max_parts",
+          "kind": "legal_parameter",
+          "parameter_ref": "paternity.max_parts",
+          "rule_ids": [
+            "paternity"
+          ]
+        },
+        {
+          "id": "2B.param.paternity.notice_days",
+          "field": "parameter:paternity.notice_days",
+          "kind": "legal_parameter",
+          "parameter_ref": "paternity.notice_days",
+          "rule_ids": [
+            "paternity"
+          ]
+        },
+        {
+          "id": "2B.param.rates.paternity",
+          "field": "parameter:rates.paternity",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.paternity",
+          "rule_ids": [
+            "standard-rates"
+          ]
+        },
+        {
+          "id": "2B.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "2C",
+      "round_id": 2,
+      "title": "Ojcowski na później",
+      "description": "Zarezerwuj ojcowski na czas, gdy najbardziej przyda się dodatkowa opieka.",
+      "conditions": "Bieżąca opieka zapewniona, ojciec uprawniony i nadal możliwy legalny późniejszy termin. Nie pozwól zarezerwować puli poza limitem wieku.",
+      "effects": [
+        {
+          "op": "reserve",
+          "who": "father",
+          "pool": "paternity",
+          "start": "need:paternity_later",
+          "days": "params.paternity.days"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Do rozpoczęcia bloku dochód z pracy bez dodatkowego zasiłku; pokaż datowaną prognozę rezerwy osobno."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Bez bieżącego zużycia puli i bez dodatkowych pokrytych dni; późniejszy blok musi zostać zrealizowany."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "reserve",
+        "flexibility"
+      ],
+      "legal_rule_ids": [
+        "paternity",
+        "standard-rates",
+        "base"
+      ],
+      "parameter_refs": [
+        "paternity.days",
+        "paternity.use_by_child_months",
+        "paternity.notice_days"
+      ],
+      "combo": {
+        "with": [
+          "4E"
+        ],
+        "name": "Wykorzystana rezerwa",
+        "check": "covers_need",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "2C.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2C.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2C.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2C.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2C.param.paternity.days",
+          "field": "parameter:paternity.days",
+          "kind": "legal_parameter",
+          "parameter_ref": "paternity.days",
+          "rule_ids": [
+            "paternity"
+          ]
+        },
+        {
+          "id": "2C.param.paternity.use_by_child_months",
+          "field": "parameter:paternity.use_by_child_months",
+          "kind": "legal_parameter",
+          "parameter_ref": "paternity.use_by_child_months",
+          "rule_ids": [
+            "paternity"
+          ]
+        },
+        {
+          "id": "2C.param.paternity.notice_days",
+          "field": "parameter:paternity.notice_days",
+          "kind": "legal_parameter",
+          "parameter_ref": "paternity.notice_days",
+          "rule_ids": [
+            "paternity"
+          ]
+        },
+        {
+          "id": "2C.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "2D",
+      "round_id": 2,
+      "title": "Uzupełniający dla mamy",
+      "description": "Po hospitalizacji dziecka zaplanuj należny uzupełniający dla mamy.",
+      "conditions": "Kwalifikująca hospitalizacja jest faktem. Prawo i wymiar obliczone; osiągalny termin, zaświadczenie, drugi rodzic nie korzysta z tego samego uprawnienia.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "mother",
+          "kind": "supplementary",
+          "start": "after:maternity",
+          "days": "derived.supplementary_days"
+        },
+        {
+          "op": "mark_docs",
+          "bundle": "supplementary",
+          "only_if": "facts.documents_available"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Przelicz należny blok od podstawy mamy według stawki uzupełniającego; nie stosuj do niego automatycznie stawki uśrednionej."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Dodaj obliczony blok po macierzyńskim; nie odejmuj go z puli rodzicielskiego."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "health",
+        "continuity",
+        "documents"
+      ],
+      "legal_rule_ids": [
+        "supplementary",
+        "standard-rates",
+        "base"
+      ],
+      "parameter_refs": [
+        "rates.supplementary",
+        "supplementary.extreme.cap_weeks",
+        "supplementary.preterm.cap_weeks",
+        "supplementary.term.cap_weeks",
+        "deadlines.supplementary_notice_days_before_maternity_end"
+      ],
+      "combo": {
+        "with": [
+          "4A"
+        ],
+        "name": "Bez luki",
+        "check": "touching",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "2D.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "supplementary",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2D.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "supplementary",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2D.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "supplementary",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2D.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "supplementary",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2D.param.rates.supplementary",
+          "field": "parameter:rates.supplementary",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.supplementary",
+          "rule_ids": [
+            "standard-rates"
+          ]
+        },
+        {
+          "id": "2D.param.supplementary.extreme.cap_weeks",
+          "field": "parameter:supplementary.extreme.cap_weeks",
+          "kind": "legal_parameter",
+          "parameter_ref": "supplementary.extreme.cap_weeks",
+          "rule_ids": [
+            "supplementary"
+          ]
+        },
+        {
+          "id": "2D.param.supplementary.preterm.cap_weeks",
+          "field": "parameter:supplementary.preterm.cap_weeks",
+          "kind": "legal_parameter",
+          "parameter_ref": "supplementary.preterm.cap_weeks",
+          "rule_ids": [
+            "supplementary"
+          ]
+        },
+        {
+          "id": "2D.param.supplementary.term.cap_weeks",
+          "field": "parameter:supplementary.term.cap_weeks",
+          "kind": "legal_parameter",
+          "parameter_ref": "supplementary.term.cap_weeks",
+          "rule_ids": [
+            "supplementary"
+          ]
+        },
+        {
+          "id": "2D.param.deadlines.supplementary_notice_days_before_maternity_end",
+          "field": "parameter:deadlines.supplementary_notice_days_before_maternity_end",
+          "kind": "legal_parameter",
+          "parameter_ref": "deadlines.supplementary_notice_days_before_maternity_end",
+          "rule_ids": [
+            "supplementary"
+          ]
+        },
+        {
+          "id": "2D.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "2E",
+      "round_id": 2,
+      "title": "Uzupełniający dla taty",
+      "description": "Po hospitalizacji dziecka zaplanuj należny uzupełniający dla taty.",
+      "conditions": "Jak dla uzupełniającego mamy, ale uprawniony jest ojciec; wybór rodzica nie powiększa wymiaru. Sprawdź dokumenty po drugim rodzicu.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "father",
+          "kind": "supplementary",
+          "start": "after:maternity",
+          "days": "derived.supplementary_days"
+        },
+        {
+          "op": "mark_docs",
+          "bundle": "supplementary_other_parent",
+          "only_if": "facts.documents_available"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Zastąp dochód ojca odpowiednim świadczeniem; dochód mamy wynika z jej odrębnego statusu i faktycznego powrotu do pracy."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Jedna wspólna pula uzupełniającego; ten sam okres nie może zostać przyznany obojgu."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "health",
+        "shared",
+        "continuity"
+      ],
+      "legal_rule_ids": [
+        "supplementary",
+        "standard-rates",
+        "base",
+        "insured-parent"
+      ],
+      "parameter_refs": [
+        "rates.supplementary",
+        "deadlines.supplementary_notice_days_before_maternity_end"
+      ],
+      "combo": {
+        "with": [
+          "4A"
+        ],
+        "name": "Bez luki",
+        "check": "touching",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "2E.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "supplementary",
+            "standard-rates",
+            "base",
+            "insured-parent"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2E.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "supplementary",
+            "standard-rates",
+            "base",
+            "insured-parent"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2E.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "supplementary",
+            "standard-rates",
+            "base",
+            "insured-parent"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2E.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "supplementary",
+            "standard-rates",
+            "base",
+            "insured-parent"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2E.param.rates.supplementary",
+          "field": "parameter:rates.supplementary",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.supplementary",
+          "rule_ids": [
+            "standard-rates"
+          ]
+        },
+        {
+          "id": "2E.param.deadlines.supplementary_notice_days_before_maternity_end",
+          "field": "parameter:deadlines.supplementary_notice_days_before_maternity_end",
+          "kind": "legal_parameter",
+          "parameter_ref": "deadlines.supplementary_notice_days_before_maternity_end",
+          "rule_ids": [
+            "supplementary"
+          ]
+        },
+        {
+          "id": "2E.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "2F",
+      "round_id": 2,
+      "title": "Witaj w rodzinie",
+      "description": "Uruchom plan świadczeń po przyjęciu dziecka na wychowanie.",
+      "conditions": "Potwierdzone przyjęcie; dla adopcji także wystąpienie do sądu, dla pieczy jej niezawodowy charakter. Wiek, liczba dzieci i dokumenty sprawdzone.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "choice.parent",
+          "kind": "maternity",
+          "start": "choice.acceptance_leave_start",
+          "days": "derived.acceptance_entitlement",
+          "context": "on_maternity_terms",
+          "merge_into": "baseline.acceptance"
+        },
+        {
+          "op": "mark_docs",
+          "bundle": "acceptance",
+          "only_if": "facts.documents_available"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Przelicz zasiłek od podstawy wybranego rodzica i właściwego wariantu; nie wypłacaj ponownie za rezerwację z 1F."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Wpisz rzeczywisty blok i właściwy wymiar dla wieku oraz ścieżki; nie używaj daty urodzenia jako daty przyjęcia."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "adoption",
+        "continuity",
+        "documents"
+      ],
+      "legal_rule_ids": [
+        "adoption",
+        "insured-parent",
+        "standard-rates",
+        "base"
+      ],
+      "parameter_refs": [
+        "maternity.weeks_by_children",
+        "maternity.adoption_min_weeks"
+      ],
+      "combo": {
+        "with": [
+          "1F"
+        ],
+        "name": "Gotowi na przyjęcie",
+        "check": "docs_complete",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "2F.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "adoption",
+            "insured-parent",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2F.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "adoption",
+            "insured-parent",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2F.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "adoption",
+            "insured-parent",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2F.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "adoption",
+            "insured-parent",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "2F.param.maternity.weeks_by_children",
+          "field": "parameter:maternity.weeks_by_children",
+          "kind": "legal_parameter",
+          "parameter_ref": "maternity.weeks_by_children",
+          "rule_ids": [
+            "maternity-pool",
+            "adoption"
+          ]
+        },
+        {
+          "id": "2F.param.maternity.adoption_min_weeks",
+          "field": "parameter:maternity.adoption_min_weeks",
+          "kind": "legal_parameter",
+          "parameter_ref": "maternity.adoption_min_weeks",
+          "rule_ids": [
+            "adoption"
+          ]
+        },
+        {
+          "id": "2F.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "3A",
+      "round_id": 3,
+      "title": "Więcej na początku",
+      "description": "Wybierz podstawowy wariant wypłat za macierzyński i rodzicielski.",
+      "conditions": "Prawo potwierdzone, brak wcześniejszego wiążącego wyboru wariantu uśrednionego. To wybór porównywanych planów, nie dowolna zmiana już wypłaconych świadczeń.",
+      "effects": [
+        {
+          "op": "set_rate_variant",
+          "value": "standard"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Przelicz wszystkie planowane okresy według ich stawek; pokaż zmianę między etapami i sumę świadczeń w tym samym horyzoncie."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Wariant stawek sam nie dodaje dni i nie zmienia puli urlopów."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "budget",
+        "early"
+      ],
+      "legal_rule_ids": [
+        "standard-rates",
+        "base",
+        "floor"
+      ],
+      "parameter_refs": [
+        "rates.maternity",
+        "rates.parental",
+        "parental_benefit_floor"
+      ],
+      "combo": {
+        "with": [
+          "4C"
+        ],
+        "name": "Budżet dopięty",
+        "check": "budget_ok",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "3A.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "standard-rates",
+            "base",
+            "floor"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3A.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "standard-rates",
+            "base",
+            "floor"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3A.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "standard-rates",
+            "base",
+            "floor"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3A.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "standard-rates",
+            "base",
+            "floor"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3A.param.rates.maternity",
+          "field": "parameter:rates.maternity",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.maternity",
+          "rule_ids": [
+            "standard-rates"
+          ]
+        },
+        {
+          "id": "3A.param.rates.parental",
+          "field": "parameter:rates.parental",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.parental",
+          "rule_ids": [
+            "standard-rates",
+            "exclusive-rate"
+          ]
+        },
+        {
+          "id": "3A.param.parental_benefit_floor",
+          "field": "parameter:parental_benefit_floor",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental_benefit_floor",
+          "rule_ids": [
+            "floor"
+          ]
+        },
+        {
+          "id": "3A.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "3B",
+      "round_id": 3,
+      "title": "Równiej przez miesiące",
+      "description": "Złóż w terminie wniosek o uśredniony wariant wypłat.",
+      "conditions": "Dostępny wariant i osiągalny termin od porodu albo odpowiedniego zdarzenia przyjęcia; uwzględnij wyłączny blok drugiego rodzica.",
+      "effects": [
+        {
+          "op": "set_rate_variant",
+          "value": "averaged"
+        },
+        {
+          "op": "mark_docs",
+          "bundle": "averaged_request",
+          "only_if": "facts.documents_available"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Przelicz plan; wyłączny blok drugiego rodzica rozlicz osobno. Stabilność i suma zależą od podstaw oraz terminów wykorzystania."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Bez dodatkowych tygodni; pilnuj wykorzystania rodzicielskiego w pierwszym roku i ewentualnego wyrównania."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "budget",
+        "stability",
+        "documents"
+      ],
+      "legal_rule_ids": [
+        "averaged",
+        "exclusive-rate",
+        "top-up",
+        "base",
+        "floor"
+      ],
+      "parameter_refs": [
+        "rates.averaged",
+        "rates.parental",
+        "deadlines.averaged_request_days_after_birth"
+      ],
+      "combo": {
+        "with": [
+          "4F"
+        ],
+        "name": "Obie pule w grze",
+        "check": "covers_need",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "3B.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "averaged",
+            "exclusive-rate",
+            "top-up",
+            "base",
+            "floor"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3B.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "averaged",
+            "exclusive-rate",
+            "top-up",
+            "base",
+            "floor"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3B.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "averaged",
+            "exclusive-rate",
+            "top-up",
+            "base",
+            "floor"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3B.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "averaged",
+            "exclusive-rate",
+            "top-up",
+            "base",
+            "floor"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3B.param.rates.averaged",
+          "field": "parameter:rates.averaged",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.averaged",
+          "rule_ids": [
+            "averaged"
+          ]
+        },
+        {
+          "id": "3B.param.rates.parental",
+          "field": "parameter:rates.parental",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.parental",
+          "rule_ids": [
+            "standard-rates",
+            "exclusive-rate"
+          ]
+        },
+        {
+          "id": "3B.param.deadlines.averaged_request_days_after_birth",
+          "field": "parameter:deadlines.averaged_request_days_after_birth",
+          "kind": "legal_parameter",
+          "parameter_ref": "deadlines.averaged_request_days_after_birth",
+          "rule_ids": [
+            "averaged"
+          ]
+        },
+        {
+          "id": "3B.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "3C",
+      "round_id": 3,
+      "title": "Zmiana warty",
+      "description": "Zaplanuj powrót mamy do pracy i przejęcie pozostałego macierzyńskiego przez tatę.",
+      "conditions": "Scenariusz urodzenia, obowiązkowy okres po porodzie wykorzystany przez mamę, dodatnia reszta, uprawniony ojciec i osiągalne terminy wniosków. Przyszły blok nie oznacza powrotu już dziś.",
+      "effects": [
+        {
+          "op": "transfer_maternity",
+          "from_who": "mother",
+          "to_who": "father",
+          "start": "after:mother_personal_postbirth_period",
+          "days": "derived.transferable_maternity_remaining"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Od daty przejęcia uwzględnij pracę mamy i świadczenie od podstawy ojca; nie dopisuj dwóch świadczeń za ten sam przekazany okres."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Przenieś dni, nie twórz nowej puli. Okres przedporodowy nie zastępuje wymaganego okresu po porodzie."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "shared",
+        "handoff",
+        "continuity"
+      ],
+      "legal_rule_ids": [
+        "transfer",
+        "maternity-pool",
+        "standard-rates",
+        "base"
+      ],
+      "parameter_refs": [
+        "maternity.mother_personal_weeks"
+      ],
+      "combo": {
+        "with": [
+          "1A"
+        ],
+        "name": "Zmiana warty",
+        "check": "touching",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "3C.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "transfer",
+            "maternity-pool",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3C.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "transfer",
+            "maternity-pool",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3C.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "transfer",
+            "maternity-pool",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3C.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "transfer",
+            "maternity-pool",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3C.param.maternity.mother_personal_weeks",
+          "field": "parameter:maternity.mother_personal_weeks",
+          "kind": "legal_parameter",
+          "parameter_ref": "maternity.mother_personal_weeks",
+          "rule_ids": [
+            "transfer"
+          ]
+        },
+        {
+          "id": "3C.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "3D",
+      "round_id": 3,
+      "title": "Teczka bez braków",
+      "description": "Uzupełnij dokumenty, potwierdź podstawę i sprawdź, kto wypłaci świadczenie.",
+      "conditions": "Otwarta sprawa, dostępne wymagane dokumenty i fakty potwierdzające prawo; brak dokumentu nie może być samą kartą zmieniony w dokument dostępny.",
+      "effects": [
+        {
+          "op": "mark_docs",
+          "bundle": "current_entitlement",
+          "only_if": "facts.documents_available"
+        },
+        {
+          "op": "set_flag",
+          "name": "payer_and_base_checked",
+          "value": true
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Nie zwiększa należnego świadczenia. Potwierdzone dane mogą zmienić wcześniejszą prognozę; kompletność nie gwarantuje konkretnego dnia przelewu."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Bez dodatkowych dni urlopu; mniej otwartych formalności w planie."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "documents",
+        "security"
+      ],
+      "legal_rule_ids": [
+        "birth-docs",
+        "payer",
+        "base",
+        "insured-parent",
+        "debt",
+        "floor"
+      ],
+      "parameter_refs": [
+        "payer_threshold_insured",
+        "debt_threshold_pct_min_wage",
+        "contribution_deduction"
+      ],
+      "combo": {
+        "with": [
+          "1C",
+          "1D",
+          "2F"
+        ],
+        "name": "Kompletna teczka",
+        "check": "docs_complete",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "3D.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "birth-docs",
+            "payer",
+            "base",
+            "insured-parent",
+            "debt",
+            "floor"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3D.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "birth-docs",
+            "payer",
+            "base",
+            "insured-parent",
+            "debt",
+            "floor"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3D.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "birth-docs",
+            "payer",
+            "base",
+            "insured-parent",
+            "debt",
+            "floor"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3D.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "birth-docs",
+            "payer",
+            "base",
+            "insured-parent",
+            "debt",
+            "floor"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3D.param.payer_threshold_insured",
+          "field": "parameter:payer_threshold_insured",
+          "kind": "legal_parameter",
+          "parameter_ref": "payer_threshold_insured",
+          "rule_ids": [
+            "payer"
+          ]
+        },
+        {
+          "id": "3D.param.debt_threshold_pct_min_wage",
+          "field": "parameter:debt_threshold_pct_min_wage",
+          "kind": "legal_parameter",
+          "parameter_ref": "debt_threshold_pct_min_wage",
+          "rule_ids": [
+            "debt"
+          ]
+        },
+        {
+          "id": "3D.param.contribution_deduction",
+          "field": "parameter:contribution_deduction",
+          "kind": "legal_parameter",
+          "parameter_ref": "contribution_deduction",
+          "rule_ids": [
+            "base"
+          ]
+        },
+        {
+          "id": "3D.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "3E",
+      "round_id": 3,
+      "title": "Uwzględnij dodatkowy wymiar",
+      "description": "Zaktualizuj pulę rodzicielskiego na podstawie zaświadczenia „Za życiem”.",
+      "conditions": "Wymagane zaświadczenie istnieje w scenariuszu i nie zostało już uwzględnione. Karta nie przyznaje diagnozy ani nie nagradza choroby.",
+      "effects": [
+        {
+          "op": "set_flag",
+          "name": "za_zyciem_verified",
+          "value": true
+        },
+        {
+          "op": "mark_docs",
+          "bundle": "za_zyciem",
+          "only_if": "facts.documents_available"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Samo potwierdzenie nie wypłaca pieniędzy. Prognoza zmienia się po przypisaniu dostępnych okresów konkretnym rodzicom."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Zaktualizuj uprawnioną pulę, osobno zachowaj części wyłączne; przy przyjęciu użyj właściwego wariantu."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "rights",
+        "reserve",
+        "documents"
+      ],
+      "legal_rule_ids": [
+        "za-zyciem",
+        "parental-pool",
+        "parental-docs"
+      ],
+      "parameter_refs": [
+        "parental.weeks_za_zyciem_single",
+        "parental.weeks_za_zyciem_multiple",
+        "parental.exclusive_weeks"
+      ],
+      "combo": {
+        "with": [
+          "4D"
+        ],
+        "name": "Plan na potrzeby",
+        "check": "covers_need",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "3E.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "za-zyciem",
+            "parental-pool",
+            "parental-docs"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3E.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "za-zyciem",
+            "parental-pool",
+            "parental-docs"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3E.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "za-zyciem",
+            "parental-pool",
+            "parental-docs"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3E.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "za-zyciem",
+            "parental-pool",
+            "parental-docs"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3E.param.parental.weeks_za_zyciem_single",
+          "field": "parameter:parental.weeks_za_zyciem_single",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.weeks_za_zyciem_single",
+          "rule_ids": [
+            "za-zyciem"
+          ]
+        },
+        {
+          "id": "3E.param.parental.weeks_za_zyciem_multiple",
+          "field": "parameter:parental.weeks_za_zyciem_multiple",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.weeks_za_zyciem_multiple",
+          "rule_ids": [
+            "za-zyciem"
+          ]
+        },
+        {
+          "id": "3E.param.parental.exclusive_weeks",
+          "field": "parameter:parental.exclusive_weeks",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.exclusive_weeks",
+          "rule_ids": [
+            "parental-pool",
+            "exclusive-rate"
+          ]
+        },
+        {
+          "id": "3E.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "3F",
+      "round_id": 3,
+      "title": "Świadczenie po końcu umowy",
+      "description": "Potwierdź odrębne prawo do macierzyńskiego po ustaniu ubezpieczenia.",
+      "conditions": "Ustawowa przesłanka po ustaniu ubezpieczenia jest udokumentowana; nie zakładaj prawa po dowolnym zakończeniu pracy. Przypadki sporne i orzeczenia są faktami, nie wyborem gracza.",
+      "effects": [
+        {
+          "op": "set_flag",
+          "name": "post_insurance_entitlement_verified",
+          "value": true
+        },
+        {
+          "op": "mark_docs",
+          "bundle": "post_insurance_maternity",
+          "only_if": "facts.documents_available"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Po potwierdzeniu przelicz podstawowy blok po porodzie; świadczenie sprzed porodu i po porodzie są odrębnymi okresami."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Pokazuje okres pobierania świadczenia bez fikcyjnego urlopu u byłego pracodawcy."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "security",
+        "continuity",
+        "documents"
+      ],
+      "legal_rule_ids": [
+        "job-loss-after",
+        "insured-parent",
+        "base",
+        "payer"
+      ],
+      "parameter_refs": [
+        "maternity.weeks_by_children",
+        "rates.maternity"
+      ],
+      "combo": {
+        "with": [
+          "1E"
+        ],
+        "name": "Ciągłość wypłat",
+        "check": "touching",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "3F.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "job-loss-after",
+            "insured-parent",
+            "base",
+            "payer"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3F.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "job-loss-after",
+            "insured-parent",
+            "base",
+            "payer"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3F.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "job-loss-after",
+            "insured-parent",
+            "base",
+            "payer"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3F.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "job-loss-after",
+            "insured-parent",
+            "base",
+            "payer"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "3F.param.maternity.weeks_by_children",
+          "field": "parameter:maternity.weeks_by_children",
+          "kind": "legal_parameter",
+          "parameter_ref": "maternity.weeks_by_children",
+          "rule_ids": [
+            "maternity-pool",
+            "adoption"
+          ]
+        },
+        {
+          "id": "3F.param.rates.maternity",
+          "field": "parameter:rates.maternity",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.maternity",
+          "rule_ids": [
+            "standard-rates"
+          ]
+        },
+        {
+          "id": "3F.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "4A",
+      "round_id": 4,
+      "title": "Opieka na zmianę",
+      "description": "Ułóż rodzicielski w następujących po sobie blokach mamy i taty.",
+      "conditions": "Oboje uprawnieni, dostępne pule i części, terminy wniosków osiągalne. Nie przenoś wyłącznej części między rodzicami.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "mother",
+          "kind": "parental",
+          "start": "need:first_year",
+          "days": "choice.mother_parental_days"
+        },
+        {
+          "op": "add_block",
+          "who": "father",
+          "kind": "parental",
+          "start": "after:planned_parental:mother",
+          "days": "choice.father_parental_days"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "W każdym okresie przelicz pensję pracującego rodzica i zasiłek opiekuna od jego podstawy."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Kolejne bloki wydłużają pokryty kalendarz; zużywają odpowiednie pule i części obojga."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "shared",
+        "handoff",
+        "continuity"
+      ],
+      "legal_rule_ids": [
+        "parental-pool",
+        "parental-parts",
+        "parental-docs",
+        "averaged",
+        "exclusive-rate",
+        "base"
+      ],
+      "parameter_refs": [
+        "parental.exclusive_weeks",
+        "parental.max_parts",
+        "rates.parental"
+      ],
+      "combo": {
+        "with": [
+          "2D",
+          "2E",
+          "3C"
+        ],
+        "name": "Bez luki",
+        "check": "touching",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "4A.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "averaged",
+            "exclusive-rate",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4A.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "averaged",
+            "exclusive-rate",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4A.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "averaged",
+            "exclusive-rate",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4A.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "averaged",
+            "exclusive-rate",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4A.param.parental.exclusive_weeks",
+          "field": "parameter:parental.exclusive_weeks",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.exclusive_weeks",
+          "rule_ids": [
+            "parental-pool",
+            "exclusive-rate"
+          ]
+        },
+        {
+          "id": "4A.param.parental.max_parts",
+          "field": "parameter:parental.max_parts",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.max_parts",
+          "rule_ids": [
+            "parental-parts"
+          ]
+        },
+        {
+          "id": "4A.param.rates.parental",
+          "field": "parameter:rates.parental",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.parental",
+          "rule_ids": [
+            "standard-rates",
+            "exclusive-rate"
+          ]
+        },
+        {
+          "id": "4A.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "4B",
+      "round_id": 4,
+      "title": "Rodzicielski we dwoje",
+      "description": "Zaplanuj wspólny blok rodzicielskiego na okres, gdy potrzebujecie być razem.",
+      "conditions": "Dwa uprawnienia, wystarczające pule każdego rodzica i całej rodziny, dostępne części oraz osiągalne terminy.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "mother",
+          "kind": "parental",
+          "start": "need:shared",
+          "days": "choice.shared_parental_days"
+        },
+        {
+          "op": "add_block",
+          "who": "father",
+          "kind": "parental",
+          "start": "need:shared",
+          "days": "choice.shared_parental_days"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Za wspólne dni dwa świadczenia od różnych podstaw, bez pensji za czas nieprzepracowany; porównaj z budżetem rodziny."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Każdy rodzic zużywa własne dni; pokrycie tej samej potrzeby dziecka licz raz. Wspólny czas przechowuj osobno."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "shared",
+        "overlap"
+      ],
+      "legal_rule_ids": [
+        "simultaneous",
+        "parental-pool",
+        "parental-parts",
+        "parental-docs",
+        "standard-rates",
+        "averaged",
+        "exclusive-rate",
+        "base"
+      ],
+      "parameter_refs": [
+        "parental.max_parts",
+        "rates.parental",
+        "rates.averaged"
+      ],
+      "combo": {
+        "with": [
+          "2A"
+        ],
+        "name": "Wspólny start",
+        "check": "overlap",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "4B.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "simultaneous",
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "standard-rates",
+            "averaged",
+            "exclusive-rate",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4B.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "simultaneous",
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "standard-rates",
+            "averaged",
+            "exclusive-rate",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4B.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "simultaneous",
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "standard-rates",
+            "averaged",
+            "exclusive-rate",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4B.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "simultaneous",
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "standard-rates",
+            "averaged",
+            "exclusive-rate",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4B.param.parental.max_parts",
+          "field": "parameter:parental.max_parts",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.max_parts",
+          "rule_ids": [
+            "parental-parts"
+          ]
+        },
+        {
+          "id": "4B.param.rates.parental",
+          "field": "parameter:rates.parental",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.parental",
+          "rule_ids": [
+            "standard-rates",
+            "exclusive-rate"
+          ]
+        },
+        {
+          "id": "4B.param.rates.averaged",
+          "field": "parameter:rates.averaged",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.averaged",
+          "rule_ids": [
+            "averaged"
+          ]
+        },
+        {
+          "id": "4B.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "4C",
+      "round_id": 4,
+      "title": "Praca i rodzicielski",
+      "description": "Połącz rodzicielski z uzgodnioną pracą w części etatu.",
+      "conditions": "Pracownik u pracodawcy udzielającego urlopu, osiągalny wniosek i potwierdzona możliwość organizacji pracy. Sprawdź opiekę w godzinach pracy.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "choice.parent",
+          "kind": "parental",
+          "start": "need:first_year",
+          "days": "choice.parental_pool_days",
+          "work_fraction": "choice.work_fraction",
+          "duration_semantics": "pool_before_extension"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Pensja za pracę plus proporcjonalnie obniżony zasiłek; wylicz także część wydłużoną i wybrany sposób jej wykorzystania."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Wydłuż właściwy blok zgodnie z zasadami; nie uznawaj całego dnia pracy za zapewnioną osobistą opiekę."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "work",
+        "budget",
+        "flexibility"
+      ],
+      "legal_rule_ids": [
+        "part-time",
+        "parental-pool",
+        "parental-parts",
+        "parental-docs",
+        "base"
+      ],
+      "parameter_refs": [
+        "parental.part_time_max_fraction",
+        "parental.part_time_cap_weeks_single",
+        "parental.part_time_cap_weeks_multiple",
+        "deadlines.part_time_notice_days"
+      ],
+      "combo": {
+        "with": [
+          "5C"
+        ],
+        "name": "Długi pomost",
+        "check": "budget_ok",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "4C.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "part-time",
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4C.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "part-time",
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4C.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "part-time",
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4C.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "part-time",
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4C.param.parental.part_time_max_fraction",
+          "field": "parameter:parental.part_time_max_fraction",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.part_time_max_fraction",
+          "rule_ids": [
+            "part-time"
+          ]
+        },
+        {
+          "id": "4C.param.parental.part_time_cap_weeks_single",
+          "field": "parameter:parental.part_time_cap_weeks_single",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.part_time_cap_weeks_single",
+          "rule_ids": [
+            "part-time"
+          ]
+        },
+        {
+          "id": "4C.param.parental.part_time_cap_weeks_multiple",
+          "field": "parameter:parental.part_time_cap_weeks_multiple",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.part_time_cap_weeks_multiple",
+          "rule_ids": [
+            "part-time"
+          ]
+        },
+        {
+          "id": "4C.param.deadlines.part_time_notice_days",
+          "field": "parameter:deadlines.part_time_notice_days",
+          "kind": "legal_parameter",
+          "parameter_ref": "deadlines.part_time_notice_days",
+          "rule_ids": [
+            "part-time"
+          ]
+        },
+        {
+          "id": "4C.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "4D",
+      "round_id": 4,
+      "title": "Rezerwa na adaptację",
+      "description": "Zabezpiecz bieżącą opiekę i zachowaj konkretny blok rodzicielskiego na później.",
+      "conditions": "Istnieje wykonalny plan pierwszego roku i przyszła potrzeba; pozostają właściwa pula, części i czas. Samo zachowanie urlopu nie zapewnia dzisiejszej opieki.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "choice.parent",
+          "kind": "parental",
+          "start": "need:first_year",
+          "days": "choice.first_year_parental_days"
+        },
+        {
+          "op": "reserve",
+          "who": "choice.parent",
+          "pool": "parental",
+          "start": "need:adaptation",
+          "days": "choice.adaptation_reserve_days"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Przelicz bieżące bloki i przyszłą prognozę osobno; przy uśrednieniu sprawdź ewentualną zmianę rozliczenia pierwszego roku."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Rezerwa nie zużywa części ani dni i nie zwiększa pokrytej opieki, dopóki nie stanie się blokiem."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "reserve",
+        "flexibility",
+        "preparation"
+      ],
+      "legal_rule_ids": [
+        "parental-pool",
+        "parental-parts",
+        "top-up",
+        "parental-docs",
+        "base"
+      ],
+      "parameter_refs": [
+        "parental.max_parts",
+        "parental.last_child_age_years"
+      ],
+      "combo": {
+        "with": [
+          "5A",
+          "5B"
+        ],
+        "name": "Rezerwa na później",
+        "check": "covers_need",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "4D.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "top-up",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4D.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "top-up",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4D.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "top-up",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4D.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "top-up",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4D.param.parental.max_parts",
+          "field": "parameter:parental.max_parts",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.max_parts",
+          "rule_ids": [
+            "parental-parts"
+          ]
+        },
+        {
+          "id": "4D.param.parental.last_child_age_years",
+          "field": "parameter:parental.last_child_age_years",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.last_child_age_years",
+          "rule_ids": [
+            "parental-parts"
+          ]
+        },
+        {
+          "id": "4D.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "4E",
+      "round_id": 4,
+      "title": "Wykorzystaj ojcowski",
+      "description": "Zamień zachowaną pulę ojcowskiego w konkretną opiekę przed upływem terminu.",
+      "conditions": "Po 2B albo 2C została pula; wybrany blok i wniosek mieszczą się w terminie. Przy adopcji użyj odrębnego zegara.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "father",
+          "kind": "paternity",
+          "start": "need:paternity_later",
+          "days": "derived.paternity_remaining",
+          "consume_reservation": "paternity"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Rozlicz wykorzystany blok tylko raz; sama wcześniejsza rezerwacja nie była wypłatą."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Odejmij wykorzystane dni i część; przyznaj pokrycie wyłącznie za rzeczywiście zamkniętą potrzebę."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "reserve",
+        "handoff",
+        "continuity"
+      ],
+      "legal_rule_ids": [
+        "paternity",
+        "standard-rates",
+        "base"
+      ],
+      "parameter_refs": [
+        "paternity.min_part_days",
+        "paternity.max_parts",
+        "paternity.notice_days",
+        "rates.paternity"
+      ],
+      "combo": {
+        "with": [
+          "2B",
+          "2C"
+        ],
+        "name": "Wykorzystana rezerwa",
+        "check": "covers_need",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "4E.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4E.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4E.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4E.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "paternity",
+            "standard-rates",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4E.param.paternity.min_part_days",
+          "field": "parameter:paternity.min_part_days",
+          "kind": "legal_parameter",
+          "parameter_ref": "paternity.min_part_days",
+          "rule_ids": [
+            "paternity"
+          ]
+        },
+        {
+          "id": "4E.param.paternity.max_parts",
+          "field": "parameter:paternity.max_parts",
+          "kind": "legal_parameter",
+          "parameter_ref": "paternity.max_parts",
+          "rule_ids": [
+            "paternity"
+          ]
+        },
+        {
+          "id": "4E.param.paternity.notice_days",
+          "field": "parameter:paternity.notice_days",
+          "kind": "legal_parameter",
+          "parameter_ref": "paternity.notice_days",
+          "rule_ids": [
+            "paternity"
+          ]
+        },
+        {
+          "id": "4E.param.rates.paternity",
+          "field": "parameter:rates.paternity",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.paternity",
+          "rule_ids": [
+            "standard-rates"
+          ]
+        },
+        {
+          "id": "4E.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "4F",
+      "round_id": 4,
+      "title": "Własny blok taty",
+      "description": "Zaplanuj niewykorzystaną wyłączną część rodzicielskiego taty.",
+      "conditions": "Ojciec uprawniony, jego wyłączna część nadal dostępna, pozostałe limity i terminy zachowane; dotyczy również właściwego scenariusza przyjęcia.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "father",
+          "kind": "parental",
+          "start": "need:father_solo",
+          "days": "derived.father_exclusive_remaining"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Zasiłek za wyłączny blok według właściwej stawki od podstawy ojca, także gdy drugi rodzic ma wariant uśredniony."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Odejmij dni z części ojca i całej puli; nie dodawaj ich ponownie ponad pulę rodziny."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "shared",
+        "rights",
+        "handoff"
+      ],
+      "legal_rule_ids": [
+        "parental-pool",
+        "exclusive-rate",
+        "parental-parts",
+        "parental-docs",
+        "base"
+      ],
+      "parameter_refs": [
+        "parental.exclusive_weeks",
+        "rates.parental"
+      ],
+      "combo": {
+        "with": [
+          "3B"
+        ],
+        "name": "Obie pule w grze",
+        "check": "covers_need",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "4F.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "parental-pool",
+            "exclusive-rate",
+            "parental-parts",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4F.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "parental-pool",
+            "exclusive-rate",
+            "parental-parts",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4F.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "parental-pool",
+            "exclusive-rate",
+            "parental-parts",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4F.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "parental-pool",
+            "exclusive-rate",
+            "parental-parts",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "4F.param.parental.exclusive_weeks",
+          "field": "parameter:parental.exclusive_weeks",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.exclusive_weeks",
+          "rule_ids": [
+            "parental-pool",
+            "exclusive-rate"
+          ]
+        },
+        {
+          "id": "4F.param.rates.parental",
+          "field": "parameter:rates.parental",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.parental",
+          "rule_ids": [
+            "standard-rates",
+            "exclusive-rate"
+          ]
+        },
+        {
+          "id": "4F.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "5A",
+      "round_id": 5,
+      "title": "Spokojna adaptacja",
+      "description": "Przeznacz pozostały rodzicielski na jeden blok adaptacji.",
+      "conditions": "Finał planowany, właściwy rodzic ma dni i część; osiągalny wniosek, właściwy limit wieku oraz rzeczywista potrzeba.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "choice.parent",
+          "kind": "parental",
+          "start": "need:adaptation",
+          "days": "needs.adaptation.days",
+          "consume_reservation": "parental"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Zastąp dochód z pracy świadczeniem za blok i przelicz wariant; nie dodawaj wypłaty drugi raz za rezerwację."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Pokryj konkretne dni, zużyj pulę odpowiedniego rodzica i jedną część."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "reserve",
+        "adaptation",
+        "continuity"
+      ],
+      "legal_rule_ids": [
+        "parental-pool",
+        "parental-parts",
+        "parental-docs",
+        "standard-rates",
+        "averaged",
+        "base"
+      ],
+      "parameter_refs": [
+        "parental.max_parts",
+        "parental.last_child_age_years",
+        "rates.parental"
+      ],
+      "combo": {
+        "with": [
+          "4D"
+        ],
+        "name": "Rezerwa na później",
+        "check": "covers_need",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "5A.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "standard-rates",
+            "averaged",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5A.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "standard-rates",
+            "averaged",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5A.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "standard-rates",
+            "averaged",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5A.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "standard-rates",
+            "averaged",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5A.param.parental.max_parts",
+          "field": "parameter:parental.max_parts",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.max_parts",
+          "rule_ids": [
+            "parental-parts"
+          ]
+        },
+        {
+          "id": "5A.param.parental.last_child_age_years",
+          "field": "parameter:parental.last_child_age_years",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.last_child_age_years",
+          "rule_ids": [
+            "parental-parts"
+          ]
+        },
+        {
+          "id": "5A.param.rates.parental",
+          "field": "parameter:rates.parental",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.parental",
+          "rule_ids": [
+            "standard-rates",
+            "exclusive-rate"
+          ]
+        },
+        {
+          "id": "5A.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "5B",
+      "round_id": 5,
+      "title": "Dwie przerwy na opiekę",
+      "description": "Rozdziel pozostały rodzicielski między dwa okresy potrzebne rodzinie.",
+      "conditions": "Finał planowany, dwie rzeczywiste potrzeby, wystarczające dni i co najmniej dwie wolne części w limicie rodziny; oba wnioski na czas.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "choice.parent",
+          "kind": "parental",
+          "start": "need:adaptation",
+          "days": "needs.adaptation.days",
+          "consume_reservation": "parental"
+        },
+        {
+          "op": "add_block",
+          "who": "choice.parent",
+          "kind": "parental",
+          "start": "need:later_break",
+          "days": "needs.later_break.days",
+          "consume_reservation": "parental"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Rozłóż świadczenie na miesiące obu bloków; oceń najniższy dochód w stałym horyzoncie."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Dwa bloki pokrywają dwie potrzeby i zużywają dwie części; sprawdź sumę wniosków obojga rodziców."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "flexibility",
+        "adaptation",
+        "reserve"
+      ],
+      "legal_rule_ids": [
+        "parental-pool",
+        "parental-parts",
+        "parental-docs",
+        "standard-rates",
+        "averaged",
+        "base"
+      ],
+      "parameter_refs": [
+        "parental.max_parts",
+        "parental.last_child_age_years"
+      ],
+      "combo": {
+        "with": [
+          "4D"
+        ],
+        "name": "Rezerwa na później",
+        "check": "covers_need",
+        "mult": "0.50"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "5B.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "standard-rates",
+            "averaged",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5B.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "standard-rates",
+            "averaged",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5B.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "standard-rates",
+            "averaged",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5B.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "standard-rates",
+            "averaged",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5B.param.parental.max_parts",
+          "field": "parameter:parental.max_parts",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.max_parts",
+          "rule_ids": [
+            "parental-parts"
+          ]
+        },
+        {
+          "id": "5B.param.parental.last_child_age_years",
+          "field": "parameter:parental.last_child_age_years",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.last_child_age_years",
+          "rule_ids": [
+            "parental-parts"
+          ]
+        },
+        {
+          "id": "5B.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "5C",
+      "round_id": 5,
+      "title": "Łagodny powrót do pracy",
+      "description": "Wykorzystaj rodzicielski podczas adaptacji, łącząc go z częścią etatu.",
+      "conditions": "Finał planowany; pracownik, dostępna pula i część, potwierdzona organizacja pracy, osiągalny termin. Cały wydłużony okres mieści się w granicach.",
+      "effects": [
+        {
+          "op": "add_block",
+          "who": "choice.parent",
+          "kind": "parental",
+          "start": "need:adaptation",
+          "days": "choice.adaptation_pool_days",
+          "work_fraction": "choice.work_fraction",
+          "duration_semantics": "pool_before_extension",
+          "consume_reservation": "parental"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Przelicz część wynagrodzenia i obniżony zasiłek przez właściwy okres; nie obiecuj automatycznie wyższego łącznego dochodu."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Oblicz wydłużenie i opiekę godzinową; pozostałe godziny wymagają innego opiekuna."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "work",
+        "adaptation",
+        "flexibility"
+      ],
+      "legal_rule_ids": [
+        "part-time",
+        "parental-pool",
+        "parental-parts",
+        "parental-docs",
+        "base"
+      ],
+      "parameter_refs": [
+        "parental.part_time_max_fraction",
+        "deadlines.part_time_notice_days",
+        "parental.part_time_cap_weeks_single",
+        "parental.part_time_cap_weeks_multiple"
+      ],
+      "combo": {
+        "with": [
+          "4C"
+        ],
+        "name": "Długi pomost",
+        "check": "budget_ok",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "5C.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "part-time",
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5C.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "part-time",
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5C.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "part-time",
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5C.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "part-time",
+            "parental-pool",
+            "parental-parts",
+            "parental-docs",
+            "base"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5C.param.parental.part_time_max_fraction",
+          "field": "parameter:parental.part_time_max_fraction",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.part_time_max_fraction",
+          "rule_ids": [
+            "part-time"
+          ]
+        },
+        {
+          "id": "5C.param.deadlines.part_time_notice_days",
+          "field": "parameter:deadlines.part_time_notice_days",
+          "kind": "legal_parameter",
+          "parameter_ref": "deadlines.part_time_notice_days",
+          "rule_ids": [
+            "part-time"
+          ]
+        },
+        {
+          "id": "5C.param.parental.part_time_cap_weeks_single",
+          "field": "parameter:parental.part_time_cap_weeks_single",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.part_time_cap_weeks_single",
+          "rule_ids": [
+            "part-time"
+          ]
+        },
+        {
+          "id": "5C.param.parental.part_time_cap_weeks_multiple",
+          "field": "parameter:parental.part_time_cap_weeks_multiple",
+          "kind": "legal_parameter",
+          "parameter_ref": "parental.part_time_cap_weeks_multiple",
+          "rule_ids": [
+            "part-time"
+          ]
+        },
+        {
+          "id": "5C.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "5D",
+      "round_id": 5,
+      "title": "Mama przejmuje nagłą opiekę",
+      "description": "W kwalifikującej nagłej sytuacji zaplanuj opiekuńczy mamy.",
+      "conditions": "Finał nagły; zdarzenie, wiek dziecka, ubezpieczenie, osobista opieka, dostępność domowników i wspólny roczny limit sprawdzone. Nie dotyczy dowolnej zaplanowanej przerwy placówki.",
+      "effects": [
+        {
+          "op": "add_care",
+          "who": "mother",
+          "start": "need:emergency",
+          "days": "needs.emergency.days"
+        },
+        {
+          "op": "mark_docs",
+          "bundle": "care",
+          "only_if": "facts.documents_available"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Przelicz świadczenie od podstawy mamy i utracone wynagrodzenie; porównaj z wariantem taty."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Pokryj rzeczywiste dni nagłej opieki; odejmij je ze wspólnego limitu rocznego rodziny."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "emergency",
+        "security",
+        "handoff"
+      ],
+      "legal_rule_ids": [
+        "care-right",
+        "care-money",
+        "care-docs",
+        "base",
+        "debt"
+      ],
+      "parameter_refs": [
+        "rates.care",
+        "care.days_per_year_child_under_14"
+      ],
+      "combo": {
+        "with": [
+          "4F"
+        ],
+        "name": "Opieka we dwoje",
+        "check": "covers_need",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "5D.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "care-right",
+            "care-money",
+            "care-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5D.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "care-right",
+            "care-money",
+            "care-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5D.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "care-right",
+            "care-money",
+            "care-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5D.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "care-right",
+            "care-money",
+            "care-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5D.param.rates.care",
+          "field": "parameter:rates.care",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.care",
+          "rule_ids": [
+            "care-money"
+          ]
+        },
+        {
+          "id": "5D.param.care.days_per_year_child_under_14",
+          "field": "parameter:care.days_per_year_child_under_14",
+          "kind": "legal_parameter",
+          "parameter_ref": "care.days_per_year_child_under_14",
+          "rule_ids": [
+            "care-money"
+          ]
+        },
+        {
+          "id": "5D.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "5E",
+      "round_id": 5,
+      "title": "Tata przejmuje nagłą opiekę",
+      "description": "W tej samej nagłej sytuacji zaplanuj opiekuńczy taty.",
+      "conditions": "Jak w wariancie mamy, ale warunki spełnia ojciec. Ta sama potrzeba i te same daty umożliwiają uczciwe porównanie kwot.",
+      "effects": [
+        {
+          "op": "add_care",
+          "who": "father",
+          "start": "need:emergency",
+          "days": "needs.emergency.days"
+        },
+        {
+          "op": "mark_docs",
+          "bundle": "care",
+          "only_if": "facts.documents_available"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Przelicz świadczenie od podstawy taty i utracone wynagrodzenie; suma dla rodziny może być inna mimo tej samej liczby dni."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Ta sama opieka i ten sam wspólny limit; drugi rodzic nie dostaje świadczenia za te same dni."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "emergency",
+        "shared",
+        "handoff"
+      ],
+      "legal_rule_ids": [
+        "care-right",
+        "care-money",
+        "care-docs",
+        "base",
+        "debt"
+      ],
+      "parameter_refs": [
+        "rates.care",
+        "care.days_per_year_child_under_14"
+      ],
+      "combo": {
+        "with": [
+          "4A"
+        ],
+        "name": "Zmiana warty",
+        "check": "covers_need",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "5E.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "care-right",
+            "care-money",
+            "care-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5E.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "care-right",
+            "care-money",
+            "care-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5E.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "care-right",
+            "care-money",
+            "care-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5E.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "care-right",
+            "care-money",
+            "care-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5E.param.rates.care",
+          "field": "parameter:rates.care",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.care",
+          "rule_ids": [
+            "care-money"
+          ]
+        },
+        {
+          "id": "5E.param.care.days_per_year_child_under_14",
+          "field": "parameter:care.days_per_year_child_under_14",
+          "kind": "legal_parameter",
+          "parameter_ref": "care.days_per_year_child_under_14",
+          "rule_ids": [
+            "care-money"
+          ]
+        },
+        {
+          "id": "5E.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    },
+    {
+      "id": "5F",
+      "round_id": 5,
+      "title": "Nagła opieka na zmianę",
+      "description": "Podziel kwalifikującą nagłą opiekę na kolejne dni mamy i taty.",
+      "conditions": "Finał nagły, oboje spełniają warunki w swoich dniach; potrzeba pozwala na podział, dni są rozłączne, wspólny limit wystarcza.",
+      "effects": [
+        {
+          "op": "add_care",
+          "who": "mother",
+          "start": "need:emergency",
+          "days": "choice.emergency_mother_days"
+        },
+        {
+          "op": "add_care",
+          "who": "father",
+          "start": "after:emergency:mother",
+          "days": "derived.emergency_remaining_days"
+        },
+        {
+          "op": "mark_docs",
+          "bundle": "care_both",
+          "only_if": "facts.documents_available"
+        }
+      ],
+      "stats": {
+        "money": {
+          "kind": "derived",
+          "explanation": "Każdy odcinek licz od podstawy jego opiekuna; bez dwóch świadczeń za ten sam dzień i bez sztucznego bonusu pieniężnego."
+        },
+        "time": {
+          "kind": "derived",
+          "explanation": "Dwa rozłączne odcinki pokrywają jedną potrzebę; łączny limit rodziny maleje o rzeczywistą liczbę dni."
+        },
+        "happiness": {
+          "kind": "game_score",
+          "chips": 10,
+          "explanation": "Punkty za wykonalną decyzję; nie miara zdrowia ani obietnica samopoczucia."
+        }
+      },
+      "tags": [
+        "emergency",
+        "shared",
+        "flexibility"
+      ],
+      "legal_rule_ids": [
+        "care-right",
+        "care-money",
+        "care-docs",
+        "base",
+        "debt"
+      ],
+      "parameter_refs": [
+        "rates.care",
+        "care.days_per_year_child_under_14"
+      ],
+      "combo": {
+        "with": [
+          "4A"
+        ],
+        "name": "Drużyna w gotowości",
+        "check": "covers_need",
+        "mult": "0.25"
+      },
+      "notes": "",
+      "claims": [
+        {
+          "id": "5F.description",
+          "field": "description",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "care-right",
+            "care-money",
+            "care-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5F.conditions",
+          "field": "conditions",
+          "kind": "legal_interpretation",
+          "rule_ids": [
+            "care-right",
+            "care-money",
+            "care-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5F.stats.money",
+          "field": "stats.money",
+          "kind": "derived",
+          "rule_ids": [
+            "care-right",
+            "care-money",
+            "care-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5F.stats.time",
+          "field": "stats.time",
+          "kind": "derived",
+          "rule_ids": [
+            "care-right",
+            "care-money",
+            "care-docs",
+            "base",
+            "debt"
+          ],
+          "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
+        },
+        {
+          "id": "5F.param.rates.care",
+          "field": "parameter:rates.care",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.care",
+          "rule_ids": [
+            "care-money"
+          ]
+        },
+        {
+          "id": "5F.param.care.days_per_year_child_under_14",
+          "field": "parameter:care.days_per_year_child_under_14",
+          "kind": "legal_parameter",
+          "parameter_ref": "care.days_per_year_child_under_14",
+          "rule_ids": [
+            "care-money"
+          ]
+        },
+        {
+          "id": "5F.happiness",
+          "field": "stats.happiness",
+          "kind": "game_design",
+          "rule_ids": [],
+          "explanation": "Punktacja autorska, bez podstawy prawnej."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1313 @@
+{
+  "schema_version": 1,
+  "rules": [
+    {
+      "id": "maternity-pool",
+      "summary": "Pula macierzyńskiego zależy od liczby dzieci; okres przed porodem zużywa tę samą pulę.",
+      "evidence": [
+        {
+          "document_id": "labour-code",
+          "unit": "article-180",
+          "locator": "art. 180 § 1 pkt 1–5, § 2–3",
+          "quote": "20 tygodni - w przypadku urodzenia jednego dziecka przy jednym porodzie",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-180",
+          "pdf_page": 3,
+          "unit_start_pdf_page": 3,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "labour-code",
+          "unit": "article-1831",
+          "locator": "art. 183¹ § 1–2",
+          "quote": "pierwszym dniem urlopu macierzyńskiego jest dzień porodu",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-1831",
+          "pdf_page": 9,
+          "unit_start_pdf_page": 9,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "prebirth",
+      "summary": "Pracownica może zaplanować część macierzyńskiego przed przewidywaną datą porodu; potrzebne zaświadczenie.",
+      "evidence": [
+        {
+          "document_id": "labour-code",
+          "unit": "article-180",
+          "locator": "art. 180 § 2–3",
+          "quote": "Przed przewidywaną datą porodu pracownica może wykorzystać niewięcej niż 6 tygodni urlopu macierzyńskiego",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-180",
+          "pdf_page": 3,
+          "unit_start_pdf_page": 3,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-13",
+          "locator": "§ 13 ust. 1 pkt 1",
+          "quote": "zaświadczenie lekarskie wystawione na zwykłym druku określające przewidywaną datę porodu",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-13",
+          "pdf_page": 3,
+          "unit_start_pdf_page": 3,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "sick-right",
+      "summary": "Niezdolność do pracy stwierdza lekarz. Prawo zależy od ubezpieczenia, wyczekiwania i jego wyjątków; ciąża sama nie jest zwolnieniem.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-6",
+          "locator": "art. 6 ust. 1",
+          "quote": "stał się niezdolny do pracy z powodu choroby w czasie trwania ubezpieczenia chorobowego",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-6",
+          "pdf_page": 2,
+          "unit_start_pdf_page": 2,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefits-act",
+          "unit": "article-4",
+          "locator": "art. 4 ust. 1–3",
+          "quote": "po upływie 30 dni nieprzerwanego ubezpieczenia chorobowego",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-4",
+          "pdf_page": 2,
+          "unit_start_pdf_page": 2,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefits-act",
+          "unit": "article-53",
+          "locator": "art. 53 ust. 1",
+          "quote": "zaświadczenia lekarskie",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-53",
+          "pdf_page": 13,
+          "unit_start_pdf_page": 13,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "sick-money",
+      "summary": "Stawka w ciąży dotyczy podstawy zasiłku. U pracownicy rozdzielamy wynagrodzenie chorobowe i zasiłek, z uwzględnieniem wieku i roku kalendarzowego.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-11",
+          "locator": "art. 11 ust. 2 pkt 1, ust. 4",
+          "quote": "przypada w okresie ciąży",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-11",
+          "pdf_page": 3,
+          "unit_start_pdf_page": 3,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefits-act",
+          "unit": "article-8",
+          "locator": "art. 8 ust. 1–2",
+          "quote": "niedłużej niż przez 270 dni",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-8",
+          "pdf_page": 3,
+          "unit_start_pdf_page": 3,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "labour-code",
+          "unit": "article-92",
+          "locator": "art. 92 § 1 pkt 1–2, § 4–5",
+          "quote": "pracownik zachowuje prawo do 100% wynagrodzenia",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-92",
+          "pdf_page": 1,
+          "unit_start_pdf_page": 1,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "sick-docs",
+      "summary": "Dobieramy dokumenty do tytułu ubezpieczenia i odbiorcy; e-ZLA nie zastępuje wszystkich wniosków.",
+      "evidence": [
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-2",
+          "locator": "§ 2",
+          "quote": "Dokumentami niezbędnymi do przyznania i wypłaty",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-2",
+          "pdf_page": 1,
+          "unit_start_pdf_page": 1,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-3",
+          "locator": "§ 3 ust. 1–2",
+          "quote": "zaświadczenie płatnika",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-3",
+          "pdf_page": 1,
+          "unit_start_pdf_page": 1,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "rehab",
+      "summary": "Świadczenie rehabilitacyjne wymaga wyczerpania chorobowego, dalszej niezdolności i rokowania; wypłata zależy od decyzji, a podstawa od waloryzacji.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-18",
+          "locator": "art. 18 ust. 1–3, 6–7",
+          "quote": "dalsze leczenie lub rehabilitacja lecznicza rokują odzyskanie zdolności do pracy",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-18",
+          "pdf_page": 5,
+          "unit_start_pdf_page": 5,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefits-act",
+          "unit": "article-19",
+          "locator": "art. 19 ust. 1–3",
+          "quote": "jeżeli niezdolność do pracy przypada w okresie ciąży - 100% tej podstawy",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-19",
+          "pdf_page": 6,
+          "unit_start_pdf_page": 6,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-11",
+          "locator": "§ 11 ust. 1–3",
+          "quote": "zaświadczenie o stanie zdrowia",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-11",
+          "pdf_page": 3,
+          "unit_start_pdf_page": 2,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "job-loss-before",
+      "summary": "Szczególne świadczenie przed porodem dotyczy określonej utraty zatrudnienia i braku zapewnionej innej pracy; nie każdej kończącej się umowy.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-30",
+          "locator": "art. 30 ust. 3",
+          "quote": "przysługuje do dnia porodu zasiłek w wysokości zasiłku macierzyńskiego",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-30",
+          "pdf_page": 8,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-17",
+          "locator": "§ 17 pkt 1–3",
+          "quote": "oświadczenie ubezpieczonej, że nie zapewniono jej innego zatrudnienia",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-17",
+          "pdf_page": 4,
+          "unit_start_pdf_page": 4,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "job-loss-after",
+      "summary": "Prawo po porodzie po ustaniu ubezpieczenia sprawdzamy osobno, według ustawowej przesłanki i dokumentów.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-30",
+          "locator": "art. 30 ust. 1 pkt 1–2, ust. 4",
+          "quote": "ubezpieczenie to ustało w okresie ciąży",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-30",
+          "pdf_page": 8,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "labour-code",
+          "unit": "article-177",
+          "locator": "art. 177 § 3 i § 3¹",
+          "quote": "ulega przedłużeniu do dnia porodu",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-177",
+          "pdf_page": 2,
+          "unit_start_pdf_page": 2,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-15",
+          "locator": "§ 15 ust. 1–2",
+          "quote": "Dokumentami niezbędnymi",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-15",
+          "pdf_page": 4,
+          "unit_start_pdf_page": 4,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "insured-parent",
+      "summary": "Świadczenie przysługuje uprawnionemu ubezpieczonemu; osoba bez umowy o pracę pobiera je za okres odpowiadający urlopowi, bez udzielania urlopu pracowniczego.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-29",
+          "locator": "art. 29 ust. 1–2",
+          "quote": "w okresie ubezpieczenia chorobowego albo w okresie urlopu wychowawczego",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-29",
+          "pdf_page": 6,
+          "unit_start_pdf_page": 6,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefits-act",
+          "unit": "article-29a",
+          "locator": "art. 29a ust. 1",
+          "quote": "przez okres ustalony przepisami Kodeksu pracy",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-29a",
+          "pdf_page": 8,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "adoption",
+      "summary": "Adopcja i piecza niezawodowa mają różne przesłanki wieku i dokumenty; początek wynika z przyjęcia oraz, dla adopcji, wystąpienia do sądu.",
+      "evidence": [
+        {
+          "document_id": "labour-code",
+          "unit": "article-183",
+          "locator": "art. 183 § 1, § 1¹, § 3–6",
+          "quote": "Urlop rozpoczyna się w terminie określonym we wniosku pracownika",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-183",
+          "pdf_page": 9,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefits-act",
+          "unit": "article-29",
+          "locator": "art. 29 ust. 1 pkt 2–3, ust. 2",
+          "quote": "przyjęła na wychowanie dziecko w wieku do 14 roku życia",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-29",
+          "pdf_page": 7,
+          "unit_start_pdf_page": 6,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-16",
+          "locator": "§ 16 ust. 1–2",
+          "quote": "oświadczenie ubezpieczonego o dacie przyjęcia dziecka na wychowanie",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-16",
+          "pdf_page": 4,
+          "unit_start_pdf_page": 4,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "paternity",
+      "summary": "Ojcowski ma własną pulę, ograniczenie liczby części i terminu. Przy adopcji termin liczony jest od prawomocnego przysposobienia, nie od urodzenia.",
+      "evidence": [
+        {
+          "document_id": "labour-code",
+          "unit": "article-1823",
+          "locator": "art. 182³ § 1 pkt 1–2, § 1¹, § 2",
+          "quote": "żadna nie może być krótsza niż tydzień",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-1823",
+          "pdf_page": 8,
+          "unit_start_pdf_page": 7,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "leave-applications",
+          "unit": "section-17",
+          "locator": "§ 17 ust. 1–2",
+          "quote": "wskazanie okresu",
+          "markdown": "Documents/legal/leave-applications.md",
+          "markdown_anchor": "section-17",
+          "pdf_page": 9,
+          "unit_start_pdf_page": 9,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w sprawie wniosków dot. uprawnień pracowników związanych z rodzicielstwem .pdf",
+          "source_sha256": "af34d9dbb36e12b4a3b20fff528a89e87e9dbbaa0b38ad4fee743839154e6b87",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "supplementary",
+      "summary": "Jednorazowy blok bezpośrednio po macierzyńskim, według tygodnia ciąży, masy i kwalifikujących pobytów. Okresy sumujemy, niepełny tydzień zaokrąglamy w górę.",
+      "evidence": [
+        {
+          "document_id": "labour-code",
+          "unit": "article-1802",
+          "locator": "art. 180² § 1 pkt 1–3, § 2–6",
+          "quote": "Niepełny tydzień zaokrągla się w górę do pełnego tygodnia",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-1802",
+          "pdf_page": 5,
+          "unit_start_pdf_page": 5,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "leave-applications",
+          "unit": "section-14",
+          "locator": "§ 14 ust. 1–4",
+          "quote": "zaświadczenie, o którym mowa w art. 1802 § 5 Kodeksu pracy",
+          "markdown": "Documents/legal/leave-applications.md",
+          "markdown_anchor": "section-14",
+          "pdf_page": 7,
+          "unit_start_pdf_page": 7,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w sprawie wniosków dot. uprawnień pracowników związanych z rodzicielstwem .pdf",
+          "source_sha256": "af34d9dbb36e12b4a3b20fff528a89e87e9dbbaa0b38ad4fee743839154e6b87",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-26",
+          "locator": "§ 26 pkt 1–3; dla zmiany rodzica również § 27",
+          "quote": "oświadczenie ubezpieczonego o braku zamiaru korzystania przez drugiego z rodziców",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-26",
+          "pdf_page": 7,
+          "unit_start_pdf_page": 7,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "base",
+      "summary": "Każdy rodzic ma własną podstawę. Pracownik: historia wynagrodzeń i uzupełnienia; pozostali: właściwe zasady przychodu, także przy krótszym ubezpieczeniu.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-3",
+          "locator": "art. 3 pkt 3–4",
+          "quote": "po odliczeniu kwoty odpowiadającej 13,71%",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-3",
+          "pdf_page": 2,
+          "unit_start_pdf_page": 1,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefits-act",
+          "unit": "article-36",
+          "locator": "art. 36 ust. 1–4; art. 37–42, 45, 47",
+          "quote": "jedna trzydziesta część",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-36",
+          "pdf_page": 9,
+          "unit_start_pdf_page": 9,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefits-act",
+          "unit": "article-47",
+          "locator": "art. 47",
+          "quote": "stosuje się odpowiednio",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-47",
+          "pdf_page": 11,
+          "unit_start_pdf_page": 11,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefits-act",
+          "unit": "article-48",
+          "locator": "art. 48 ust. 1–2; art. 48a–50, 52",
+          "quote": "przeciętny miesięczny przychód",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-48",
+          "pdf_page": 11,
+          "unit_start_pdf_page": 11,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "standard-rates",
+      "summary": "Wariant podstawowy: różne stawki dla macierzyńskiego i rodzicielskiego; procent podstawy nie jest procentem pensji netto.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-31",
+          "locator": "art. 31 ust. 1–2",
+          "quote": "wynosi 100% podstawy wymiaru zasiłku",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-31",
+          "pdf_page": 9,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "averaged",
+      "summary": "Wniosek o wariant uśredniony ma termin od porodu albo odpowiedniego zdarzenia przyjęcia; wyłączna część drugiego rodzica pozostaje w odrębnej stawce.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-30a",
+          "locator": "art. 30a ust. 1–4",
+          "quote": "niepóźniej niż 21 dni po porodzie",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-30a",
+          "pdf_page": 8,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefits-act",
+          "unit": "article-31",
+          "locator": "art. 31 ust. 3, 3f–3g, 4",
+          "quote": "81,5% podstawy wymiaru zasiłku",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-31",
+          "pdf_page": 9,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "transfer",
+      "summary": "Przekazanie dotyczy pozostałej części po okresie wykorzystanym po porodzie; wymagane uprawnienie ojca i odpowiednie wnioski obojga rodziców.",
+      "evidence": [
+        {
+          "document_id": "labour-code",
+          "unit": "article-180",
+          "locator": "art. 180 § 4–5, 8–9, 14",
+          "quote": "po wykorzystaniu po porodzie co najmniej 14 tygodni",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-180",
+          "pdf_page": 3,
+          "unit_start_pdf_page": 3,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefits-act",
+          "unit": "article-29",
+          "locator": "art. 29 ust. 3–4",
+          "quote": "przerwał działalność zarobkową w celu sprawowania osobistej opieki nad dzieckiem",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-29",
+          "pdf_page": 7,
+          "unit_start_pdf_page": 6,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-18",
+          "locator": "§ 18 ust. 1–2; § 20 ust. 1–2",
+          "quote": "o dacie, od której ubezpieczony ojciec dziecka będzie korzystał z uprawnień",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-18",
+          "pdf_page": 5,
+          "unit_start_pdf_page": 4,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "payer",
+      "summary": "Płatnik świadczenia zależy od tytułu i liczby ubezpieczonych ustalanej na ustawowy dzień; po ustaniu ubezpieczenia wypłaca ZUS.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-61",
+          "locator": "art. 61 ust. 1 pkt 1–2, ust. 2–4",
+          "quote": "według stanu na dzień 30 listopada poprzedniego roku",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-61",
+          "pdf_page": 19,
+          "unit_start_pdf_page": 19,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-3",
+          "locator": "§ 3 ust. 1–2",
+          "quote": "zaświadczenie płatnika",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-3",
+          "pdf_page": 1,
+          "unit_start_pdf_page": 1,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "birth-docs",
+      "summary": "Dokumenty do zasiłku są zależne od sprawy. Gdy płaci ZUS, zasadniczo przekazuje się dane dziecka do pobrania aktu z rejestru, zamiast odpisu na start.",
+      "evidence": [
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-12",
+          "locator": "§ 12",
+          "quote": "dane i informacje określone w załączniku nr 6",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-12",
+          "pdf_page": 3,
+          "unit_start_pdf_page": 3,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-13",
+          "locator": "§ 13 ust. 1–4",
+          "quote": "Odpisu skróconego aktu urodzenia dziecka nie przedstawia się, jeżeli płatnikiem zasiłku jest Zakład",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-13",
+          "pdf_page": 3,
+          "unit_start_pdf_page": 3,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "parental-pool",
+      "summary": "Pula zależy od liczby dzieci i właściwej ścieżki. Każdy rodzic ma wyłączną część wewnątrz puli, nie dodatkowo ponad nią.",
+      "evidence": [
+        {
+          "document_id": "labour-code",
+          "unit": "article-1821a",
+          "locator": "art. 182¹a § 1, 3–5; przy przyjęciu art. 183 § 4–5",
+          "quote": "Prawa tego nie można przenieść",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-1821a",
+          "pdf_page": 6,
+          "unit_start_pdf_page": 6,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "labour-code",
+          "unit": "article-183",
+          "locator": "art. 183 § 4–4⁶ i § 5",
+          "quote": "38 tygodni",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-183",
+          "pdf_page": 8,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "za-zyciem",
+      "summary": "Posiadanie wymaganego zaświadczenia zwiększa pulę, ale nie przydziela automatycznie wszystkich tygodni ani nie znosi wyłącznych części.",
+      "evidence": [
+        {
+          "document_id": "labour-code",
+          "unit": "article-1821a",
+          "locator": "art. 182¹a § 2–4",
+          "quote": "65 tygodni",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-1821a",
+          "pdf_page": 6,
+          "unit_start_pdf_page": 6,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "labour-code",
+          "unit": "article-183",
+          "locator": "art. 183 § 4³–4⁵",
+          "quote": "62 tygodni",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-183",
+          "pdf_page": 9,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "leave-applications",
+          "unit": "section-15",
+          "locator": "§ 15 ust. 2 pkt 3",
+          "quote": "kopię zaświadczenia",
+          "markdown": "Documents/legal/leave-applications.md",
+          "markdown_anchor": "section-15",
+          "pdf_page": 8,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w sprawie wniosków dot. uprawnień pracowników związanych z rodzicielstwem .pdf",
+          "source_sha256": "af34d9dbb36e12b4a3b20fff528a89e87e9dbbaa0b38ad4fee743839154e6b87",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "parental-parts",
+      "summary": "Liczymy części i wnioski obojga rodziców łącznie, również okresy odpowiadające urlopom. Przy przyjęciu stosujemy właściwe granice wieku.",
+      "evidence": [
+        {
+          "document_id": "labour-code",
+          "unit": "article-1821c",
+          "locator": "art. 182¹c",
+          "quote": "niewięcej niż w 5 częściach",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-1821c",
+          "pdf_page": 6,
+          "unit_start_pdf_page": 6,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "labour-code",
+          "unit": "article-1821d",
+          "locator": "art. 182¹d § 1–2",
+          "quote": "niekrótszym niż 21 dni",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-1821d",
+          "pdf_page": 6,
+          "unit_start_pdf_page": 6,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "labour-code",
+          "unit": "article-183",
+          "locator": "art. 183 § 4–5",
+          "quote": "niedłużej jednak niż do ukończenia przez dziecko 14 roku życia",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-183",
+          "pdf_page": 8,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "simultaneous",
+      "summary": "Jednoczesny rodzicielski obojga zużywa pulę za każdą osobę; dzień pokrytej opieki w statystyce czasu liczymy raz.",
+      "evidence": [
+        {
+          "document_id": "labour-code",
+          "unit": "article-1821a",
+          "locator": "art. 182¹a § 6–7",
+          "quote": "mogą jednocześnie korzystać oboje",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-1821a",
+          "pdf_page": 6,
+          "unit_start_pdf_page": 6,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefits-act",
+          "unit": "article-29a",
+          "locator": "art. 29a ust. 3–4",
+          "quote": "łączny okres zasiłku macierzyńskiego nie może przekraczać",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-29a",
+          "pdf_page": 8,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "part-time",
+      "summary": "Łączenie z pracą u pracodawcy udzielającego urlopu wymaga odpowiedniego wniosku i możliwości organizacyjnych. Świadczenie maleje proporcjonalnie do pracy.",
+      "evidence": [
+        {
+          "document_id": "labour-code",
+          "unit": "article-1821e",
+          "locator": "art. 182¹e § 1–2",
+          "quote": "chyba że nie jest to możliwe ze względu na organizację pracy",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-1821e",
+          "pdf_page": 7,
+          "unit_start_pdf_page": 7,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "labour-code",
+          "unit": "article-1821f",
+          "locator": "art. 182¹f § 1–7, w tym § 1¹",
+          "quote": "130 tygodni",
+          "markdown": "Documents/legal/labour-code.md",
+          "markdown_anchor": "article-1821f",
+          "pdf_page": 7,
+          "unit_start_pdf_page": 7,
+          "source_file": "Documents/Materiały dla uczestników/Kodeks pracy (wyciąg z przepisów).pdf",
+          "source_sha256": "8cea3a13e32dd8db0c3a00c0329ebd4f035d181b312fc312b967462ce08a88c4",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefits-act",
+          "unit": "article-31",
+          "locator": "art. 31 ust. 4a",
+          "quote": "zmniejsza się proporcjonalnie do wymiaru czasu pracy",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-31",
+          "pdf_page": 9,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "leave-applications",
+          "unit": "section-16",
+          "locator": "§ 16 pkt 1–4",
+          "quote": "określenie wymiaru czasu pracy",
+          "markdown": "Documents/legal/leave-applications.md",
+          "markdown_anchor": "section-16",
+          "pdf_page": 8,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w sprawie wniosków dot. uprawnień pracowników związanych z rodzicielstwem .pdf",
+          "source_sha256": "af34d9dbb36e12b4a3b20fff528a89e87e9dbbaa0b38ad4fee743839154e6b87",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "parental-docs",
+      "summary": "Wniosek i oświadczenia uwzględniają dotychczasowe części, drugiego rodzica, przyjęcie dziecka i ewentualną pracę podczas urlopu.",
+      "evidence": [
+        {
+          "document_id": "leave-applications",
+          "unit": "section-15",
+          "locator": "§ 15 ust. 1–4",
+          "quote": "liczby wykorzystanych części",
+          "markdown": "Documents/legal/leave-applications.md",
+          "markdown_anchor": "section-15",
+          "pdf_page": 8,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w sprawie wniosków dot. uprawnień pracowników związanych z rodzicielstwem .pdf",
+          "source_sha256": "af34d9dbb36e12b4a3b20fff528a89e87e9dbbaa0b38ad4fee743839154e6b87",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-29",
+          "locator": "§ 29 pkt 1–4; przy zmianie rodzica § 30",
+          "quote": "liczbie części wypłaconego zasiłku",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-29",
+          "pdf_page": 8,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "exclusive-rate",
+      "summary": "Wyłączny blok drugiego rodzica ma stawkę rodzicielskiego także przy wariancie uśrednionym.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-31",
+          "locator": "art. 31 ust. 3f",
+          "quote": "w części przysługującej drugiemu rodzicowi",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-31",
+          "pdf_page": 9,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "top-up",
+      "summary": "Brak choćby jednego dnia rodzicielskiego w pierwszym roku zmienia rozliczenie wariantu uśrednionego; wyrównanie wymaga wniosku.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-31",
+          "locator": "art. 31 ust. 3g i 4",
+          "quote": "Jednorazowe wyrównanie zasiłku macierzyńskiego następuje na wniosek",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-31",
+          "pdf_page": 9,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "care-right",
+      "summary": "Opiekuńczy wymaga kwalifikującego zdarzenia, wieku i osobistej opieki; sprawdzamy też innego dostępnego domownika i wyjątek dla chorego dziecka poniżej dwóch lat.",
+      "evidence": [
+        {
+          "document_id": "parents-guide",
+          "unit": "page-38",
+          "locator": "Poradnik, s. drukowana 37; ustawa zasiłkowa art. 32 ust. 1–3 i art. 34",
+          "quote": "nieprzewidziane zamknięcie żłobka",
+          "markdown": "Documents/legal/parents-guide.md",
+          "markdown_anchor": "page-38",
+          "pdf_page": 38,
+          "unit_start_pdf_page": 38,
+          "source_file": "Documents/Materiały dla uczestników/Poradnik dla rodziców, ZUS 2026.pdf",
+          "source_sha256": "0563cb35f54a84d2f3e1681f52fd614fac1efd29d0716968054285ad62a04dcf",
+          "source_kind": "guidance",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "parents-guide",
+          "unit": "page-37",
+          "locator": "Poradnik, s. drukowana 36; ustawa zasiłkowa art. 34",
+          "quote": "chyba że dziecko choruje i ma mniej niż 2 lata",
+          "markdown": "Documents/legal/parents-guide.md",
+          "markdown_anchor": "page-37",
+          "pdf_page": 37,
+          "unit_start_pdf_page": 37,
+          "source_file": "Documents/Materiały dla uczestników/Poradnik dla rodziców, ZUS 2026.pdf",
+          "source_sha256": "0563cb35f54a84d2f3e1681f52fd614fac1efd29d0716968054285ad62a04dcf",
+          "source_kind": "guidance",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review",
+      "external_verification": {
+        "url": "https://api.sejm.gov.pl/eli/acts/DU/2026/854/text/U/D20260854Lj.pdf",
+        "checked_on": "2026-11-21",
+        "locator": "art. 32–35, PDF pages 19–22",
+        "note": "The supplied extract omits these articles. The guide is secondary evidence. The official consolidated text also prints a future wording of art. 32 effective 2028-01-01; do not apply it early."
+      }
+    },
+    {
+      "id": "care-money",
+      "summary": "Opiekuńczy liczymy od podstawy danego rodzica. Limit roczny jest wspólny dla rodziny, a nie osobny dla każdego rodzica.",
+      "evidence": [
+        {
+          "document_id": "parents-guide",
+          "unit": "page-39",
+          "locator": "Poradnik, s. drukowana 38; ustawa zasiłkowa art. 33 ust. 1–3, art. 35 ust. 1",
+          "quote": "Zasiłek opiekuńczy wynosi 80% podstawy wymiaru",
+          "markdown": "Documents/legal/parents-guide.md",
+          "markdown_anchor": "page-39",
+          "pdf_page": 39,
+          "unit_start_pdf_page": 39,
+          "source_file": "Documents/Materiały dla uczestników/Poradnik dla rodziców, ZUS 2026.pdf",
+          "source_sha256": "0563cb35f54a84d2f3e1681f52fd614fac1efd29d0716968054285ad62a04dcf",
+          "source_kind": "guidance",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review",
+      "external_verification": {
+        "url": "https://api.sejm.gov.pl/eli/acts/DU/2026/854/text/U/D20260854Lj.pdf",
+        "checked_on": "2026-11-21",
+        "locator": "art. 32–35, PDF pages 19–22",
+        "note": "The supplied extract omits these articles. The guide is secondary evidence. The official consolidated text also prints a future wording of art. 32 effective 2028-01-01; do not apply it early."
+      }
+    },
+    {
+      "id": "care-docs",
+      "summary": "Za ten sam okres świadczenie otrzymuje jeden rodzic; do opieki nad dzieckiem potrzebny wniosek i dowód właściwy dla zdarzenia.",
+      "evidence": [
+        {
+          "document_id": "parents-guide",
+          "unit": "page-37",
+          "locator": "Poradnik, s. drukowana 36",
+          "quote": "tylko jedno z Was",
+          "markdown": "Documents/legal/parents-guide.md",
+          "markdown_anchor": "page-37",
+          "pdf_page": 37,
+          "unit_start_pdf_page": 37,
+          "source_file": "Documents/Materiały dla uczestników/Poradnik dla rodziców, ZUS 2026.pdf",
+          "source_sha256": "0563cb35f54a84d2f3e1681f52fd614fac1efd29d0716968054285ad62a04dcf",
+          "source_kind": "guidance",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "parents-guide",
+          "unit": "page-39",
+          "locator": "Poradnik, s. drukowana 38",
+          "quote": "formularz Z-15A",
+          "markdown": "Documents/legal/parents-guide.md",
+          "markdown_anchor": "page-39",
+          "pdf_page": 39,
+          "unit_start_pdf_page": 39,
+          "source_file": "Documents/Materiały dla uczestników/Poradnik dla rodziców, ZUS 2026.pdf",
+          "source_sha256": "0563cb35f54a84d2f3e1681f52fd614fac1efd29d0716968054285ad62a04dcf",
+          "source_kind": "guidance",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review",
+      "external_verification": {
+        "url": "https://api.sejm.gov.pl/eli/acts/DU/2026/854/text/U/D20260854Lj.pdf",
+        "checked_on": "2026-11-21",
+        "locator": "art. 32–35, PDF pages 19–22",
+        "note": "The supplied extract omits these articles. The guide is secondary evidence. The official consolidated text also prints a future wording of art. 32 effective 2028-01-01; do not apply it early."
+      }
+    },
+    {
+      "id": "debt",
+      "summary": "Dla wskazanych płatników własnych składek zadłużenie może blokować świadczenia; spłata i terminy wymagają odrębnego sprawdzenia.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-2a",
+          "locator": "art. 2a ust. 1–2",
+          "quote": "do czasu spłaty całości zadłużenia",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-2a",
+          "pdf_page": 1,
+          "unit_start_pdf_page": 1,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    },
+    {
+      "id": "floor",
+      "summary": "Podwyższenie niskiego zasiłku wymaga uwzględnienia okresu i innych tytułów; nie jest dodatkowym świadczeniem za kartę.",
+      "evidence": [
+        {
+          "document_id": "benefits-act",
+          "unit": "article-31",
+          "locator": "art. 31 ust. 3a i 3c",
+          "quote": "ustala się proporcjonalnie do okresu",
+          "markdown": "Documents/legal/benefits-act.md",
+          "markdown_anchor": "article-31",
+          "pdf_page": 9,
+          "unit_start_pdf_page": 8,
+          "source_file": "Documents/Materiały dla uczestników/wyciąg z ustawy o świadczeniach pieniężnych z ubezpieczeń społecznych w razie choroby i macierzyństwa (ustawa zasiłkowa).pdf",
+          "source_sha256": "ae7820edd5439d1322e028b71ac0d07a47c1aaacd17e184e95cdd89170b0655c",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        },
+        {
+          "document_id": "benefit-documents",
+          "unit": "section-28",
+          "locator": "§ 28 pkt 1–2",
+          "quote": "podwyższenie zasiłku macierzyńskiego nie jest pobierane z innego tytułu",
+          "markdown": "Documents/legal/benefit-documents.md",
+          "markdown_anchor": "section-28",
+          "pdf_page": 7,
+          "unit_start_pdf_page": 7,
+          "source_file": "Documents/Materiały dla uczestników/rozporządzenie w spr. zakresu informacji o okolicznościach mających wpływ na prawo do zasiłków ...pdf",
+          "source_sha256": "1a81c9aaa3f41b8f97763494fcb1ebbeeefd870694b5fc69fd09c1098d911395",
+          "source_kind": "legislation",
+          "status": "checked_against_supplied_file"
+        }
+      ],
+      "version_scope": "supplied_hacknation_2026_materials",
+      "effective_from": null,
+      "effective_to": null,
+      "production_status": "requires_temporal_review"
+    }
+  ]
+}

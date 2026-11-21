@@ -1,4 +1,5 @@
 import catalog from "../../../shared/cards.json";
+import deck from "../../../shared/deck-design.json";
 import type { Card, GamePreview } from "@/types/game";
 
 const localPreview: GamePreview = {
@@ -11,17 +12,16 @@ const localPreview: GamePreview = {
     { id: "time", label: "Czas", value: null, unit: "dni", max: null },
     { id: "happiness", label: "Szczęście", value: null, unit: "pkt", max: null },
   ],
-  // The catalog JSON holds only card text; fill the game-mechanics defaults the API would add.
-  rounds: catalog.rounds.map((round) => ({ ...round, cards: round.cards.map((card): Card => ({ tags: [], requires: [], effects: [], chips: 0, combos: [], ...card })) })),
+  // Authored annotations are a preview, never executable effects or fabricated amounts.
+  rounds: catalog.rounds.map((round) => ({ ...round,
+    description: round.id === 1 ? "Przygotujcie się na narodziny albo przyjęcie dziecka. Poznajcie dostępne ścieżki." : round.id === 2 ? "Zaplanujcie pierwsze tygodnie po narodzinach lub przyjęciu dziecka na wychowanie." : round.description,
+    cards: deck.cards.filter((card) => card.round_id === round.id).map((design): Card => ({
+    id: design.id, round_id: design.round_id, title: design.title, description: design.description,
+    tags: design.tags, requires: [], effects: [], chips: 0, combos: [], sources: [], design,
+  })) })),
 };
 
-export async function getGamePreview(): Promise<GamePreview> {
-  if (!process.env.API_URL) return localPreview;
-
-  const response = await fetch(
-    `${process.env.API_URL.replace(/\/$/, "")}/api/v1/game/preview`,
-    { cache: "no-store", signal: AbortSignal.timeout(5000) },
-  );
-  if (!response.ok) throw new Error("Nie udało się pobrać podglądu gry.");
-  return (await response.json()) as GamePreview;
+export function getGamePreview(): GamePreview {
+  // The home page always previews the current designed deck. Backend sessions use /game/[id].
+  return localPreview;
 }

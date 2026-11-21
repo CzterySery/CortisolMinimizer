@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "cortisol-minimizer-api"
 version = "0.1.0"
-description = "API gry Zasiłkowy Poker"
+description = "API gry Cortisol Minimizer"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115,<1",

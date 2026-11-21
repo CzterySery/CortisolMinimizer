@@ -1,4 +1,5 @@
 .DS_Store
+frontend/public/legal/
 __pycache__/
 *.py[cod]
 .venv/

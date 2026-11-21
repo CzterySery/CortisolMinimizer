@@ -1,4 +1,6 @@
-# Zasiłkowy Poker — talia 30 kart
+# Cortisol Minimizer — wcześniejsze inspiracje talii
+
+Aktualny projekt 30 kart z warunkami, efektami i podstawami prawnymi znajduje się w [cards-30.md](cards-30.md). Ten plik pozostaje materiałem historycznym do porównania.
 
 **Pięć rund, po sześć kart w puli każdej rundy.** Gra sprawdza sytuację rodziny i karty już na stole, losuje trzy pasujące propozycje, a gracz wybiera jedną. Po piątej rundzie ma na stole pięć decyzji, które razem tworzą plan rodziny.
 
