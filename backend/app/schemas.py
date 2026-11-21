@@ -376,9 +376,18 @@ class PueMessage(Model):
     question: str = Field(min_length=1, max_length=2000)
 
 
+class PueSource(Model):
+    title: str
+    locator: str = ""
+    url: str
+    snippet: str = ""
+
+
 class PueReply(Model):
     answer: str
     links: list[str] = []
+    sources: list[PueSource] = []
+    mode: Literal["gemini-rag", "local-rag", "fallback"] = "local-rag"
 
 
 class ApplicationIn(Model):

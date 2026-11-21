@@ -1,19 +1,16 @@
 """Simulated mObywatel / ZUS PUE (eZUS) / USC. The brief asks only for simulations: personas are fictional,
 filings are stored in `submissions` and go nowhere."""
 import hmac
-import json
 import os
-import re
 import secrets
 from datetime import date
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, HTTPException
 
-from app import params, repositories
-from app.calc.base import money, percent
+from app import params, rag, repositories
+from app.calc.base import money
 from app.params import Params
-from app.repositories import DATA
 from app.schemas import (
     ApplicationIn,
     ApplicationOut,
@@ -122,31 +119,15 @@ def birth_certificate(req: BirthCertificateRequest, persona: MaybeMe) -> Applica
 
 @router.post("/pue/messages")
 def pue(msg: PueMessage, persona: MaybeMe) -> PueReply:
-    reply = answer(msg.question, params.active(date.today()))
-    repositories.add_submission("pue", {"question": msg.question, "persona": persona.id if persona else None},
-                                "odpowiedź automatyczna")
+    reply = answer(msg.question, params.active(date.today()), persona)
+    repositories.add_submission("pue", {"question": msg.question, "persona": persona.id if persona else None,
+                                        "mode": reply.mode}, "odpowiedź automatyczna")
     return reply
 
 
-def answer(question: str, p: Params) -> PueReply:
-    """Canned replies by keyword (data/pue.json); numbers come from the params in force, so admin edits show up."""
-    text = question.lower()
-    for topic in json.loads((DATA / "pue.json").read_text(encoding="utf-8")):
-        if any(k in text for k in topic["keywords"]):
-            return PueReply(answer=fill(topic["answer"], p), links=topic["links"])
-    return PueReply(answer="W prawdziwym eZUS na to pytanie odpowiedziałby konsultant. Ta symulacja ma gotowe "
-                           "odpowiedzi o urlopach, zasiłkach, zwolnieniach, składkach i dokumentach; spróbuj zapytać "
-                           "o jeden z tych tematów albo sprawdź swój plan w kalkulatorze.",
-                    links=["/calculator", "https://www.zus.pl"])
+def answer(question: str, p: Params, persona: PersonaRecord | None = None) -> PueReply:
+    """RAG assistant over all loaded ZUS/Labour Code documents, rules, forms and cards."""
+    return rag.answer_question(question, p, persona)
 
 
-def fill(template: str, p: Params) -> str:
-    """{rates.sick} -> 0.80, {rates.sick|%} -> 80%, {maternity.weeks_by_children.0} -> 20."""
-    data = p.model_dump()
-
-    def value(match: re.Match) -> str:
-        node = data
-        for key in match[1].split("."):
-            node = node[int(key)] if isinstance(node, list) else node[key]
-        return percent(node) if match[2] else str(node)
-    return re.sub(r"\{([\w.]+)(\|%)?\}", value, template)
+fill = rag.fill_params

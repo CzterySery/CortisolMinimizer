@@ -60,7 +60,7 @@ export default function Applications() {
         {todo.map((d) => (
           <ApplicationForm key={`${key(d)}|${d.start}|${d.due_by}|${account?.persona.id}`} doc={d} auth={auth}
             name={account && account.persona.who === d.who ? account.persona.name : ""}
-            birth={plan?.family.birth_date ?? plan?.family.due_date ?? ""}
+            birth={plan?.family.birth_date ?? ""}
             onInspect={(name) => setGuide({ doc: d, name })}
             onSent={(id) => { setFiled((f) => new Set(f).add(key(d))); setSent(`Wysłano (symulacja): ${d.form} → ${recipientLabel[d.recipient]}, numer ${id}.`); }} />
         ))}
@@ -73,7 +73,7 @@ export default function Applications() {
           <strong>{form.code}</strong><span>{form.title}</span><span>{form.pages.length} stron · {form.issuer === "employer" ? "wypełnia płatnik" : "wniosek"}</span>
         </button>)}</div>
       </details>
-      {guide && <DocumentGuide key={`${key(guide.doc)}|${guide.doc.start}`} doc={guide.doc} plan={plan} name={guide.name} onClose={() => setGuide(undefined)} />}
+      {guide && <DocumentGuide key={`${key(guide.doc)}|${guide.doc.start}`} doc={guide.doc} plan={plan} name={guide.name} account={account} onClose={() => setGuide(undefined)} />}
     </main>
   );
 }

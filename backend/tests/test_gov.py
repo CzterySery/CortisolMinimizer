@@ -55,9 +55,21 @@ def test_account_needs_a_valid_token(client):
     assert client.get("/api/v1/zus/me", headers={"Authorization": forged}).status_code == 401
 
 
-def test_debt_certificate_blocks_jdg_benefits(client):
+def test_debt_certificate_blocks_jdg_benefits(client, monkeypatch):
+    personas = repositories.get_personas()
+    next(p for p in personas if p["id"] == "magda")["plan"]["family"]["mother"]["contribution_debt"] = "150.00"
+    monkeypatch.setattr(repositories, "get_personas", lambda: personas)
     debt = client.get("/api/v1/zus/me", headers=login(client, "magda")).json()["debt"]
     assert debt == {"as_of": "2026-09-14", "debt": "150.00", "blocks_benefits": True}  # > 1% of 4806 (art. 2a)
+
+
+def test_magda_account_plan_can_be_calculated(client):
+    account = client.get("/api/v1/zus/me", headers=login(client, "magda")).json()
+    assert account["debt"]["debt"] == "0.00" and not account["debt"]["blocks_benefits"]
+    assert all("wstrzymane" not in app["status"] for app in account["applications"])
+    response = client.post("/api/v1/calc/plan", json=account["plan"])
+    assert response.status_code == 200
+    assert not [issue for issue in response.json()["issues"] if issue["severity"] == "error"]
 
 
 def test_filed_applications_come_back_on_the_account(client):
@@ -78,9 +90,39 @@ def test_filed_applications_come_back_on_the_account(client):
 def test_pue_answers_from_params_and_logs_the_question(client):
     reply = client.post("/api/v1/pue/messages", json={"question": "Ile trwa urlop ojcowski?"}).json()
     assert "14 dni" in reply["answer"] and reply["links"]
+    assert any(s["url"] == "/sources/labour-code#article-1823" for s in reply["sources"])
     assert client.sent[-1]["kind"] == "pue"
     assert "konsultant" in answer("Jaka jest pogoda?", P).answer
     assert "81,5%" in answer("Czy warto wybrać 81,5%?", P).answer
+
+
+def test_rag_indexes_all_loaded_documents_and_cites_sources(monkeypatch):
+    from app import rag
+    chunks, _, _ = rag._build_index()
+    kinds = {c.kind for c in chunks}
+    assert kinds == {"rule", "document", "form", "card"} and len(chunks) >= 200
+
+    # Deep subtopic queries not in basic pue.json keywords
+    preterm = answer("Ile trwa uzupełniający urlop macierzyński dla wcześniaka w szpitalu?", P)
+    assert "15 tygodni" in preterm.answer and "/sources/labour-code#article-1802" in preterm.links
+    assert any(s.url == "/sources/labour-code#article-1802" for s in preterm.sources)
+
+    rehab = answer("Kiedy składa się wniosek ZNp-7 o świadczenie rehabilitacyjne?", P)
+    assert "12 miesięcy" in rehab.answer and any(s.url.startswith("/sources/benefits-act#article-18") for s in rehab.sources)
+
+    # Simulated Gemini API generation with GEMINI_API_KEY
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
+    monkeypatch.setattr(
+        rag,
+        "_call_gemini",
+        lambda api_key, q, ch, p, ctx="": (
+            "Urlop uzupełniający trwa do 15 tygodni (KP art. 180²).",
+            ["/sources/labour-code#article-1802"],
+        ),
+    )
+    gem = answer("Wcześniak w szpitalu — ile urlopu?", P)
+    assert gem.mode == "gemini-rag"
+    assert "15 tygodni" in gem.answer and "/sources/labour-code#article-1802" in gem.links
 
 
 def test_every_pue_answer_renders():
@@ -93,7 +135,7 @@ def test_every_pue_answer_renders():
 def test_personas_match_the_calculator():
     """Each persona shows a brief case; what it already filed must be among its plan's documents."""
     expected = {"anna": set(),
-                "magda": {"debt.blocks-benefits", "base.raised-in-pregnancy", "insured-parent.no-voluntary-sickness"},
+                "magda": {"base.raised-in-pregnancy"},
                 "ola": {"insured-parent.ends-before-birth"}}
     for pid, persona in _personas().items():
         result = compute_plan(persona.plan, P)

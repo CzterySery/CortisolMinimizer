@@ -154,7 +154,7 @@
   "id": "magda",
   "name": "Magdalena Wiśniewska",
   "who": "mother",
-  "description": "Własna działalność z dobrowolnym chorobowym, zaległość w składkach i podstawa podniesiona w ciąży. Partner na zleceniu bez dobrowolnego chorobowego.",
+  "description": "Własna działalność z dobrowolnym chorobowym, bez zaległości w składkach i podstawa podniesiona w ciąży. Partner na zleceniu z dobrowolnym chorobowym.",
   "insurance": [
    {
     "title": "pozarolnicza działalność gospodarcza",
@@ -186,7 +186,7 @@
     "who": "mother",
     "recipient": "zus",
     "filed_on": "2026-09-22",
-    "status": "wstrzymane: zaległość w składkach (art. 2a)"
+    "status": "przyjęte"
    }
   ],
   "plan": {
@@ -195,7 +195,7 @@
      "employment": "self_employed",
      "voluntary_sickness": true,
      "insured_since": "2025-02-01",
-     "contribution_debt": "150.00",
+     "contribution_debt": "0.00",
      "age": 34,
      "salary_history": [
       {
@@ -250,6 +250,8 @@
     },
     "father": {
      "employment": "contract",
+     "voluntary_sickness": true,
+     "insured_since": "2025-02-01",
      "base_monthly": "4500.00",
      "payer_insured_count": 3
     },

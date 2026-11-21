@@ -1624,6 +1624,23 @@ export interface components {
             /** Question */
             question: string;
         };
+        /** PueSource */
+        PueSource: {
+            /** Title */
+            title: string;
+            /**
+             * Locator
+             * @default ""
+             */
+            locator: string;
+            /** Url */
+            url: string;
+            /**
+             * Snippet
+             * @default ""
+             */
+            snippet: string;
+        };
         /** PueReply */
         PueReply: {
             /** Answer */
@@ -1633,6 +1650,17 @@ export interface components {
              * @default []
              */
             links: string[];
+            /**
+             * Sources
+             * @default []
+             */
+            sources: components["schemas"]["PueSource"][];
+            /**
+             * Mode
+             * @default local-rag
+             * @enum {string}
+             */
+            mode: "gemini-rag" | "local-rag" | "fallback";
         };
         /** Rates */
         "Rates-Input": {

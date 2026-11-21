@@ -5,11 +5,12 @@ import Image from "next/image";
 import type { S } from "@/lib/api";
 import { day } from "@/lib/format";
 import { whoLabel, recipientLabel } from "@/lib/labels";
-import { documentIssuer, officialForm, suggestedField, leaveRule, type GuideDoc, type OfficialForm } from "@/lib/document-guides";
+import { documentIssuer, officialForm, prefilledFields, knownPayer, leaveRule, type GuideDoc, type OfficialForm } from "@/lib/document-guides";
 import { LegalBasis } from "@/components/legal-basis";
+import "./document-guide.css";
 
-export function DocumentGuide({ doc, plan, name, onClose }: {
-  doc: GuideDoc; plan?: S["Plan-Input"]; name?: string; onClose: () => void;
+export function DocumentGuide({ doc, plan, name, account, onClose }: {
+  doc: GuideDoc; plan?: S["Plan-Input"]; name?: string; account?: S["ZusAccount"]; onClose: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const title = useId();
@@ -22,38 +23,47 @@ export function DocumentGuide({ doc, plan, name, onClose }: {
       <button type="button" className="button" autoFocus onClick={onClose}>Zamknij podgląd</button>
     </header>
     <p className="muted">Podpowiedzi i próbne wpisy służą nauce. Nie zmieniają oryginalnego PDF-u ani nie są wysyłane do ZUS.</p>
-    {form ? <OfficialGuide form={form} doc={doc} plan={plan} /> : documentIssuer(doc) === "doctor" ?
+    {form ? <OfficialGuide form={form} doc={doc} plan={plan} name={name} account={account} /> : documentIssuer(doc) === "doctor" ?
       <section className="panel"><h3>Ten dokument wystawia lekarz</h3><p>e-ZLA trafia elektronicznie do ZUS i płatnika. Nie wypełniasz go samodzielnie. Sprawdź swoje dane oraz okres niezdolności; błąd zgłoś lekarzowi.</p><p>{doc.note}</p><LegalBasis rules={["sick-docs"]} /></section>
       : doc.recipient === "usc" ? <section className="panel"><h3>To wniosek do USC, nie formularz ZUS</h3>
         <p>Przygotuj imię i nazwisko dziecka, datę i miejsce urodzenia, wybór odpisu skróconego lub zupełnego oraz sposób odbioru. Dane wpisujesz w usłudze USC.</p>
         <p>{doc.note}</p><a href="https://www.gov.pl/web/gov/uzyskaj-odpis-aktu-stanu-cywilnego-urodzenia-malzenstwa-zgonu" target="_blank" rel="noreferrer">Otwórz usługę odpisu aktu na gov.pl ↗</a></section>
-        : <LeaveGuide doc={doc} name={name} />}
+        : <LeaveGuide doc={doc} name={name} payer={knownPayer(doc, account)} />}
   </dialog>;
 }
 
-function OfficialGuide({ form, doc, plan }: { form: OfficialForm; doc: GuideDoc; plan?: S["Plan-Input"] }) {
+function OfficialGuide({ form, doc, plan, name, account }: {
+  form: OfficialForm; doc: GuideDoc; plan?: S["Plan-Input"]; name?: string; account?: S["ZusAccount"];
+}) {
   const [pageIndex, setPageIndex] = useState(0);
   const [fieldIndex, setFieldIndex] = useState(0);
   const [zoom, setZoom] = useState(100);
-  const [examples, setExamples] = useState<Record<string, string>>({});
+  const [edits, setEdits] = useState<Record<string, string>>({});
+  const filled = prefilledFields(form, doc, plan, name, account);
+  // Derive untouched values from new account data without overwriting corrections (including clearing).
+  const valueOf = (id: string) => edits[id] ?? filled[id]?.value ?? "";
   const fieldHelp = useId();
   const paper = useRef<HTMLDivElement>(null);
   const page = form.pages[pageIndex];
   const selected = page.fields[fieldIndex];
-  const suggested = selected ? suggestedField(form, selected, doc, plan) : undefined;
+  const suggested = selected ? filled[selected.id] : undefined;
   const employerPart = form.issuer === "employer" || (form.id === "znp7" && page.number >= 3);
   const changePage = (index: number) => { setPageIndex(index); setFieldIndex(0); };
   const selectField = (index: number, scroll = false) => {
     setFieldIndex(index);
     if (scroll) paper.current?.querySelector<HTMLElement>(`[data-field="${page.fields[index]?.id}"]`)?.scrollIntoView({ block: "nearest", inline: "nearest" });
   };
-  const setExample = (value: string) => { if (selected) setExamples({ ...examples, [selected.id]: value }); };
+  const setExample = (value: string) => { if (selected) setEdits({ ...edits, [selected.id]: value }); };
 
   return <>
     <div className="form-source"><span>Oryginalny formularz ZUS · wersja {day(form.version)} · sprawdzono {day(form.checked)}</span>
       <div className="actions"><a href={form.pdf} target="_blank" rel="noreferrer">Otwórz oryginalny PDF ↗</a>
         <a href={form.sourcePage} target="_blank" rel="noreferrer">Strona formularza w ZUS ↗</a></div>
     </div>
+    {doc.rule !== "Oficjalny wzór ZUS" && <p className="notice" role="status">
+      <strong>Automatycznie uzupełnione pola: {Object.keys(filled).length}.</strong> Dane z planu i konta są już widoczne w formularzu. Sprawdź je i popraw w podglądzie. Nieznane dane i oświadczenia pozostają puste.
+      {name && name.trim().split(/\s+/).length !== 2 && <> Imię i nazwisko „{name}” rozdziel ręcznie na właściwe pola.</>}
+    </p>}
     {form.id === "z15" && <p className="notice">Od 24.10.2026 formularz Z-15 zastępuje Z-15A i Z-15B. Poniżej pokazujemy aktualny Z-15, również gdy pozycja planu ma starszą nazwę.</p>}
     {form.issuer === "employer" && <p className="notice"><strong>Wypełnia płatnik składek — pracodawca lub zleceniodawca.</strong> Możesz sprawdzić, jakich danych potrzebuje, ale nie podpisujesz tego zaświadczenia za płatnika.</p>}
     {form.id === "znp7" && <p className="notice">Część I (strony 1–2) wypełnia osoba ubiegająca się o świadczenie. Część II (strony 3–4) wypełnia płatnik składek.</p>}
@@ -79,7 +89,7 @@ function OfficialGuide({ form, doc, plan }: { form: OfficialForm; doc: GuideDoc;
               aria-label={`Pole ${index + 1}: ${field.label}`} aria-pressed={selected?.id === field.id} aria-describedby={fieldHelp}
               title={field.label} onClick={() => selectField(index)}>
               <span className="pdf-hotspot-number" aria-hidden="true">{index + 1}</span>
-              {examples[field.id] && <span className="pdf-example" aria-hidden="true">{examples[field.id]}</span>}
+              {valueOf(field.id) && <span className={`pdf-example ${field.type === "CheckBox" ? "is-check" : ""}`} aria-hidden="true">{valueOf(field.id)}</span>}
             </button>;
           })}
         </div>
@@ -92,12 +102,15 @@ function OfficialGuide({ form, doc, plan }: { form: OfficialForm; doc: GuideDoc;
           <p className="eyebrow">Pole {fieldIndex + 1} · strona {page.number} · {selected.type === "CheckBox" ? "zaznaczenie" : "wpis"}</p>
           <h3>Co tutaj wpisać?</h3><p className="field-official-instruction">{selected.label}</p>
           <p className="muted">{selected.reviewed ? "Podpowiedź sprawdzona z podpisem na wydruku; oryginalny opis techniczny PDF-u wymagał korekty." : "Opis pola pochodzi z oryginalnego PDF-u ZUS."} Warunek „jeśli” oznacza, że pole nie dotyczy każdej sprawy.</p>
+          {suggested && <div className="suggested-field"><p><strong>Uzupełniono automatycznie</strong><br />Źródło: {suggested.source}.<br />{suggested.value}</p>
+            {selected.id in edits && <p>To pole zostało zmienione w podglądzie.</p>}
+            {!employerPart && selected.id in edits && <button type="button" className="button" onClick={() => setEdits((previous) => {
+              const next = { ...previous }; delete next[selected.id]; return next;
+            })}>Przywróć dane źródłowe</button>}</div>}
           {employerPart ? <p className="notice">To część dla płatnika. Dane i podpis uzupełnia pracodawca, zleceniodawca albo upoważniona osoba.</p> : <>
-            {suggested && <div className="suggested-field"><p><strong>Propozycja z Twojego planu:</strong><br />{suggested}</p>
-              <button type="button" className="button" onClick={() => setExample(suggested)}>Pokaż ten okres w polu</button></div>}
-            {selected.type === "CheckBox" ? <label className="field-check"><input type="checkbox" checked={examples[selected.id] === "X"}
+            {selected.type === "CheckBox" ? <label className="field-check"><input type="checkbox" checked={valueOf(selected.id) === "X"}
               onChange={(e) => setExample(e.target.checked ? "X" : "")} />Próbne zaznaczenie X</label>
-              : <label className="field">Próbny wpis w tym polu<input value={examples[selected.id] ?? ""} maxLength={220}
+              : <label className="field">Próbny wpis w tym polu<input value={valueOf(selected.id)} maxLength={220}
                 placeholder="Wpisz przykład, aby zobaczyć jego miejsce" autoComplete="off" onChange={(e) => setExample(e.target.value)} /></label>}
             <p className="muted">Próbne wpisy zostają wyłącznie w otwartym podglądzie. Nie wpisuj tu danych, których nie znasz; PESEL, adres, dane dziecka i rachunek trzeba sprawdzić we własnych dokumentach.</p>
           </>}
@@ -110,13 +123,13 @@ function OfficialGuide({ form, doc, plan }: { form: OfficialForm; doc: GuideDoc;
   </>;
 }
 
-function LeaveGuide({ doc, name }: { doc: GuideDoc; name?: string }) {
+function LeaveGuide({ doc, name, payer }: { doc: GuideDoc; name?: string; payer?: string }) {
   const [selected, setSelected] = useState(0);
   const period = doc.start && doc.end ? `${day(doc.start)} – ${day(doc.end)}` : "[podaj okres, którego dotyczy wniosek]";
   const areas = [
     { title: "Twoje dane", value: name || "[Twoje imię i nazwisko]", help: "Wpisz imię i nazwisko pracownika składającego wniosek. Dane drugiego rodzica podajesz w odpowiednim oświadczeniu, jeśli są wymagane." },
     { title: "Miejsce i data", value: "[miejscowość, data złożenia]", help: "Wpisz miejscowość i rzeczywistą datę złożenia pisma. Nie jest to automatycznie data rozpoczęcia urlopu." },
-    { title: "Adresat", value: recipientLabel[doc.recipient] === "Pracodawca" ? "[nazwa i adres pracodawcy]" : "[właściwy adresat]", help: "Wpisz nazwę pracodawcy lub działu kadr, do którego kierujesz wniosek." },
+    { title: "Adresat", value: recipientLabel[doc.recipient] === "Pracodawca" ? (payer ? `${payer}\n[uzupełnij adres pracodawcy]` : "[nazwa i adres pracodawcy]") : "[właściwy adresat]", help: "Wpisz nazwę pracodawcy lub działu kadr, do którego kierujesz wniosek. Nazwa, jeśli ją znamy, pochodzi z okresu ubezpieczenia na koncie." },
     { title: "Treść i okres", value: `${doc.form}\nOkres: ${period}`, help: "Wskaż rodzaj urlopu i dokładne daty. Okres pochodzi z planu; sprawdź go przed przepisaniem do podpisanego wniosku." },
     { title: "Oświadczenia i załączniki", value: doc.note || "[wymagane oświadczenia i załączniki]", help: "Uzupełnij wymagane oświadczenia zgodnie ze stanem faktycznym. Informacja poniżej wynika z Twojego planu. Nie składaj oświadczenia, jeśli nie potwierdzasz jego treści." },
     { title: "Podpis", value: "[Twój podpis]", help: "Podpisz dokument w wymagany sposób. Ten podgląd nie jest podpisem elektronicznym ani wysłaniem wniosku." },

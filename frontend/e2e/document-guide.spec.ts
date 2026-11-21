@@ -37,7 +37,7 @@ test("official ZAM fields and page images form an interactive, non-submitting de
   expect(sent).toBe(0);
 });
 
-test("a plan period is suggested only for the correct ZAM field", async ({ page }) => {
+test("known periods and leave type are filled immediately, editable and restorable", async ({ page }) => {
   await page.goto("/applications");
   await page.evaluate(() => sessionStorage.setItem("otwartekarty.myplan", JSON.stringify({
     family: { mother: { employment: "self_employed", voluntary_sickness: true, base_monthly: "6000" }, due_date: "2027-03-01" },
@@ -47,16 +47,61 @@ test("a plan period is suggested only for the correct ZAM field", async ({ page 
   await expect(page.locator("details.form-card").filter({ hasText: /Z-3:/ })).toHaveCount(0);
   await page.locator(".docs").getByRole("button", { name: /^ZAM:/ }).click();
   const dialog = page.getByRole("dialog");
-  await expect(dialog.getByText("Propozycja z Twojego planu:")).toHaveCount(0); // identity is not guessed
+  await expect(dialog.getByLabel("Próbny wpis w tym polu")).toHaveValue(""); // identity is not guessed
   await dialog.getByLabel("Strona formularza").selectOption("1");
   await dialog.getByLabel("Wybierz pole na tej stronie").selectOption("2");
-  await expect(dialog.getByText("Propozycja z Twojego planu:")).toHaveCount(0); // a checkbox must never receive date text
+  await expect(dialog.getByLabel("Próbne zaznaczenie X")).not.toBeChecked(); // not adoption
+  await expect(dialog.locator('[data-field="p2-1"] .pdf-example')).toHaveText("X");
   await dialog.getByLabel("Wybierz pole na tej stronie").selectOption("3");
   await expect(dialog.getByLabel("Próbny wpis w tym polu")).toBeVisible();
-  await expect(dialog.getByText("Propozycja z Twojego planu:")).toBeVisible();
-  await dialog.getByRole("button", { name: "Pokaż ten okres w polu" }).click();
+  await expect(dialog.getByText("Uzupełniono automatycznie", { exact: true })).toBeVisible();
   await expect(dialog.locator('[data-field="p2-3"] .pdf-example')).toContainText("2027");
+  const original = await dialog.getByLabel("Próbny wpis w tym polu").inputValue();
+  await dialog.getByLabel("Próbny wpis w tym polu").fill("");
+  await expect(dialog.locator('[data-field="p2-3"] .pdf-example')).toHaveCount(0);
+  await dialog.getByRole("button", { name: "Przywróć dane źródłowe" }).click();
+  await expect(dialog.getByLabel("Próbny wpis w tym polu")).toHaveValue(original);
   await dialog.getByLabel("Powiększenie").selectOption("200");
+  await noOverflow(page);
+});
+
+test("account identity and payer are filled only for the matching parent, library stays blank", async ({ page }, info) => {
+  await page.route("**/api/v1/zus/me", (route) => route.fulfill({ json: {
+    persona: { id: "demo", name: "Anna Kowalczyk", who: "mother" }, applications: [],
+    insurance: [{ payer: "Przykładowa firma", start: "2020-01-01", end: null }],
+  } }));
+  await page.goto("/applications");
+  await page.evaluate(() => {
+    sessionStorage.setItem("otwartekarty.user", "demo");
+    sessionStorage.setItem("otwartekarty.myplan", JSON.stringify({
+      family: { mother: { employment: "self_employed", voluntary_sickness: true, base_monthly: "6000" },
+        father: { employment: "self_employed", voluntary_sickness: true, base_monthly: "6000" }, due_date: "2027-03-01" },
+      blocks: [{ who: "mother", kind: "maternity", start: "2027-03-01", days: 140 },
+        { who: "father", kind: "paternity", start: "2027-03-01", days: 14 }],
+    }));
+  });
+  await page.reload();
+  await expect(page.getByText("Dokumenty, które ZUS już ma, są odhaczone.", { exact: false })).toBeVisible();
+  await page.locator(".docs").getByRole("button", { name: /^ZAM: wniosek o zasiłek macierzyński/ }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.locator('[data-field="p1-3"] .pdf-example')).toHaveText("Anna");
+  await expect(dialog.locator('[data-field="p1-4"] .pdf-example')).toHaveText("Kowalczyk");
+  await expect(dialog.locator('[data-field="p1-16"] .pdf-example')).toHaveText("Przykładowa firma");
+  await expect(dialog.locator('[data-field="p1-0"] .pdf-example')).toHaveCount(0);
+  await page.screenshot({ path: `../tmp/form-prefilled-${info.project.name}.png`, fullPage: true });
+  await dialog.getByLabel("Strona formularza").selectOption("4");
+  await expect(dialog.locator(".pdf-example")).toHaveCount(0); // other parent and declarations
+  await page.keyboard.press("Escape");
+  await page.locator(".docs").getByRole("button", { name: /^ZAM: wniosek o zasiłek za urlop ojcowski/ }).click();
+  await expect(dialog.locator(".pdf-example")).toHaveCount(0); // father's first page
+  await dialog.getByLabel("Strona formularza").selectOption("1");
+  await expect(dialog.locator('[data-field="p2-9"] .pdf-example')).toHaveText("X");
+  await expect(dialog.locator('[data-field="p2-10"] .pdf-example')).toContainText("2027");
+  await page.keyboard.press("Escape");
+  await library(page, "ZAM");
+  await expect(dialog.locator(".pdf-example")).toHaveCount(0);
+  await dialog.getByLabel("Strona formularza").selectOption("1");
+  await expect(dialog.locator(".pdf-example")).toHaveCount(0);
   await noOverflow(page);
 });
 
