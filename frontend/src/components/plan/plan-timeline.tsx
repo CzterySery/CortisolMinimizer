@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { S } from "@/lib/api";
-import { pln } from "@/lib/format";
+import { day, pln } from "@/lib/format";
+import { kindLabel, whoLabel } from "@/lib/labels";
 import { BudgetChart } from "./budget-chart";
 import { CareCalendar } from "./care-calendar";
 import { DocsChecklist } from "./docs-checklist";
@@ -12,6 +13,15 @@ const severity = { error: "Błąd", warning: "Uwaga", info: "Info" } as const;
 export function PlanTimeline({ result }: { result: S["PlanResult"] }) {
   return (
     <div className="plan-grid">
+      <Panel title="Kwoty zasiłków">
+        <p>{Object.entries(result.bases).filter(([, base]) => Number(base) > 0).map(([who, base]) => `${whoLabel[who as keyof typeof whoLabel]}: podstawa ${pln(base)}`).join(" · ")}</p>
+        <div className="table-scroll"><table className="data-table">
+          <thead><tr><th>Kto</th><th>Okres</th><th>Od – do</th><th>Kwota</th></tr></thead>
+          <tbody>{result.calendar.map((c, i) => <tr key={i}>
+            <td>{whoLabel[c.who]}</td><td>{kindLabel[c.kind]}</td><td>{day(c.start)} – {day(c.end)}</td><td>{pln(c.benefit)}</td>
+          </tr>)}</tbody>
+        </table></div>
+      </Panel>
       <Panel title="Budżet"><BudgetChart months={result.months} /></Panel>
       <Panel title="Opieka"><CareCalendar calendar={result.calendar} /></Panel>
       <Panel title="Pozostałe urlopy"><PoolsMeter pools={result.pools} /></Panel>

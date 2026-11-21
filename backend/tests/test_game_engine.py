@@ -94,7 +94,7 @@ def test_paperwork_does_not_create_money_or_time():
     assert before.result.pools == after.result.pools
     assert before.statistics[:2] == after.statistics[:2]
     assert before.statistics[2].value == 50
-    assert after.statistics[2].value == 58
+    assert after.statistics[2].value == 70
 
 
 @pytest.mark.parametrize("scenario", ["standard", "hospital", "za-zyciem"])
@@ -102,8 +102,8 @@ def test_complete_plan_valid_and_knowledge_only_increases_on_education(scenario)
     state = run("1C" if scenario == "hospital" else "1B", "2B", "3B", "4D", "5F", scenario=scenario)
     assert not [issue for issue in state.result.issues if issue.severity == "error"]
     knowledge = state.statistics[2]
-    assert knowledge.value == 50 + (8 if scenario == "hospital" else 0)
-    assert candidate(run("1A"), "2D").statistics[2].value == 58
+    assert knowledge.value == 50 + (20 if scenario == "hospital" else 0)
+    assert candidate(run("1A"), "2D").statistics[2].value == 70
     assert candidate(run("1A"), "2A").statistics[2].value == 50
     assert state.result.pools.care_days_left == P.care.days_per_year_child_under_14 - DATASET["choices"]["emergency_days"]
 

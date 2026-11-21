@@ -1,4 +1,4 @@
-# Cortisol Minimizer — wcześniejsze inspiracje talii
+# OtwarteKarty — wcześniejsze inspiracje talii
 
 Aktualny projekt 30 kart z warunkami, efektami i podstawami prawnymi znajduje się w [cards-30.md](cards-30.md). Ten plik pozostaje materiałem historycznym do porównania.
 

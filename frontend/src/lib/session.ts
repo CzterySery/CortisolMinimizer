@@ -13,24 +13,24 @@ function write(key: string, value?: string) {
 
 const slot = (key: string) => ({ get: () => read(key), set: (v?: string) => write(key, v) });
 
-export const userToken = slot("zp.user");
-export const adminToken = slot("zp.admin");
-export const savedGame = slot("zp.game.v1");
+export const userToken = slot("otwartekarty.user");
+export const adminToken = slot("otwartekarty.admin");
+export const savedGame = slot("otwartekarty.game.v1");
 
 // The plan the user built in the calculator, read by /applications (their own case, never a game result).
 export const myPlan = {
-  put: (plan: unknown) => write("zp.myplan", JSON.stringify(plan)),
+  put: (plan: unknown) => write("otwartekarty.myplan", JSON.stringify(plan)),
   get: (): unknown => {
-    try { return JSON.parse(read("zp.myplan") ?? "null") ?? undefined; } catch { return undefined; }
+    try { return JSON.parse(read("otwartekarty.myplan") ?? "null") ?? undefined; } catch { return undefined; }
   },
 };
 
 // "Otwórz w kalkulatorze": the finished game's sample plan travels to /calculator once.
 export const planHandoff = {
-  put: (plan: unknown) => write("zp.plan", JSON.stringify(plan)),
+  put: (plan: unknown) => write("otwartekarty.plan", JSON.stringify(plan)),
   take: (): unknown => {
-    const raw = read("zp.plan");
-    write("zp.plan");
+    const raw = read("otwartekarty.plan");
+    write("otwartekarty.plan");
     return raw ? JSON.parse(raw) : undefined;
   },
 };

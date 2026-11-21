@@ -368,24 +368,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/deck": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Deck */
-        get: operations["get_deck_api_v1_admin_deck_get"];
-        /** Put Deck */
-        put: operations["put_deck_api_v1_admin_deck_put"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/admin/submissions": {
         parameters: {
             query?: never;
@@ -393,7 +375,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Submissions */
+        /**
+         * Submissions
+         * @description Everything sent through the simulated channels (applications, USC requests, PUE questions), newest first.
+         */
         get: operations["submissions_api_v1_admin_submissions_get"];
         put?: never;
         post?: never;
@@ -585,49 +570,14 @@ export interface components {
              * Format: date
              */
             end: string;
-        };
-        /** Card */
-        "Card-Input": {
-            /** Id */
-            id: string;
-            /** Round Id */
-            round_id: number;
-            /** Title */
-            title: string;
-            /** Description */
-            description: string;
-            /** Sources */
-            sources?: components["schemas"]["Source-Input"][];
             /**
-             * Tags
-             * @default []
-             */
-            tags?: string[];
-            /**
-             * Requires
-             * @default []
-             */
-            requires?: components["schemas"]["Requirement"][];
-            /**
-             * Effects
-             * @default []
-             */
-            effects?: {
-                [key: string]: unknown;
-            }[];
-            /**
-             * Chips
+             * Benefit
              * @default 0
              */
-            chips?: number;
-            /**
-             * Combos
-             * @default []
-             */
-            combos?: components["schemas"]["Combo-Input"][];
+            benefit: string;
         };
         /** Card */
-        "Card-Output": {
+        Card: {
             /** Id */
             id: string;
             /** Round Id */
@@ -637,7 +587,7 @@ export interface components {
             /** Description */
             description: string;
             /** Sources */
-            sources: components["schemas"]["Source-Output"][];
+            sources: components["schemas"]["Source"][];
             /**
              * Tags
              * @default []
@@ -664,7 +614,7 @@ export interface components {
              * Combos
              * @default []
              */
-            combos: components["schemas"]["Combo-Output"][];
+            combos: components["schemas"]["Combo"][];
         };
         /** Care */
         Care: {
@@ -673,49 +623,29 @@ export interface components {
             /** Days Per Year Other */
             days_per_year_other: number;
         };
-        /** CaseInput */
-        "CaseInput-Input": {
+        /**
+         * CaseInput
+         * @description A case as read from the documents: the family facts and the periods applied for.
+         */
+        CaseInput: {
+            plan: components["schemas"]["Plan-Input"];
             /**
-             * Event
-             * @enum {string}
+             * Title
+             * @default
              */
-            event: "sickness" | "birth" | "adoption";
-            /**
-             * Event Date
-             * Format: date
-             */
-            event_date: string;
-            family: components["schemas"]["Family-Input"];
-        };
-        /** CaseInput */
-        "CaseInput-Output": {
-            /**
-             * Event
-             * @enum {string}
-             */
-            event: "sickness" | "birth" | "adoption";
-            /**
-             * Event Date
-             * Format: date
-             */
-            event_date: string;
-            family: components["schemas"]["Family-Output"];
+            title?: string;
         };
         /** CaseVerdict */
         CaseVerdict: {
-            /** Insured On Event Date */
-            insured_on_event_date: boolean;
+            /** Insured */
+            insured: boolean;
             /** Waiting Period Ok */
             waiting_period_ok: boolean;
             /** Debt Block */
             debt_block: boolean;
             /** Entitled */
-            entitled: string[];
-            /** Base */
-            base: string | null;
-            result: components["schemas"]["PlanResult"] | null;
-            /** Explain */
-            explain: components["schemas"]["Explain"][];
+            entitled: boolean;
+            result: components["schemas"]["PlanResult"];
         };
         /** Catalog */
         Catalog: {
@@ -741,21 +671,7 @@ export interface components {
             phone: string;
         };
         /** Combo */
-        "Combo-Input": {
-            /** With */
-            with: string[];
-            /** Name */
-            name: string;
-            /**
-             * Check
-             * @enum {string}
-             */
-            check: "touching" | "overlap" | "budget_ok" | "docs_complete" | "covers_need";
-            /** Mult */
-            mult: number | string;
-        };
-        /** Combo */
-        "Combo-Output": {
+        Combo: {
             /** With */
             with: string[];
             /** Name */
@@ -998,6 +914,28 @@ export interface components {
              * Format: date
              */
             horizon_end: string;
+        };
+        /**
+         * Granted
+         * @description What a ZUS payout printout shows for one parent.
+         */
+        Granted: {
+            /**
+             * Who
+             * @enum {string}
+             */
+            who: "mother" | "father";
+            /** Base */
+            base: string | null;
+            /** Daily */
+            daily: string | null;
+            /**
+             * Months
+             * @default {}
+             */
+            months: {
+                [key: string]: string;
+            };
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -1351,13 +1289,11 @@ export interface components {
         };
         /** ParseResult */
         ParseResult: {
-            /** Form Detected */
-            form_detected: string | null;
-            case: components["schemas"]["CaseInput-Output"] | null;
-            /** Missing Fields */
-            missing_fields: string[];
+            sample: components["schemas"]["SampleCase"] | null;
             /** Needs Manual Entry */
             needs_manual_entry: boolean;
+            /** Message */
+            message: string;
         };
         /** Paternity */
         Paternity: {
@@ -1438,6 +1374,13 @@ export interface components {
              * @default 0
              */
             top_up: string;
+            /**
+             * Bases
+             * @default {}
+             */
+            bases: {
+                [key: string]: string;
+            };
         };
         /** Pools */
         Pools: {
@@ -1584,7 +1527,42 @@ export interface components {
             /** Description */
             description: string;
             /** Cards */
-            cards: components["schemas"]["Card-Output"][];
+            cards: components["schemas"]["Card"][];
+        };
+        /**
+         * SampleCase
+         * @description A ZUS sample case transcribed into numbers (no names, no documents), with ZUS's own outcome to compare.
+         */
+        SampleCase: {
+            plan: components["schemas"]["Plan-Output"];
+            /**
+             * Title
+             * @default
+             */
+            title: string;
+            /** Id */
+            id: string;
+            /** Source */
+            source: string;
+            /**
+             * Sha256
+             * @default []
+             */
+            sha256: string[];
+            /** Zus Entitled */
+            zus_entitled: boolean;
+            /** Zus Outcome */
+            zus_outcome: string;
+            /**
+             * Granted
+             * @default []
+             */
+            granted: components["schemas"]["Granted"][];
+            /**
+             * Note
+             * @default
+             */
+            note: string;
         };
         /** ScenarioSummary */
         ScenarioSummary: {
@@ -1644,21 +1622,7 @@ export interface components {
             selected?: string[];
         };
         /** Source */
-        "Source-Input": {
-            /** Id */
-            id: string;
-            /** Title */
-            title: string;
-            /**
-             * Url
-             * Format: uri
-             */
-            url: string;
-            /** Locator */
-            locator?: string | null;
-        };
-        /** Source */
-        "Source-Output": {
+        Source: {
             /** Id */
             id: string;
             /** Title */
@@ -1813,7 +1777,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Card-Output"][];
+                    "application/json": components["schemas"]["Card"][];
                 };
             };
         };
@@ -2003,7 +1967,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CaseInput-Output"][];
+                    "application/json": components["schemas"]["SampleCase"][];
                 };
             };
         };
@@ -2050,7 +2014,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CaseInput-Input"];
+                "application/json": components["schemas"]["CaseInput"];
             };
         };
         responses: {
@@ -2387,72 +2351,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConfigVersion"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_deck_api_v1_admin_deck_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Card-Output"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    put_deck_api_v1_admin_deck_put: {
-        parameters: {
-            query?: never;
-            header?: {
-                authorization?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Card-Input"][];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ConfigVersion"];
                 };
             };
             /** @description Validation Error */

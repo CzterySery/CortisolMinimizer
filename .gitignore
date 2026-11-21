@@ -15,4 +15,11 @@ out/
 .env.*.local
 # ZUS sample cases: HackNation-only, must not be redistributed
 Documents/Przykładowe sprawy/
-Documents/*sprawy*/
+Documents/*[Ss]prawy*/
+
+# IDE
+.idea/
+
+# Playwright output
+frontend/test-results/
+frontend/playwright-report/

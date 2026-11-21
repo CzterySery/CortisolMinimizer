@@ -14,8 +14,7 @@ from app.schemas import Catalog
 
 DEFAULT_CATALOG = Path(__file__).resolve().parents[2] / "shared" / "cards.json"
 DATA = Path(__file__).parent / "data"
-SEEDED_KINDS = ("params",)  # deck joins in B6 (seeded from the catalog)
-LOCAL_DATABASE = "postgresql://zp:zp@localhost:5432/zp"  # `docker compose up -d db`
+LOCAL_DATABASE = "postgresql://otwartekarty:otwartekarty@localhost:5432/otwartekarty"  # `docker compose up -d db`
 
 
 def get_catalog() -> Catalog:
@@ -30,6 +29,14 @@ def get_designed_cards() -> list[dict]:
 
 def get_game_scenarios() -> dict:
     return json.loads((DATA / "scenarios.json").read_text(encoding="utf-8"))
+
+
+def seed_params() -> list[tuple[int, dict]]:
+    """Params versions shipped with the code: params.json is version 1 (in force now); params-history.json lists
+    older years as overrides on top of it (minimum wage, voluntary base cap), seeded as versions -n..-1."""
+    current = json.loads((DATA / "params.json").read_text(encoding="utf-8"))
+    history = json.loads((DATA / "params-history.json").read_text(encoding="utf-8"))
+    return [(i - len(history), current | older) for i, older in enumerate(history)] + [(1, current)]
 
 
 def get_personas() -> list[dict]:
@@ -57,14 +64,13 @@ def init() -> None:
                 id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, kind TEXT NOT NULL,
                 payload JSONB NOT NULL, status TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
         """)
-        for kind in SEEDED_KINDS:
-            data = json.loads((DATA / f"{kind}.json").read_text(encoding="utf-8"))
-            # version 1 is the seed shipped with the code: refreshed on every start so new legal
-            # fields reach existing databases; admin edits are versions >= 2 and stay untouched
-            c.execute("""INSERT INTO config (kind, version, effective_from, data) VALUES (%s, 1, %s, %s)
+        # versions <= 1 are the seeds shipped with the code: refreshed on every start so new legal fields reach
+        # existing databases; admin edits are versions >= 2 and stay untouched
+        for version, data in seed_params():
+            c.execute("""INSERT INTO config (kind, version, effective_from, data) VALUES ('params', %s, %s, %s)
                          ON CONFLICT (kind, version) DO UPDATE
                          SET effective_from = EXCLUDED.effective_from, data = EXCLUDED.data""",
-                      (kind, data.get("effective_from", "1970-01-01"), Jsonb(data)))
+                      (version, data["effective_from"], Jsonb(data)))
 
 
 def get_config(kind: str, on: str) -> dict:
@@ -102,8 +108,10 @@ def add_submission(kind: str, payload: dict, status: str) -> int:
                          (kind, Jsonb(payload), status)).fetchone()["id"]
 
 
-def list_submissions(persona: str) -> list[dict]:
-    """What one mObywatel identity sent from this app, newest first."""
+def list_submissions(persona: str | None = None) -> list[dict]:
+    """Newest first; with `persona`, only what that mObywatel identity sent (otherwise everything, for the admin)."""
     with db() as c:
+        if persona is None:
+            return c.execute("SELECT id, kind, payload, status, created_at FROM submissions ORDER BY id DESC").fetchall()
         return c.execute("SELECT id, kind, payload, status, created_at FROM submissions "
                          "WHERE payload->>'persona' = %s ORDER BY id DESC", (persona,)).fetchall()

@@ -1,4 +1,4 @@
-# Cortisol Minimizer
+# OtwarteKarty
 
 Kliknięcie powierzchni karty, Enter/spacja lub przeciągnięcie zagrywa ją na stół; przyciski informacji otwierają źródła. Rozdania animują przejście kart ze stosu do ręki, a kliknięcie stosu rozpoczyna nowe rozdanie. Edukacyjne karty zwiększają pasek wiedzy; decyzje urlopowe go nie zmieniają. [Audyt wpływu 30 kart](docs/card-impact-audit.md) określa porównanie, okres, skutek teraz i później oraz podstawy prawne. Nieznany dochód pozostaje nieznany.
 
@@ -41,7 +41,7 @@ scripts/sync_cards.py   # eksport 15 kart z cards.md
 
 Wymagane Python 3.11+, Node.js 20.9+ z npm oraz Docker (baza PostgreSQL).
 
-Baza, z katalogu głównego (port 5432, użytkownik i hasło `zp`):
+Baza, z katalogu głównego (port 5432, użytkownik i hasło `otwartekarty`):
 
 ```sh
 docker compose up -d db
@@ -86,6 +86,15 @@ Oba serwisy w kontenerach, z katalogu głównego:
 docker compose up --build
 ```
 
+Produkcyjnie (publiczny jest tylko frontend na porcie 3000; TLS zapewnia reverse proxy albo load balancer hosta):
+
+```sh
+POSTGRES_PASSWORD=... ADMIN_TOKEN=... SESSION_SECRET=... \
+  docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
+
+Bez tych trzech zmiennych polecenie się nie uruchomi. Baza i backend nie mają publicznych portów.
+
 ## API
 
 Wszystkie endpointy są pod `/api/v1`, a pełna lista jest w `/docs`. Działają już:
@@ -101,8 +110,10 @@ Wszystkie endpointy są pod `/api/v1`, a pełna lista jest w `/docs`. Działają
 | GET/POST | `/api/v1/auth/personas`, `/api/v1/auth/mobywatel`, `/api/v1/zus/me` | symulowane logowanie mObywatel i konto eZUS: ubezpieczenia, e-ZLA, zaświadczenie o niezaleganiu, złożone dokumenty |
 | POST | `/api/v1/applications`, `/api/v1/usc/birth-certificate`, `/api/v1/pue/messages` | symulowane wysłanie wniosku, wniosek o odpis aktu urodzenia, pytanie do ZUS (gotowe odpowiedzi) |
 | GET/PUT | `/api/v1/admin/params` (+ `/versions`) | parametry prawne, każda zmiana to nowa wersja (nagłówek `Authorization: Bearer $ADMIN_TOKEN`) |
+| GET | `/api/v1/admin/submissions` | wszystko, co wysłano przez symulowane kanały |
+| GET/POST | `/api/v1/cases/samples`, `/api/v1/cases/parse`, `/api/v1/cases/evaluate` | przykładowe sprawy ZUS (same liczby), rozpoznanie wgranego PDF po skrócie SHA-256, ocena sprawy kalkulatorem |
 
-Pozostałe (sprawy, talia i wnioski w panelu administracyjnym) mają gotowy kontrakt i zwracają `501` do czasu implementacji.
+Przykładowe sprawy ZUS to skany bez warstwy tekstowej. Aplikacja ich nie odczytuje (nie używa OCR ani AI): rozpoznaje wgrany plik przykładowej sprawy po skrócie, a inną sprawę wpisuje się ręcznie. Same dokumenty spraw są tylko lokalnie (`Documents/Sprawy `, poza repozytorium).
 
 ## Karty i późniejsza baza
 
@@ -120,10 +131,13 @@ Trwałe dane są w [repositories.py](backend/app/repositories.py): katalog kart 
 
 ```sh
 cd backend && uv run pytest && uv run ruff check app tests   # testy jednostkowe, bez bazy
-TEST_DATABASE_URL=postgresql://zp:zp@localhost:5432/zp uv run pytest -m integration   # SQL na prawdziwym PostgreSQL (schemat zp_test)
+TEST_DATABASE_URL=postgresql://otwartekarty:otwartekarty@localhost:5432/otwartekarty uv run pytest -m integration   # SQL na prawdziwym PostgreSQL (schemat otwartekarty_test)
 cd frontend && npm run typecheck && npm run lint && npm run build
+cd frontend && npx playwright install chromium && npm run e2e   # ścieżka jurora na działającym stosie (docker compose up --build)
 ```
+
+`npm run e2e` przechodzi grę, kalkulator, wnioski, logowanie mObywatel, sprawdzanie sprawy, pomoc i panel admina w widoku komputera (1280 px) i telefonu (375 px). Sprawdza, że żadna strona nie wychodzi poza szerokość ekranu, i zapisuje zrzuty do [docs/screenshots](docs/screenshots/).
 
 Po zmianie modeli w `backend/app/schemas.py` (przy działającym backendzie) wygeneruj typy frontendu: `cd frontend && npm run gen:api`.
 
-Przykładowe sprawy ZUS są wyłącznie do użytku HackNation i **nie mogą trafić do repozytorium** (`.gitignore` obejmuje `Documents/Przykładowe sprawy/`).
+Przykładowe sprawy ZUS są wyłącznie do użytku HackNation i **nie mogą trafić do repozytorium** (`.gitignore` obejmuje `Documents/*[Ss]prawy*/`, a `.dockerignore` cały katalog `Documents/` poza źródłami prawnymi).

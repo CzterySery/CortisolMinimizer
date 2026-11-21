@@ -121,5 +121,8 @@ def test_base_from_salary_history_and_input_errors():
     assert month(r, "2027-04").benefit["mother"] == Decimal("5177.40")  # 30 x 172.58 (base 5177.40)
     with pytest.raises(ValueError, match="drugiego rodzica"):
         run(Block(who="father", kind="paternity", start=BIRTH, days=7), father=None)
-    with pytest.raises(ValueError, match="podstawę wymiaru"):
-        compute_plan(Plan(family=Family(mother=Parent(employment="employee"), due_date=BIRTH)), P)
+    no_base = compute_plan(Plan(family=Family(mother=Parent(employment="employee"), due_date=BIRTH), blocks=[MATERNITY]), P)
+    assert month(no_base, "2027-03").benefit["mother"] == 0  # unknown base counts as 0 zł (rules.py warns base.missing)
+    not_insured = Parent(employment="contract", base_monthly=Decimal(5000))  # zlecenie without voluntary sickness
+    r = compute_plan(Plan(family=Family(mother=not_insured, due_date=BIRTH), blocks=[MATERNITY]), P)
+    assert month(r, "2027-03").benefit["mother"] == 0 and r.bases["mother"] == Decimal(5000)

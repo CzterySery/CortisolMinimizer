@@ -49,6 +49,11 @@ def month_range(first: date, last: date):
         y, m = (y + 1, 1) if m == 12 else (y, m + 1)
 
 
+def sickness_insured(parent: Parent) -> bool:
+    """Employees are insured by law; zlecenie and JDG only with voluntary sickness insurance (art. 1, art. 29)."""
+    return parent.employment == "employee" or (parent.employment != "none" and parent.voluntary_sickness)
+
+
 def parent_base(who: str, parent: Parent, first_event: date, p: Params, explain: list[Explain]) -> Decimal:
     if parent.employment == "none":
         explain.append(Explain(text=f"{WHO[who]}: brak tytułu do ubezpieczenia chorobowego, więc bez wynagrodzenia "
@@ -59,7 +64,10 @@ def parent_base(who: str, parent: Parent, first_event: date, p: Params, explain:
                                rule="art. 36, art. 48"))
         return parent.base_monthly
     if not parent.salary_history:
-        raise ValueError(f"{WHO[who]}: podaj podstawę wymiaru (base_monthly) albo historię wynagrodzeń (salary_history).")
+        # case files rarely state every base: count 0 zł and let rules.py warn (base.missing) instead of failing
+        explain.append(Explain(text=f"{WHO[who]}: brak podstawy wymiaru i wynagrodzeń, więc kwoty liczone jako 0 zł.",
+                               rule="art. 36"))
+        return Decimal(0)
     # shortcut: one base per parent for the whole plan, taken at the first benefit; art. 43 keeps it across
     # benefits without a 1-month break, but a longer break should recompute it
     result = benefit_base(BaseRequest(employment=parent.employment, event_date=first_event,
@@ -141,11 +149,12 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
 
     floor_day = money(p.parental_benefit_floor / 30)
     amount: dict[str, dict[date, Decimal]] = {}
+    block_benefit: dict[int, Decimal] = {}  # id(block) -> benefit paid for it (what a ZUS decision shows)
     for who in parents:
         amount[who], rehab_day, seen = {}, 0, {}
         for d in sorted(days[who]):
             b = days[who][d]
-            if b.kind == "vacation":  # paid leave: salary continues (KP art. 172), no benefit
+            if b.kind == "vacation" or not sickness_insured(parents[who]):  # paid leave / no sickness insurance
                 continue
             rehab_day += b.kind == "rehab"
             r = rate(who, b, d, rehab_day)
@@ -155,7 +164,8 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
                 daily = max(daily, floor_day)
             amount[who][d] = money(daily * (ONE - b.work_fraction))
             seen.setdefault(id(b), (b, Counter()))[1][(r, amount[who][d])] += 1
-        for b, rates in seen.values():
+        for key, (b, rates) in seen.items():
+            block_benefit[key] = sum((a * n for (_, a), n in rates.items()), Decimal(0))
             paid = ", ".join(f"{percent(r)} podstawy: {n} dni × {pln(a)}" for (r, a), n in rates.items())
             part = f", praca {percent(b.work_fraction)} etatu" if b.work_fraction else ""
             explain.append(Explain(text=f"{WHO[who]}: {KIND[b.kind]} {b.start.isoformat()} – {last_day(b).isoformat()}"
@@ -202,9 +212,10 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
         months.append(MonthRow(month=f"{y:04d}-{m:02d}", salary=salary, benefit=benefit, total=total,
                                below_target=total < target))
 
-    return PlanResult(months=months, calendar=[CalendarEntry(who=b.who, kind=b.kind, start=b.start, end=last_day(b))
-                                               for b in blocks],
-                      pools=_pools(plan, days, p), documents=[], issues=[], explain=explain, top_up=top_up)
+    calendar = [CalendarEntry(who=b.who, kind=b.kind, start=b.start, end=last_day(b),
+                              benefit=block_benefit.get(id(b), Decimal(0))) for b in blocks]
+    return PlanResult(months=months, calendar=calendar, pools=_pools(plan, days, p), documents=[], issues=[],
+                      explain=explain, top_up=top_up, bases=base)
 
 
 def payer(parent: Parent, p: Params) -> str:

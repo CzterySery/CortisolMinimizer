@@ -31,14 +31,19 @@ def test_admin_requires_token(client):
     assert client.get("/api/v1/admin/params", headers={"Authorization": "Bearer wrong"}).status_code == 401
 
 
+def test_admin_lists_submissions(client, monkeypatch):
+    from datetime import datetime
+    row = {"id": 3, "kind": "pue", "payload": {"question": "?", "persona": None}, "status": "odpowiedź automatyczna",
+           "created_at": datetime(2026, 11, 21, 12, 0)}
+    monkeypatch.setattr(repositories, "list_submissions", lambda persona=None: [row])
+    assert client.get("/api/v1/admin/submissions").status_code == 401
+    assert client.get("/api/v1/admin/submissions", headers=AUTH).json()[0]["kind"] == "pue"
+
+
 def test_admin_rejects_invalid_params(client):
     params = json.loads((repositories.DATA / "params.json").read_text(encoding="utf-8"))
     del params["rates"]
     assert client.put("/api/v1/admin/params", json=params, headers=AUTH).status_code == 422
-
-
-def test_stubs_are_501_not_500(client):
-    assert client.get("/api/v1/cases/samples").status_code == 501
 
 
 def test_home_game_replays_and_rejects_exhausted_pool(client, monkeypatch):

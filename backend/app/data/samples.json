@@ -1,0 +1,305 @@
+[
+ {
+  "id": "jdg-81-5",
+  "title": "Działalność gospodarcza: zasiłek macierzyński 81,5%",
+  "source": "zas. macierzyński (osoba prowadząca działalność)",
+  "sha256": [
+   "8cd3fab8924095fd3d6b6572b499c2101d0aeabd08668014e21cba22e7e96e27"
+  ],
+  "zus_entitled": true,
+  "zus_outcome": "Przyznano zasiłek macierzyński w wysokości 81,5% podstawy; wypłaty za wrzesień i październik 2026.",
+  "granted": [
+   {
+    "who": "mother",
+    "base": "4877.11",
+    "daily": "132.49",
+    "months": {
+     "2026-09": "1457.39",
+     "2026-10": "4107.19"
+    }
+   }
+  ],
+  "note": "Podstawę 4877,11 zł ZUS ustalił z zadeklarowanych podstaw składek, których akta nie zawierają, więc jest daną wejściową. Okresy z wniosku ZAM: macierzyński od 20.09.2026, rodzicielski od 07.02.2027 do 18.09.2027.",
+  "plan": {
+   "family": {
+    "mother": {
+     "employment": "self_employed",
+     "voluntary_sickness": true,
+     "base_monthly": "4877.11"
+    },
+    "due_date": "2026-09-20",
+    "birth_date": "2026-09-20"
+   },
+   "rate_variant": "averaged",
+   "blocks": [
+    {
+     "who": "mother",
+     "kind": "maternity",
+     "start": "2026-09-20",
+     "days": 140
+    },
+    {
+     "who": "mother",
+     "kind": "parental",
+     "start": "2027-02-07",
+     "days": 224
+    }
+   ]
+  }
+ },
+ {
+  "id": "ojciec-9-tygodni",
+  "title": "Ojciec, działalność gospodarcza: 9 tygodni urlopu rodzicielskiego",
+  "source": "zas. macierzyński za część urlopu rodzicielskiego – 9 tygodni",
+  "sha256": [
+   "95befcf305df2f5b98125492c9c5cb2d6476e45647b5c2131125d98e043baa6a"
+  ],
+  "zus_entitled": true,
+  "zus_outcome": "Przyznano zasiłek macierzyński 70% za 9 tygodni urlopu rodzicielskiego ojca (29.09–30.11.2026).",
+  "granted": [
+   {
+    "who": "father",
+    "base": "4344.11",
+    "daily": "101.36",
+    "months": {
+     "2026-09": "202.72",
+     "2026-10": "3142.16"
+    }
+   }
+  ],
+  "note": "Podstawy składek z poświadczenia ubezpieczenia (09.2025–08.2026). Lipiec 2026 (2552,52 zł, 14/31 dni) pominięty tak jak w wyliczeniu ZUS: miesiąc z zasiłkiem (art. 38 ust. 1 w zw. z art. 48 ust. 2). Dane matki nie są w aktach.",
+  "plan": {
+   "family": {
+    "mother": {
+     "employment": "employee"
+    },
+    "father": {
+     "employment": "self_employed",
+     "voluntary_sickness": true,
+     "salary_history": [
+      {
+       "month": "2025-09",
+       "gross": "5203.80"
+      },
+      {
+       "month": "2025-10",
+       "gross": "5203.80"
+      },
+      {
+       "month": "2025-11",
+       "gross": "5203.80"
+      },
+      {
+       "month": "2025-12",
+       "gross": "5203.80"
+      },
+      {
+       "month": "2026-01",
+       "gross": "3099.48"
+      },
+      {
+       "month": "2026-02",
+       "gross": "5652.00"
+      },
+      {
+       "month": "2026-03",
+       "gross": "5652.00"
+      },
+      {
+       "month": "2026-04",
+       "gross": "5652.00"
+      },
+      {
+       "month": "2026-05",
+       "gross": "5652.00"
+      },
+      {
+       "month": "2026-06",
+       "gross": "3202.80"
+      },
+      {
+       "month": "2026-08",
+       "gross": "5652.00"
+      }
+     ]
+    },
+    "due_date": "2024-08-29",
+    "birth_date": "2024-08-29"
+   },
+   "blocks": [
+    {
+     "who": "father",
+     "kind": "parental",
+     "start": "2026-09-29",
+     "days": 63
+    }
+   ]
+  }
+ },
+ {
+  "id": "brak-ubezpieczenia-porod",
+  "title": "Odmowa: brak ubezpieczenia chorobowego w dniu porodu",
+  "source": "zas. macierzyński – odmowa – nie podlega ubezp. chorobowemu na dzień porodu",
+  "sha256": [
+   "bc2c370919db43766d312631bea31d208105370ff9c3f337c62df4c0c8d16378"
+  ],
+  "zus_entitled": false,
+  "zus_outcome": "Odmowa: decyzją ZUS nie podlegała ubezpieczeniom jako pracownik, więc w dniu porodu (12.06.2025) nie była ubezpieczona.",
+  "note": "Decyzja ZUS o niepodleganiu ubezpieczeniom oznacza brak tytułu do ubezpieczenia. Okres z wniosku: 12.06.2025–10.06.2026.",
+  "plan": {
+   "family": {
+    "mother": {
+     "employment": "none"
+    },
+    "due_date": "2025-06-12",
+    "birth_date": "2025-06-12"
+   },
+   "blocks": [
+    {
+     "who": "mother",
+     "kind": "maternity",
+     "start": "2025-06-12",
+     "days": 140
+    },
+    {
+     "who": "mother",
+     "kind": "parental",
+     "start": "2025-10-30",
+     "days": 224
+    }
+   ]
+  }
+ },
+ {
+  "id": "jdg-wyrejestrowanie",
+  "title": "Odmowa: działalność zamknięta przed urlopem rodzicielskim",
+  "source": "zas. macierzyński – odmowa – brak zgłoszenia do ubezpieczeń",
+  "sha256": [
+   "30acf542066494cb53f233d3943c99097c1b82d1db24b4bd80436fd22a15f88b"
+  ],
+  "zus_entitled": false,
+  "zus_outcome": "Macierzyński wypłacono do 23.01.2026; zasiłku za rodzicielski od 06.02.2026 odmówiono, bo od 24.01.2026 nie podlegała ubezpieczeniu chorobowemu.",
+  "note": "Podstawa wymiaru nie jest podana w aktach, więc kwoty są pominięte; sprawa sprawdza prawo do zasiłku.",
+  "plan": {
+   "family": {
+    "mother": {
+     "employment": "self_employed",
+     "voluntary_sickness": true,
+     "insured_until": "2026-01-23"
+    },
+    "due_date": "2025-09-06",
+    "birth_date": "2025-09-06"
+   },
+   "blocks": [
+    {
+     "who": "mother",
+     "kind": "maternity",
+     "start": "2025-09-06",
+     "days": 140
+    },
+    {
+     "who": "mother",
+     "kind": "parental",
+     "start": "2026-02-06",
+     "days": 224
+    }
+   ]
+  }
+ },
+ {
+  "id": "zlecenie-bez-chorobowego",
+  "title": "Odmowa: umowa zlecenia bez dobrowolnego chorobowego",
+  "source": "zas. macierzyński – umowa zlecenie bez chorobowego – odmowa",
+  "sha256": [
+   "f7ab67f49f422218339a9dc4622dc1edf1705f6e409e9f7791749a44fcd7f747"
+  ],
+  "zus_entitled": false,
+  "zus_outcome": "Odmowa: przy umowie zlecenia nie było dobrowolnego ubezpieczenia chorobowego.",
+  "note": "Dziecko urodzone 24.08.2025; wniosek o macierzyński 24.08.2025–10.01.2026.",
+  "plan": {
+   "family": {
+    "mother": {
+     "employment": "contract",
+     "voluntary_sickness": false
+    },
+    "due_date": "2025-08-24",
+    "birth_date": "2025-08-24"
+   },
+   "blocks": [
+    {
+     "who": "mother",
+     "kind": "maternity",
+     "start": "2025-08-24",
+     "days": 140
+    }
+   ]
+  }
+ },
+ {
+  "id": "szosta-czesc-rodzicielskiego",
+  "title": "Odmowa: szósta część urlopu rodzicielskiego",
+  "source": "zas. macierzyński ojciec – za okres rodzicielskiego – 6. część – decyzja odmowna",
+  "sha256": [
+   "522b7bf501e300f2a80013f828970244333df3b272601a351c6c067d450e993d"
+  ],
+  "zus_entitled": false,
+  "zus_outcome": "Odmowa za 12–18.08.2024: rodzice wykorzystali już 5 części urlopu rodzicielskiego (mama 1, tata 4).",
+  "note": "Części z decyzji: mama 03.06.2024–12.01.2025; tata 10–23.04, 13–26.05, 10–23.06, 8–21.07.2024 i wniosek 12–18.08.2024. Datę porodu przyjęto 20 tygodni przed rodzicielskim mamy (akta jej nie podają); podstawy nie są podane.",
+  "plan": {
+   "family": {
+    "mother": {
+     "employment": "employee"
+    },
+    "father": {
+     "employment": "employee"
+    },
+    "due_date": "2024-01-15",
+    "birth_date": "2024-01-15"
+   },
+   "blocks": [
+    {
+     "who": "mother",
+     "kind": "maternity",
+     "start": "2024-01-15",
+     "days": 140
+    },
+    {
+     "who": "father",
+     "kind": "parental",
+     "start": "2024-04-10",
+     "days": 14
+    },
+    {
+     "who": "father",
+     "kind": "parental",
+     "start": "2024-05-13",
+     "days": 14
+    },
+    {
+     "who": "mother",
+     "kind": "parental",
+     "start": "2024-06-03",
+     "days": 224
+    },
+    {
+     "who": "father",
+     "kind": "parental",
+     "start": "2024-06-10",
+     "days": 14
+    },
+    {
+     "who": "father",
+     "kind": "parental",
+     "start": "2024-07-08",
+     "days": 14
+    },
+    {
+     "who": "father",
+     "kind": "parental",
+     "start": "2024-08-12",
+     "days": 7
+    }
+   ]
+  }
+ }
+]

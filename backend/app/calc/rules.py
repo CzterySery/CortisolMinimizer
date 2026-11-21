@@ -9,7 +9,16 @@ from itertools import pairwise
 from math import ceil
 
 from app.calc.base import pln
-from app.calc.plan import KIND, MATERNITY_BENEFIT, ONE, WHO, day_map, last_day, pool_sizes
+from app.calc.plan import (
+    KIND,
+    MATERNITY_BENEFIT,
+    ONE,
+    WHO,
+    day_map,
+    last_day,
+    pool_sizes,
+    sickness_insured,
+)
 from app.params import Params
 from app.schemas import Block, Issue, Plan, PlanResult
 
@@ -76,6 +85,15 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
         if not taken:
             continue
         since, until = parent.insured_since, parent.insured_until
+        if parent.base_monthly is None and not parent.salary_history and sickness_insured(parent):
+            add("base.missing", "warning", f"{WHO[who]}: brak podstawy wymiaru i wynagrodzeń z Z-3, więc kwoty zasiłków "
+                "są pominięte (0 zł).", "art. 36")
+        # ZUS refuses a non-employee's benefit for a period after the insurance ended (sample case: JDG closed
+        # after the maternity period, parental refused); employees: see the shortcut below
+        ended = [b for b in taken if until and b.start > until and b.kind != "job_loss_benefit"]
+        if ended and parent.employment != "employee":
+            add("insured-parent.ended", "error", f"{span(ended[0])}: ubezpieczenie chorobowe ustało {until.isoformat()}, "
+                "więc za ten okres zasiłek nie przysługuje.", "art. 29 ust. 1")
         if since and taken[0].start < since:
             add("insured-parent.not-yet-insured", "error", f"{span(taken[0])}: zaczyna się przed początkiem "
                 f"ubezpieczenia ({since.isoformat()}).", "art. 29 ust. 1")

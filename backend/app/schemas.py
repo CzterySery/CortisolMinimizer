@@ -171,6 +171,7 @@ class CalendarEntry(Model):
     kind: BlockKind
     start: date
     end: date
+    benefit: Decimal = Decimal(0)  # benefit for this period, the figure a ZUS decision shows
 
 
 class Pools(Model):
@@ -209,6 +210,7 @@ class PlanResult(Model):
     issues: list[Issue]
     explain: list[Explain]
     top_up: Decimal = Decimal(0)  # wyrównanie do 100% (art. 31 ust. 4)
+    bases: dict[Who, Decimal] = {}  # podstawa wymiaru per parent
 
 
 class BaseRequest(Model):
@@ -259,26 +261,42 @@ class GameSimulation(Model):
 # --- jury cases ---
 
 class CaseInput(Model):
-    event: Literal["sickness", "birth", "adoption"]
-    event_date: date
-    family: Family
+    """A case as read from the documents: the family facts and the periods applied for."""
+    plan: Plan
+    title: str = ""  # e.g. "Zasiłek chorobowy w ciąży, umowa o pracę"
+
+
+class Granted(Model):
+    """What a ZUS payout printout shows for one parent."""
+    who: Who
+    base: Decimal | None = None  # podstawa wymiaru
+    daily: Decimal | None = None  # stawka dzienna
+    months: dict[str, Decimal] = {}  # amount paid per calendar month ("2026-09": ...)
+
+
+class SampleCase(CaseInput):
+    """A ZUS sample case transcribed into numbers (no names, no documents), with ZUS's own outcome to compare."""
+    id: str
+    source: str  # which ZUS sample bundle the numbers were transcribed from
+    sha256: list[str] = []  # of the bundle PDF(s), to recognize an upload
+    zus_entitled: bool
+    zus_outcome: str  # ZUS's decision in one sentence
+    granted: list[Granted] = []
+    note: str = ""  # what was transcribed and any assumption made
 
 
 class ParseResult(Model):
-    form_detected: str | None
-    case: CaseInput | None
-    missing_fields: list[str]
+    sample: SampleCase | None  # the upload is one of the ZUS sample bundles, recognized by its SHA-256
     needs_manual_entry: bool
+    message: str
 
 
 class CaseVerdict(Model):
-    insured_on_event_date: bool
+    insured: bool  # sickness insurance covers the case (no insured-parent error)
     waiting_period_ok: bool
     debt_block: bool
-    entitled: list[str]
-    base: Decimal | None
-    result: PlanResult | None
-    explain: list[Explain]
+    entitled: bool  # no legal error at all
+    result: PlanResult  # bases, benefit per period (calendar), months, issues, documents, explain
 
 
 # --- simulated gov services (mObywatel, ZUS PUE/eZUS, USC) ---
