@@ -2,7 +2,9 @@
 
 Szkielet gry edukacyjnej na hackathon ZUS: **Python + FastAPI** oraz **React + Next.js (App Router) + TypeScript**. Jasna plansza nawiązuje do szkicu: statystyki po lewej, pięć miejsc na decyzje na górze, talia w lewym dolnym rogu i trzy karty w ręce. Na telefonie karty układają się pionowo.
 
-To wyłącznie podgląd pierwszej rundy. Nie ma losowania, wyboru kart, przechodzenia rund, przeliczania statystyk, sesji ani zapisu gry. Wartości statystyk są puste. Dekoracyjne paski nie przedstawiają wyliczonego stanu. Nazwa gry jest robocza.
+Interaktywny podgląd obejmuje pięć rund. Karty wysuwają się po najechaniu myszką; przeciągnij jedną na podświetlone miejsce na stole lub użyj przycisku „Połóż na stole” (również na telefonie i klawiaturą). Po położeniu karty pojawia się ręka kolejnej rundy. Po pięciu decyzjach stół jest kompletny. „Rozdaj od nowa” czyści układ. Upuszczenie karty poza aktywnym miejscem nie zmienia stołu.
+
+To lokalna interakcja frontendu: bez przeliczania statystyk, losowania, sesji i zapisu gry. Odświeżenie strony resetuje układ. Wartości statystyk są puste; dekoracyjne paski nie przedstawiają wyliczonego stanu. Nazwa gry jest robocza.
 
 ## Struktura
 
