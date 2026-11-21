@@ -23,6 +23,15 @@ def get_catalog() -> Catalog:
     return Catalog.model_validate_json(path.read_text(encoding="utf-8"))
 
 
+def get_designed_cards() -> list[dict]:
+    """The authored 30-card deck is distinct from the legacy 15-card catalog."""
+    return json.loads(DEFAULT_CATALOG.with_name("deck-design.json").read_text(encoding="utf-8"))["cards"]
+
+
+def get_game_scenarios() -> dict:
+    return json.loads((DATA / "scenarios.json").read_text(encoding="utf-8"))
+
+
 @contextmanager
 def db():
     # shortcut: one connection per call, fine for demo traffic; switch to psycopg_pool if load grows

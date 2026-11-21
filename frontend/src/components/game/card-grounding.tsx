@@ -116,7 +116,6 @@ export function CardGrounding({ card }: { card: Card }) {
             title={hint(`parameter:${path}`, labels[path] ?? "Parametr świadczenia")}><span>{labels[path] ?? "Parametr świadczenia"}</span><strong>{parameterValue(path)} ⓘ</strong></button>)}
         </details>}
       </>}
-      {design.combo && <div className="combo-description"><strong>Combo: {design.combo.name}</strong><p>Połącz z kartą {design.combo.with.join(" lub ")}. Bonus wymaga sprawdzenia rzeczywistego planu; samo zebranie kart nie wystarcza.</p></div>}
       {design.notes && <p className="muted">Ta ścieżka wymaga uzupełnienia parametrów przed uruchomieniem wyliczeń.</p>}
     </dialog>
   </>;

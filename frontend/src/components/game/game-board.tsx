@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import type { Card, Stage, Statistic } from "@/types/game";
 import { DecisionCard } from "./decision-card";
@@ -18,7 +19,7 @@ export interface GameBoardProps {
   projected?: Statistic[]; // stats if the focused card were played (server preview)
   played: Card[];
   hand: Card[];
-  onPlay: (cardId: string) => void;
+  onPlay: (cardId: string) => void | Promise<void>;
   onFocusCard?: (cardId: string) => void;
   onUnfocusCard?: (cardId: string) => void;
   simulation?: { signals?: CardSignals; title?: string; hovering: boolean };
@@ -26,9 +27,12 @@ export interface GameBoardProps {
   summaryHref?: string;
   previewGoal?: string;
   dealKey?: number;
+  belowHand?: ReactNode;
+  unavailable?: Record<string, string>;
+  busy?: boolean;
 }
 
-// Presentational board. State lives in the caller: PreviewGame (local, no backend) or /game/[id] (server game).
+// Presentational board. The home caller replays decisions through the API; sessions use /game/[id].
 export function GameBoard(props: GameBoardProps) {
   const { mode, stages, currentRound, totalRounds, handSize, statistics, projected, played, hand, onPlay, onFocusCard, onReset, summaryHref } = props;
   const [draggedId, setDraggedId] = useState<string | null>(null);
@@ -77,7 +81,7 @@ export function GameBoard(props: GameBoardProps) {
 
   async function playCard(cardId: string) {
     const card = hand.find((item) => item.id === cardId);
-    if (complete || !card || playLocked.current || Date.now() < playBlockedUntil.current) return;
+    if (complete || !card || props.busy || props.unavailable?.[cardId] || playLocked.current || Date.now() < playBlockedUntil.current) return;
     playLocked.current = true;
     setPlayingId(cardId);
     setDraggedId(null);
@@ -97,7 +101,7 @@ export function GameBoard(props: GameBoardProps) {
         await animation.finished;
       }
       playBlockedUntil.current = Date.now() + 250;
-      onPlay(cardId);
+      await onPlay(cardId);
       const next = stages.find((item) => item.id === stage!.id + 1);
       setAnnouncement(`Karta „${card.title}” trafiła na stół. ${next ? `Teraz runda ${next.id}: ${next.title}.` : `Wszystkie ${totalRounds} kart jest na stole.`}`);
     } catch {
@@ -117,12 +121,11 @@ export function GameBoard(props: GameBoardProps) {
   }
 
   const note = complete
-    ? mode === "preview" ? "Układ jest podglądem — statystyki nie są jeszcze przeliczane." : "Wszystkie decyzje są na stole. Zobacz, co oznaczają dla budżetu i opieki."
+    ? "Wszystkie decyzje są na stole. Zobacz, co oznaczają dla budżetu i opieki."
     : "Kliknij kartę lub przeciągnij ją na stół.";
 
   return (
-    <main className="game-layout" ref={boardRef}>
-      <Statistics statistics={statistics} projected={projected} simulation={props.simulation} />
+    <main className={`game-layout ${mode === "preview" ? "preview-board" : ""}`} ref={boardRef}>
       <div className="main-board">
         <section className="board-context" aria-labelledby="story-title">
           <p className="eyebrow">{complete ? "Wasz plan jest na stole" : `Runda 0${stage.id} / 0${totalRounds} · ${stage.title}`}</p>
@@ -133,10 +136,11 @@ export function GameBoard(props: GameBoardProps) {
         <RoundTrack stages={stages} currentRound={currentRound} playedCards={played} draggedId={draggedId} onPlayCard={playCard} />
         <section className="hand-section" aria-labelledby="hand-title">
           <div className="section-heading hand-heading"><h2 id="hand-title">{complete ? "Kompletny stół" : "Twoja ręka"}</h2>{mode === "game" && <span>{complete ? `${played.length} zagranych kart` : `${handSize} karty · przeciągnij jedną na podświetlone miejsce`}</span>}
-            {onReset && <button className="deck-stack" ref={deckRef} onClick={resetBoard} aria-label="Rozdaj karty ze stosu" title="Nowe rozdanie"><span /><span /><span><b>c.</b></span></button>}
+            {onReset && <button className="deck-stack" ref={deckRef} onClick={resetBoard} disabled={props.busy} aria-label="Rozdaj karty ze stosu" title="Nowe rozdanie"><span /><span /><span><b>c.</b></span></button>}
           </div>
+          <div className="hand-and-balance">
           {!complete && <div className="hand" key={`${stage.id}-${props.dealKey ?? 0}`}>{hand.map((card, index) => (
-            <div className={`hand-card ${draggedId === card.id ? "is-dragging" : ""} ${playingId === card.id ? "is-playing" : ""}`} key={card.id} draggable tabIndex={0} role="group" data-card-id={card.id}
+            <div className={`hand-card ${props.unavailable?.[card.id] ? "is-unavailable" : ""} ${draggedId === card.id ? "is-dragging" : ""} ${playingId === card.id ? "is-playing" : ""}`} key={card.id} draggable={!props.busy && !props.unavailable?.[card.id]} tabIndex={0} role="group" data-card-id={card.id}
               aria-label={`Karta: ${card.title}. Enter lub spacja, aby zagrać.`}
               onClick={(event) => {
                 if (Date.now() < ignoreClickUntil.current || (event.target as HTMLElement).closest("button, a, dialog, summary")) return;
@@ -159,9 +163,12 @@ export function GameBoard(props: GameBoardProps) {
                 setDraggedId(card.id);
               }} onDragEnd={() => { setDraggedId(null); ignoreClickUntil.current = Date.now() + 250; }}>
               <DecisionCard card={card} index={index} category={stage.title} />
-              <button className="play-card-button" disabled={playingId !== null} onClick={() => void playCard(card.id)} aria-label={`Zagraj kartę: ${card.title}`}>Połóż na stole <span aria-hidden="true">↑</span></button>
+              {props.unavailable?.[card.id] && <p className="card-unavailable-reason">{props.unavailable[card.id]}</p>}
+              <button className="play-card-button" disabled={props.busy || playingId !== null || !!props.unavailable?.[card.id]} onClick={() => void playCard(card.id)} aria-label={`Zagraj kartę: ${card.title}`}>{props.unavailable?.[card.id] ? "Niedostępna" : "Połóż na stole"} <span aria-hidden="true">↑</span></button>
             </div>
           ))}</div>}
+          <Statistics statistics={statistics} projected={projected} simulation={props.simulation} hideValues={mode === "preview"} />
+          </div>
           <div className="board-controls">
             <p className="preview-note">{note}</p>
             {complete && summaryHref && <Link className="button button-primary" href={summaryHref}>Zobacz plan rodziny</Link>}
@@ -169,6 +176,7 @@ export function GameBoard(props: GameBoardProps) {
           </div>
           <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
         </section>
+        {props.belowHand}
       </div>
     </main>
   );

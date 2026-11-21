@@ -1,6 +1,6 @@
 # Talia 30 kart — projekt mechaniki
 
-Po sześć kart na etap, trzy w ręce, jedna decyzja na rundę. To specyfikacja do wdrożenia silnika; plansza pozwala przeglądać i rozdawać 30 kart, a backendowy katalog pozostaje na 15 kartach do czasu wdrożenia silnika. Dane projektu: [deck-design.json](shared/deck-design.json). Zasady wspólne i tryby: [projekt działania](docs/card-grounding.md).
+Po sześć kart na etap, trzy w ręce, jedna decyzja na rundę. Silnik strony głównej odtwarza jeden plan w trzech jawnych scenariuszach urodzenia; niewspierane lub niespełnione warunki blokują kartę. Starszy endpoint katalogu ma osobne 15 kart. Dane projektu: [deck-design.json](shared/deck-design.json). Zasady wspólne i tryby: [projekt działania](docs/card-grounding.md).
 
 Pieniądze i czas są wyliczane z planu, nigdy dodawane jako stały bonus. Szczęście jest umownym bilansem pieniędzy i czasu. Punkty combo to osobny projekt. Zerowy wpływ decyzji formalnej na pieniądze lub czas jest poprawny. Wartości ustawowe są odczytywane przez referencje do parametrów, a nie utrzymywane w treści kart.
 
@@ -164,15 +164,15 @@ Przygotuj sprawę o rehabilitacyjne, gdy chorobowe się wyczerpuje.
 **Warunek wdrożenia:** Wymaga nowych parametrów rehabilitacyjnego i waloryzacji; blokada uruchomienia do ich dodania.
 
 <a id="1e"></a>
-### 1E · Dochód po likwidacji firmy
+### 1E · Sprawdź podstawę zasiłku
 
-Zabezpiecz szczególną ścieżkę świadczenia przed porodem po utracie zatrudnienia.
+Sprawdź wynagrodzenia i podstawę, od której będzie liczony zasiłek.
 
-**Kiedy:** Stosunek pracy ustał w ciąży wskutek śmierci, upadłości lub likwidacji pracodawcy; nie zapewniono innego zatrudnienia; dokumenty potwierdzają przesłanki.
+**Kiedy:** Dostępna historia wynagrodzeń lub potwierdzona podstawa. Okres przyjmowany do obliczenia zależy od zatrudnienia i daty powstania prawa do świadczenia.
 
-**Pieniądze:** Prognozuj należne świadczenie za okres przed porodem; nie dodawaj równolegle pensji z zakończonej pracy.
+**Pieniądze:** Weryfikacja pomaga zrozumieć wyliczenie; sama nie podnosi podstawy ani nie tworzy wypłaty.
 
-**Czas:** Brak zużycia podstawowego macierzyńskiego przed porodem; okres nie zwiększa jeszcze pokrycia opieki po narodzinach.
+**Czas:** Sprawdzenie podstawy nie zwalnia z pracy i nie zużywa puli urlopów.
 
 **Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
 
@@ -183,26 +183,16 @@ Zabezpiecz szczególną ścieżkę świadczenia przed porodem po utracie zatrudn
 ```json
 [
   {
-    "op": "add_block",
-    "who": "mother",
-    "kind": "job_loss_benefit",
-    "start": "facts.employment_end_next_day",
-    "days": "until:birth",
-    "only_if": "facts.job_loss.entitled"
-  },
-  {
-    "op": "mark_docs",
-    "bundle": "job_loss_before_birth",
-    "only_if": "facts.documents_available"
+    "op": "set_flag",
+    "name": "benefit_base_checked",
+    "value": true
   }
 ]
 ```
 
-**Podstawy:** [job-loss-before](Documents/legal/rules.md#job-loss-before), [base](Documents/legal/rules.md#base), [payer](Documents/legal/rules.md#payer).
+**Podstawy:** [base](Documents/legal/rules.md#base).
 
-**Parametry:** `rates.job_loss`.
-
-**Combo:** Ciągłość wypłat; partnerzy: [3F](#3f); warunek `touching`; bonus mnożnika `0.50` po sprawdzeniu rzeczywistego planu.
+**Parametry:** `contribution_deduction`.
 
 <a id="1f"></a>
 ### 1F · Przygotuj rodzinny start

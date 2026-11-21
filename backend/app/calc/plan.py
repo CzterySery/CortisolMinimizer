@@ -85,7 +85,7 @@ def pool_sizes(plan: Plan, p: Params) -> tuple[int, int]:
     return weeks[min(f.children, len(weeks)) - 1] * 7, parental * 7
 
 
-def compute_plan(plan: Plan, p: Params) -> PlanResult:
+def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = None) -> PlanResult:
     family = plan.family
     birth = family.birth_date or family.due_date
     parents = {"mother": family.mother} | ({"father": family.father} if family.father else {})
@@ -183,7 +183,9 @@ def compute_plan(plan: Plan, p: Params) -> PlanResult:
 
     all_days = [d for who in days for d in days[who]] + [birth]
     months = []
-    for y, m in month_range(min(all_days), max(all_days)):
+    # A game compares every alternative over the same horizon, including months spent working.
+    first, last = horizon if horizon is not None else (min(all_days), max(all_days))
+    for y, m in month_range(first, last):
         n = monthrange(y, m)[1]
         salary, benefit = {}, {}
         for who in parents:

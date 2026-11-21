@@ -1,9 +1,32 @@
-from fastapi import APIRouter
+from datetime import date
 
+from fastapi import APIRouter, HTTPException
+
+from app import params, repositories
 from app.api import todo
-from app.schemas import CardPreview, CardRequest, GameState, NewGame, PlayResult, ScenarioSummary
+from app.game.engine import simulate
+from app.schemas import (
+    CardPreview,
+    CardRequest,
+    GameSimulation,
+    GameState,
+    NewGame,
+    PlayResult,
+    ScenarioSummary,
+    SimulationRequest,
+)
 
 router = APIRouter(prefix="/game", tags=["game"])
+
+
+@router.post("/simulate")
+def simulate_plan(req: SimulationRequest) -> GameSimulation:
+    data = repositories.get_game_scenarios()
+    try:
+        p = params.active(date.fromisoformat(data["family"]["birth_date"]))
+        return simulate(req.scenario_id, req.selected, p, data, repositories.get_designed_cards())
+    except (ValueError, LookupError) as error:
+        raise HTTPException(422, str(error)) from error
 
 
 @router.get("/scenarios")

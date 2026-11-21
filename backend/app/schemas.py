@@ -276,6 +276,30 @@ class PlayResult(Model):
     points: int  # chips x mult, added to the happiness stat
 
 
+class SimulationRequest(Model):
+    scenario_id: Literal["standard", "hospital", "za-zyciem"] = "standard"
+    selected: list[str] = Field(default_factory=list, max_length=5)
+
+
+class SimulatedCard(Model):
+    id: str
+    available: bool
+    issues: list[Issue]
+    statistics: list[Statistic]
+    pools: Pools
+
+
+class GameSimulation(Model):
+    scenario: ScenarioSummary
+    plan: Plan
+    result: PlanResult
+    statistics: list[Statistic]
+    candidates: list[SimulatedCard]
+    reservations: dict[str, int]
+    horizon_start: date
+    horizon_end: date
+
+
 # --- jury cases ---
 
 class CaseInput(Model):

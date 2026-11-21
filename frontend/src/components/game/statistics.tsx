@@ -4,8 +4,9 @@ import type { CardSignals } from "@/lib/card-signals";
 const symbols = { money: "zł", time: "◷", happiness: "☺" };
 
 // `projected` (from the server card preview) shows what the focused card would change.
-export function Statistics({ statistics, projected, simulation }: {
+export function Statistics({ statistics, projected, simulation, hideValues = false }: {
   statistics: Statistic[]; projected?: Statistic[];
+  hideValues?: boolean;
   simulation?: { signals?: CardSignals; title?: string; hovering: boolean };
 }) {
   return (
@@ -18,14 +19,15 @@ export function Statistics({ statistics, projected, simulation }: {
         // The midpoint only positions the hatched game-balance illustration, not an expected income.
         const balanceFill = signal?.range ? 50 + (signal.range[0] + signal.range[1]) / 2 * 34 : undefined;
         // Known range => real fill; otherwise the track stays decorative.
-        const fill = stat.value != null && stat.max ? `${Math.min(100, (stat.value / stat.max) * 100)}%` : undefined;
+        const shown = next ?? stat.value;
+        const fill = shown != null && stat.max ? `${Math.max(0, Math.min(100, (shown / stat.max) * 100))}%` : undefined;
         return (
           <div className={`stat stat-${stat.id} ${simulation ? "stat-simulation" : ""}`} key={stat.id}>
             <span className="stat-symbol" aria-hidden="true">{symbols[stat.id]}</span>
             <div className="stat-detail">
               <div className="stat-heading">
                 <span>{stat.label}</span>
-                <strong>
+                <strong className={hideValues ? "sr-only" : undefined}>
                   {simulation ? signal?.label ?? "Najedź na kartę" : <>{stat.value ?? "—"} <small>{stat.unit}</small>
                   {delta !== 0 && <em className={`stat-delta ${delta > 0 ? "up" : "down"}`}>{delta > 0 ? "+" : ""}{delta}</em>}</>}
                 </strong>
@@ -35,9 +37,6 @@ export function Statistics({ statistics, projected, simulation }: {
           </div>
         );
       })}
-      {simulation ? <div className="simulation-note" aria-live="polite" aria-atomic="true">
-        {simulation.title && <p><strong>{simulation.hovering ? "Przymierzasz:" : "Ostatnia decyzja:"}</strong> {simulation.title}</p>}
-      </div> : <p className="stats-note">Każda decyzja znajdzie tu swoje odbicie. Statystyki pojawią się w rozgrywce.</p>}
     </aside>
   );
 }

@@ -41,6 +41,18 @@ def test_stubs_are_501_not_500(client):
     assert client.get("/api/v1/game/scenarios").status_code == 501
 
 
+def test_home_game_replays_and_rejects_exhausted_pool(client, monkeypatch):
+    seed = params.Params.model_validate_json((repositories.DATA / "params.json").read_text(encoding="utf-8"))
+    monkeypatch.setattr(params, "active", lambda on=None: seed)
+    selected = ["1A", "2C", "3A", "4A"]
+    response = client.post("/api/v1/game/simulate", json={"selected": selected})
+    assert response.status_code == 200
+    assert response.json()["result"]["pools"]["parental_days_left"] == 0
+    invalid = client.post("/api/v1/game/simulate", json={"selected": selected + ["5A"]})
+    assert invalid.status_code == 422
+    assert "Przekroczony" in invalid.json()["detail"]
+
+
 def test_catalog(client):
     cards = client.get("/api/v1/cards").json()
     assert len(cards) == 15 and {c["round_id"] for c in cards} == {1, 2, 3, 4, 5}

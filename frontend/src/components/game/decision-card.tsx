@@ -1,11 +1,12 @@
 import type { Card } from "@/types/game";
 import { CardGrounding } from "./card-grounding";
+import { CardArtwork } from "./card-artwork";
 
 export function DecisionCard({ card, index, category }: { card: Card; index: number; category: string }) {
   return (
     <article className={`decision-card card-${index}`}>
       <div className="card-top"><span>{card.design ? `KARTA ${card.id}` : `DECYZJA ${String.fromCharCode(65 + index)}`}</span><span aria-hidden="true">↗</span></div>
-      <div className="card-illustration" aria-hidden="true"><span className="illustration-line" /><span className="illustration-circle" /><span className="illustration-dot" /></div>
+      <CardArtwork id={card.id} />
       <div className="card-copy"><span className="card-category">{category}</span><h3>{card.title}</h3>{card.design ? <CardGrounding card={card} /> : <p>{card.description}</p>}</div>
       <footer className="card-footer">
         {card.design ? <span>Informacje z podstawą prawną ↑</span> : card.sources.length > 0 ? (

@@ -63,22 +63,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .hand-section { padding-top: 12px; }
 .hand { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: stretch; padding-top: 8px; }
 .decision-card { display: flex; flex-direction: column; min-width: 0; padding: 18px; border: 1px solid #e0e5dc; border-radius: 13px; background: #fff; box-shadow: 0 8px 22px #263b2b06; }
-.card-0 { transform: rotate(-3deg) translateY(8px); }
-.card-2 { transform: rotate(3deg) translateY(8px); }
 .card-top { display: flex; justify-content: space-between; color: #929e88; font-size: 8px; letter-spacing: 1.4px; }
 .card-top > span:last-child { font-size: 15px; line-height: 8px; }
-.card-illustration { height: 85px; position: relative; margin: 17px 0 20px; background: #f4f6ee; border-radius: 7px; overflow: hidden; }
-.illustration-circle { position: absolute; width: 49px; height: 49px; border: 1px solid #9cae8a; border-radius: 50%; left: calc(50% - 23px); top: 18px; }
-.illustration-line { position: absolute; width: 70px; height: 1px; background: #9cae8a; transform: rotate(-42deg); left: calc(50% - 35px); top: 42px; }
-.illustration-dot { position: absolute; width: 11px; height: 11px; border-radius: 50%; background: #c4d0ac; left: calc(50% + 24px); top: 23px; }
-.card-1 .card-illustration { background: #faf5ec; }
-.card-1 .illustration-circle { border-color: #beac8c; border-radius: 24px 24px 3px 3px; }
-.card-1 .illustration-line { background: #beac8c; transform: rotate(0); }
-.card-1 .illustration-dot { background: #dfceb0; }
-.card-2 .card-illustration { background: #f8f1ee; }
-.card-2 .illustration-circle { border-color: #bea297; border-radius: 3px 24px 24px 24px; transform: rotate(35deg); }
-.card-2 .illustration-line { background: #bea297; transform: rotate(42deg); }
-.card-2 .illustration-dot { background: #ddc4b7; }
 .card-copy { flex: 1; }
 .card-category { font-size: 8px; color: #9aa18f; }
 .card-copy h3 { font-family: Georgia, 'Times New Roman', serif; font-size: 21px; font-weight: 400; letter-spacing: -.5px; line-height: 1.25; margin: 10px 0; }
@@ -216,6 +202,7 @@ cite { font-style: normal; color: var(--muted-strong); font-size: 11px; }
 .data-table th { font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted-strong); }
 
 @media (max-width: 1000px) { .calculator-layout { grid-template-columns: 1fr; } }
+@media (max-width: 800px) { .preview-board > .statistics { gap: 12px; margin-top: 18px; } .preview-board .stat { align-items: flex-start; flex-direction: column; } .preview-board .stat-symbol { width: 28px; height: 28px; } }
 @media (max-width: 800px) { .site-header { flex-wrap: wrap; padding: 16px 0; } .site-nav { justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 4px; } .plan-grid, .form-grid { grid-template-columns: 1fr; } .block-row { grid-template-columns: 1fr 1fr; } }
 @media (prefers-reduced-motion: reduce) { .combo-toast { animation: none; } }
 
@@ -273,13 +260,13 @@ dialog::backdrop { background: #18312788; }
 .parameter-list summary { cursor: pointer; padding: 10px 0; }
 .parameter-item { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 18px; border: 0; border-bottom: 1px solid var(--line); padding: 12px 0; background: transparent; color: var(--ink); text-align: left; cursor: pointer; font: 12px/1.6 Arial, sans-serif; }
 .parameter-item strong { white-space: nowrap; color: #385d46; }
-.combo-description { margin-top: 20px; padding: 16px; background: #f6f1e8; border-radius: 9px; font-size: 13px; }
-.combo-description p { margin: 8px 0 0; font-size: 12px; line-height: 1.8; }
 .evidence-dialog .impact-context { background: #f3f6ee; border-radius: 9px; padding: 14px 16px; margin-bottom: 18px; }
 .evidence-dialog .impact-context p { margin: 0 0 8px; font-size: 12px; line-height: 1.75; color: var(--ink); }
 .evidence-dialog .impact-context p:last-child { margin-bottom: 0; color: var(--muted-strong); }
 .evidence-dialog .evidence-explanation { font-size: 14px; line-height: 1.8; }
 .mode-footer { padding: 20px 0 30px; border-top: 1px solid var(--line); }
+.game-layout.preview-board { display: flex; flex-direction: column; gap: 0; padding: 16px 0 20px; }
+.preview-board .main-board > .hand-section { padding-top: 10px; }
 .hand-heading { align-items: center; position: relative; min-height: 38px; padding-right: 70px; }
 .deck-stack { position: absolute; right: 8px; top: -12px; width: 43px; height: 58px; padding: 0; border: 0; background: transparent; cursor: pointer; transform: rotate(-7deg); z-index: 5; }
 .deck-stack > span { position: absolute; inset: 0; border: 1px solid #b1c2a7; border-radius: 6px; background: #edf3e6; transition: transform 180ms; }
@@ -313,3 +300,49 @@ dialog::backdrop { background: #18312788; }
   .parameter-item { align-items: flex-start; }
   .parameter-item strong { white-space: normal; text-align: right; }
 }
+
+/* The hand and balance share a row; the table keeps the full width above them. */
+.game-layout { display: block; }
+.hand-and-balance { display: grid; grid-template-columns: minmax(0, 1fr) 160px; gap: 30px; align-items: center; }
+.hand-and-balance .statistics { min-width: 0; margin: 0; padding: 0 0 0 18px; border-left: 1px solid var(--line); }
+.hand-and-balance .statistics > .eyebrow { margin-bottom: 25px; }
+.hand-and-balance .stat { margin-bottom: 27px; }
+.hand-and-balance .stat:last-child { margin-bottom: 0; }
+.hand-and-balance .stat-heading strong:not(.sr-only) { display: none; }
+.hand-and-balance .stat-detail { min-width: 0; }
+.hand-and-balance .stat-track span { transition: width 380ms cubic-bezier(.2,.75,.25,1); }
+.hand .card-0 { transform: rotate(-3deg) translateY(8px); }
+.hand .card-2 { transform: rotate(3deg) translateY(8px); }
+.card-artwork { --art: #64836b; --art-light: #eaf2e5; height: 100px; display: grid; place-items: center; position: relative; isolation: isolate; margin: 17px 0 20px; border-radius: 9px; overflow: hidden; background: var(--art-light); color: var(--art); }
+.card-artwork svg { width: 73px; height: 73px; z-index: 2; filter: drop-shadow(0 3px 4px #ffffff99); }
+.artwork-ochre { --art: #ac7c32; --art-light: #fbf0d8; }
+.artwork-rose { --art: #b56a78; --art-light: #f9e7eb; }
+.artwork-sky { --art: #577fa4; --art-light: #e8f2fa; }
+.artwork-lilac { --art: #8b6ca5; --art-light: #f1e9f7; }
+.artwork-clay { --art: #b87a56; --art-light: #f8e9df; }
+.card-artwork::before { content: ""; position: absolute; width: 85px; height: 85px; background: #ffffff90; transform: rotate(-18deg); border-radius: 24px 3px 24px 3px; }
+.artwork-shape-1::before { width: 90px; height: 78px; border-radius: 50% 50% 8px 8px; transform: rotate(9deg); }
+.artwork-shape-2::before { width: 96px; height: 70px; border-radius: 50% 5px 50% 5px; transform: rotate(-27deg); }
+.artwork-orbit { width: 160px; height: 78px; border: 1px solid currentColor; opacity: .22; border-radius: 50%; position: absolute; transform: rotate(-25deg); }
+.artwork-spark { position: absolute; width: 9px; height: 9px; border: 1px solid currentColor; transform: rotate(45deg); left: 19%; top: 25%; opacity: .6; }
+.artwork-spark::after { content: ""; position: absolute; width: 4px; height: 4px; background: currentColor; left: 130px; top: 22px; }
+.card-artwork.artwork-compact { width: 42px; height: 42px; margin: 0 0 5px; flex-shrink: 0; border-radius: 8px; }
+.artwork-compact svg { width: 35px; height: 35px; }
+.artwork-compact::before { width: 35px; height: 35px; }
+.artwork-compact .artwork-orbit, .artwork-compact .artwork-spark { display: none; }
+.round-slot.occupied { padding-top: 25px; }
+.round-slot.occupied .slot-caption { margin-top: 4px; }
+.card-unavailable-reason { font: 11px/1.65 Arial, sans-serif; color: var(--alert); background: #fbf0ea; border-radius: 8px; padding: 10px; margin: 15px 0 0; }
+.hand-card.is-unavailable .decision-card { border-style: dashed; }
+.play-card-button:disabled { opacity: .55; cursor: not-allowed; }
+.game-error { color: var(--alert); padding: 14px; border: 1px solid #e5b8a9; border-radius: 8px; font-size: 13px; }
+.scenario-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-size: 12px; }
+.scenario-picker select { font: inherit; color: var(--ink); padding: 9px 12px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); }
+.game-plan-details { font-size: 13px; line-height: 1.8; padding: 18px 0; }
+.game-plan-details > summary { cursor: pointer; color: var(--green); }
+.game-plan-details .budget-chart { margin-top: 20px; position: relative; }
+.game-plan-details .care-lanes { position: relative; }
+@media (max-width: 1100px) { .hand-and-balance { grid-template-columns: minmax(0, 1fr) 135px; gap: 20px; } .hand-and-balance .statistics { padding-left: 12px; } }
+@media (max-width: 800px) { .hand-and-balance { grid-template-columns: minmax(0, 1fr); gap: 24px; } .hand-and-balance .statistics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px 0 0; border-left: 0; border-top: 1px solid var(--line); } .hand-and-balance .statistics > .eyebrow { grid-column: 1 / -1; margin: 0; } .hand-and-balance .stat { margin: 0; } }
+@media (max-width: 560px) { .hand .card-0 { transform: rotate(-1.5deg); } .hand .card-2 { transform: rotate(1.5deg); } .round-slot.occupied { min-height: 125px; } .card-artwork.artwork-compact { width: 34px; height: 34px; } .artwork-compact svg { width: 29px; height: 29px; } }
+@media (prefers-reduced-motion: reduce) { .hand-and-balance .stat-track span { transition: none; } }

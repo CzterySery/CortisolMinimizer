@@ -194,14 +194,13 @@ CARDS = [
          "rehab base debt", (),
          {"with": ["3D"], "name": "Kompletna teczka", "check": "docs_complete", "mult": "0.50"},
          "Wymaga nowych parametrów rehabilitacyjnego i waloryzacji; blokada uruchomienia do ich dodania."),
-    card("1E", "Dochód po likwidacji firmy",
-         "Zabezpiecz szczególną ścieżkę świadczenia przed porodem po utracie zatrudnienia.",
-         "Stosunek pracy ustał w ciąży wskutek śmierci, upadłości lub likwidacji pracodawcy; nie zapewniono innego zatrudnienia; dokumenty potwierdzają przesłanki.",
-         [effect("add_block", who="mother", kind="job_loss_benefit", start="facts.employment_end_next_day", days="until:birth", only_if="facts.job_loss.entitled"), effect("mark_docs", bundle="job_loss_before_birth", only_if="facts.documents_available")],
-         "Prognozuj należne świadczenie za okres przed porodem; nie dodawaj równolegle pensji z zakończonej pracy.",
-         "Brak zużycia podstawowego macierzyńskiego przed porodem; okres nie zwiększa jeszcze pokrycia opieki po narodzinach.", 10, "security documents continuity",
-         "job-loss-before base payer", ["rates.job_loss"],
-         {"with": ["3F"], "name": "Ciągłość wypłat", "check": "touching", "mult": "0.50"}),
+    card("1E", "Sprawdź podstawę zasiłku",
+         "Sprawdź wynagrodzenia i podstawę, od której będzie liczony zasiłek.",
+         "Dostępna historia wynagrodzeń lub potwierdzona podstawa. Okres przyjmowany do obliczenia zależy od zatrudnienia i daty powstania prawa do świadczenia.",
+         [effect("set_flag", name="benefit_base_checked", value=True)],
+         "Weryfikacja pomaga zrozumieć wyliczenie; sama nie podnosi podstawy ani nie tworzy wypłaty.",
+         "Sprawdzenie podstawy nie zwalnia z pracy i nie zużywa puli urlopów.", 10, "preparation documents budget",
+         "base", ["contribution_deduction"]),
     card("1F", "Przygotuj rodzinny start",
          "Przygotuj plan i dokumenty na przyjęcie dziecka w adopcji albo pieczy niezawodowej.",
          "Wyłącznie scenariusz przyjęcia. Rozdziel adopcję i pieczę; przyszłe zdarzenie nie tworzy dzisiejszego uprawnienia.",
@@ -531,7 +530,7 @@ def make_deck(rules):
         c["claims"].append({"id": f'{c["id"]}.happiness', "field": "stats.happiness",
                             "kind": "game_design", "rule_ids": [],
                             "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."})
-    return {"schema_version": 1, "status": "design_only_not_runtime_deck",
+    return {"schema_version": 1, "status": "runtime_birth_scenarios_with_explicit_gates",
             "hand_size": 3, "rounds": 5, "cards_per_round": 6,
             "legal_rules_file": "shared/legal-rules.json",
             "parameters_file": "backend/app/data/params.json", "cards": CARDS}
@@ -543,8 +542,8 @@ def rule_link(rule_id, prefix="Documents/legal/"):
 
 def render_cards(deck):
     lines = ["# Talia 30 kart — projekt mechaniki", "",
-             ("Po sześć kart na etap, trzy w ręce, jedna decyzja na rundę. To specyfikacja do wdrożenia silnika; "
-             "plansza pozwala przeglądać i rozdawać 30 kart, a backendowy katalog pozostaje na 15 kartach do czasu wdrożenia silnika. Dane projektu: "
+             ("Po sześć kart na etap, trzy w ręce, jedna decyzja na rundę. Silnik strony głównej odtwarza jeden plan "
+             "w trzech jawnych scenariuszach urodzenia; niewspierane lub niespełnione warunki blokują kartę. Starszy endpoint katalogu ma osobne 15 kart. Dane projektu: "
              "[deck-design.json](shared/deck-design.json). Zasady wspólne i tryby: "
              "[projekt działania](docs/card-grounding.md)."), "",
              ("Pieniądze i czas są wyliczane z planu, nigdy dodawane jako stały bonus. "

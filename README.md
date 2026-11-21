@@ -2,13 +2,13 @@
 
 Kliknięcie powierzchni karty, Enter/spacja lub przeciągnięcie zagrywa ją na stół; przyciski informacji otwierają źródła. Rozdania animują przejście kart ze stosu do ręki, a kliknięcie stosu rozpoczyna nowe rozdanie. Cele planowania znajdują się pod planszą. [Audyt wpływu 30 kart](docs/card-impact-audit.md) określa porównanie, okres, skutek teraz i później oraz podstawy prawne. Nieznany dochód pozostaje nieznany; szczęście jest bilansem pieniędzy i czasu, nie osobną premią.
 
-Strona główna pokazuje [30 kart, po 6 na etap](cards-30.md), rozdaje trzy karty i pozwala sprawdzić ich efekty oraz podstawy prawne. Przycisk „Przejrzyj 30 kart” otwiera całą talię. Opis, warunki i statystyki otwierają wyjaśnienia z cytatami i oryginalnymi PDF-ami. [Mechanika i grounding](docs/card-grounding.md), [źródła prawne w Markdownzie](Documents/legal/README.md). Wyliczenia i prawna kwalifikacja pozostają do wdrożenia; podgląd nie nalicza fikcyjnych kwot ani punktów. Backendowy katalog nadal zawiera wcześniejsze 15 kart. Kontrola projektu: `python scripts/build_deck_design.py --check`.
+Strona główna pokazuje [30 kart, po 6 na etap](cards-30.md), rozdaje trzy i przelicza jeden wspólny plan za pomocą backendowego kalkulatora. Zużyte dni pozostają zużyte w kolejnych turach; niedostępne decyzje mają wyjaśnienie. Do wyboru są trzy jawne przykładowe historie rodziny. Przycisk „Przejrzyj 30 kart” otwiera całą talię, a opisy i warunki — cytaty oraz oryginalne PDF-y. [Zakres silnika i uproszczenia](docs/game-engine.md), [grounding](docs/card-grounding.md), [źródła prawne](Documents/legal/README.md). Starszy endpoint katalogu zachowuje wcześniejsze 15 kart. Kontrola projektu: `python scripts/build_deck_design.py --check`.
 
-Gra edukacyjna na hackathon ZUS (HackNation 2026): **Python + FastAPI** oraz **React + Next.js (App Router) + TypeScript**. Jasna plansza nawiązuje do szkicu: statystyki po lewej, pięć miejsc na decyzje na górze, talia w lewym dolnym rogu i trzy karty w ręce. Na telefonie karty układają się pionowo.
+Gra edukacyjna na hackathon ZUS (HackNation 2026): **Python + FastAPI** oraz **React + Next.js (App Router) + TypeScript**. Pięć miejsc na decyzje jest na górze, niżej wachlarz ręki i obok niego paski równowagi. Każda decyzja ma kolorową ilustrację, zachowaną po przejściu na stół. Na telefonie karty układają się pionowo, a paski pod ręką.
 
 Strona główna to interaktywny podgląd pięciu rund. Karty wysuwają się po najechaniu myszką; przeciągnij jedną na podświetlone miejsce na stole lub użyj przycisku „Połóż na stole” (również na telefonie i klawiaturą). Po położeniu karty pojawia się ręka kolejnej rundy. Po pięciu decyzjach stół jest kompletny. „Rozdaj od nowa” czyści układ.
 
-Podgląd działa lokalnie, bez backendu: nie przelicza statystyk i nie zapisuje gry. Pełna gra (`/game/{id}`), kalkulator, sprawdzanie spraw, wnioski i panel administracyjny korzystają z API. Ich szkielet jest gotowy, a endpointy, których jeszcze nie zbudowano, zwracają `501` z numerem kroku planu. Nazwa gry jest robocza.
+Plansza wymaga backendu i `API_URL` dla przeliczania stanu; nie zapisuje jeszcze sesji, więc odświeżenie strony rozpoczyna plan od nowa. Kalkulator korzysta z tego samego kodu. Starsza gra z sesją (`/game/{id}`), sprawdzanie spraw i pozostałe niewdrożone endpointy zwracają `501` z numerem kroku planu. Ścieżki adopcji, rehabilitacji i ustania ubezpieczenia w grze są jawnie zablokowane do czasu uzupełnienia historii i modelu danych.
 
 **AI:** aplikacja nie korzysta z AI. Kwoty i uprawnienia liczy deterministyczny kod, a stawki i limity są w `backend/app/data/params.json` (edytowalne w panelu administracyjnym).
 
@@ -72,7 +72,7 @@ npm install
 npm run dev
 ```
 
-Plansza: http://localhost:3000. Podgląd 30 kart korzysta zawsze z [projektu talii](shared/deck-design.json), również przy skonfigurowanym API. `npm run dev` i `npm run build` przygotowują publiczne dokumenty źródłowe. Żeby pozostałe strony rozmawiały z FastAPI, utwórz `frontend/.env.local`:
+Plansza: http://localhost:3000. Ilustracje i opisy korzystają z [talii 30 kart](shared/deck-design.json), a wyliczenia z API. `npm run dev` i `npm run build` przygotowują publiczne dokumenty źródłowe. Żeby plansza i pozostałe strony rozmawiały z FastAPI, utwórz `frontend/.env.local`:
 
 ```dotenv
 API_URL=http://127.0.0.1:8000
@@ -95,10 +95,12 @@ Wszystkie endpointy są pod `/api/v1`, a pełna lista jest w `/docs`. Działają
 | GET | `/api/v1/health` | status serwera |
 | GET | `/api/v1/cards`, `/api/v1/rounds`, `/api/v1/rounds/{id}` | katalog kart i rund |
 | GET | `/api/v1/game/preview` | statyczny podgląd planszy z pustymi statystykami |
+| POST | `/api/v1/game/simulate` | odtworzenie wybranych kart, plan, wspólne pule i wykonalność kolejnych kart |
+| POST | `/api/v1/calc/base`, `/api/v1/calc/plan` | podstawa zasiłku i kalkulator planu z walidacją prawną |
 | GET | `/api/v1/info/links` | oficjalne źródła (ZUS, MRPiPS, PIP) |
 | GET/PUT | `/api/v1/admin/params` (+ `/versions`) | parametry prawne, każda zmiana to nowa wersja (nagłówek `Authorization: Bearer $ADMIN_TOKEN`) |
 
-Pozostałe (kalkulator, gra z sesją, sprawy, symulacje mObywatel/PUE/wniosków, talia w panelu) mają gotowy kontrakt i zwracają `501` do czasu implementacji.
+Pozostałe (gra z sesją, sprawy, symulacje mObywatel/PUE/wniosków, talia w panelu) mają gotowy kontrakt i zwracają `501` do czasu implementacji.
 
 ## Karty i późniejsza baza
 

@@ -1,0 +1,107 @@
+"""Cross-round resource accounting; pure, no DB. Scenario values are explicit sample inputs."""
+import pytest
+
+from app.game.engine import simulate
+from app.params import Params
+from app.repositories import DATA, get_designed_cards, get_game_scenarios
+
+P = Params.model_validate_json((DATA / "params.json").read_text())
+DATASET = get_game_scenarios()
+CARDS = get_designed_cards()
+
+
+def run(*selected, scenario="standard"):
+    return simulate(scenario, list(selected), P, DATASET, CARDS)
+
+
+def candidate(state, card_id):
+    return next(card for card in state.candidates if card.id == card_id)
+
+
+def test_prebirth_is_same_pool_and_less_after_birth():
+    normal, early = run("1A"), run("1B")
+    a, b = normal.plan.blocks[0], early.plan.blocks[0]
+    assert a.days == b.days == P.maternity.weeks_by_children[0] * 7
+    assert (a.start - b.start).days == DATASET["choices"]["prebirth_days"]
+    assert normal.result.pools.maternity_days_left == early.result.pools.maternity_days_left == 0
+    assert len(normal.result.months) == len(early.result.months)
+
+
+def test_paternity_is_not_recreated_in_later_round():
+    exhausted = run("1A", "2A", "3A")
+    assert exhausted.result.pools.paternity_days_left == 0
+    assert not candidate(exhausted, "4E").available
+    split = run("1A", "2B", "3A", "4E")
+    assert split.result.pools.paternity_days_left == 0
+    assert sum(b.days for b in split.plan.blocks if b.kind == "paternity") == P.paternity.days
+    assert split.reservations["paternity"] == 0
+
+
+def test_reservation_does_not_pay_or_use_days_until_consumed():
+    baseline, reserved = run("1A"), run("1A", "2C")
+    assert baseline.result.months == reserved.result.months
+    assert reserved.result.pools.paternity_days_left == P.paternity.days
+    before = run("1A", "2C", "3A", "4D")
+    after = run("1A", "2C", "3A", "4D", "5A")
+    amount = DATASET["choices"]["adaptation_days"]
+    assert before.result.pools.parental_days_left - after.result.pools.parental_days_left == amount
+    assert before.reservations["parental"] - after.reservations["parental"] == amount
+
+
+def test_consuming_parental_pool_blocks_later_leave():
+    state = run("1A", "2C", "3A", "4A")
+    assert state.result.pools.parental_days_left == 0
+    for card in ("5A", "5B", "5C"):
+        assert not candidate(state, card).available
+    assert candidate(state, "5D").available  # separate annual care pool
+    with pytest.raises(ValueError):
+        run("1A", "2C", "3A", "4A", "5A")
+
+
+def test_part_time_consumes_pool_once_for_extended_calendar():
+    state = run("1A", "2C", "3A", "4C")
+    block = next(b for b in state.plan.blocks if b.kind == "parental")
+    amount = DATASET["choices"]["parental_pool_days"]
+    assert block.days * (1 - block.work_fraction) == amount
+    assert state.result.pools.parental_days_left == P.parental.weeks_single * 7 - amount
+
+
+def test_medical_and_special_cards_need_facts():
+    assert not candidate(run(), "1C").available
+    assert candidate(run(scenario="hospital"), "1C").available
+    assert not candidate(run("1A"), "2D").available
+    assert candidate(run("1A", scenario="hospital"), "2D").available
+    assert not candidate(run("1A", "2C"), "3E").available
+    assert candidate(run("1A", "2C", scenario="za-zyciem"), "3E").available
+
+
+def test_medical_fact_is_preserved_without_drawing_health_card():
+    baseline = run(scenario="hospital")
+    kept = run("1A", scenario="hospital")
+    documented = run("1C", scenario="hospital")
+    for state in (baseline, kept, documented):
+        sick = [b for b in state.plan.blocks if b.kind == "sick"]
+        assert len(sick) == 1 and sick[0].days == DATASET["choices"]["sick_days"]
+    assert not candidate(baseline, "1B").available  # cannot erase overlapping e-ZLA
+
+
+def test_paperwork_does_not_create_money_or_time():
+    before, after = run(), run("1E")
+    assert before.result.months == after.result.months
+    assert before.result.pools == after.result.pools
+    assert before.statistics == after.statistics
+
+
+@pytest.mark.parametrize("scenario", ["standard", "hospital", "za-zyciem"])
+def test_complete_plan_valid_and_happiness_derived(scenario):
+    state = run("1C" if scenario == "hospital" else "1B", "2B", "3B", "4D", "5F", scenario=scenario)
+    assert not [issue for issue in state.result.issues if issue.severity == "error"]
+    money, time, balance = state.statistics
+    assert balance.value == int((min(1, money.value / money.max) + time.value / time.max) * 50)
+    assert state.result.pools.care_days_left == P.care.days_per_year_child_under_14 - DATASET["choices"]["emergency_days"]
+
+
+def test_rounds_cannot_be_skipped_or_duplicated():
+    for selected in [("2A",), ("1A", "1B"), ("missing",)]:
+        with pytest.raises(ValueError):
+            run(*selected)

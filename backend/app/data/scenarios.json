@@ -1,0 +1,20 @@
+{
+  "family": {
+    "mother": {"employment": "employee", "base_monthly": "6000", "insured_since": "2024-01-01"},
+    "father": {"employment": "employee", "base_monthly": "8000", "insured_since": "2024-01-01"},
+    "due_date": "2026-12-01", "birth_date": "2026-12-01", "children": 1
+  },
+  "choices": {
+    "prebirth_days": 14, "sick_days": 21, "shared_parental_days": 56,
+    "parental_pool_days": 112, "first_year_parental_days": 140,
+    "adaptation_days": 28, "later_break_days": 14, "adaptation_pool_days": 14,
+    "emergency_days": 10, "emergency_mother_days": 5, "work_fraction": "0.5",
+    "paternity_later_offset": 250, "adaptation_offset": 730, "later_break_offset": 790,
+    "emergency_offset": 830, "horizon_before_days": 42, "horizon_after_days": 900
+  },
+  "scenarios": {
+    "standard": {"title": "Wspólny początek", "description": "Przykładowa rodzina: jedno dziecko, oboje na umowie o pracę. Podstawy zasiłku: mama 6000 zł, tata 8000 zł; kwoty przed PIT. Planowana adaptacja i potwierdzona nagła choroba dziecka, bez innego dostępnego opiekuna."},
+    "hospital": {"title": "Powrót ze szpitala", "description": "Ta sama przykładowa rodzina; potwierdzone e-ZLA mamy przed porodem, poród w 30. tygodniu, masa 1500 g i 21 kwalifikujących dni hospitalizacji dziecka.", "hospitalization": {"pregnancy_week": 30, "birth_weight_g": 1500, "hospital_days": 21}, "sick_verified": true},
+    "za-zyciem": {"title": "Dodatkowe wsparcie", "description": "Ta sama przykładowa rodzina z potwierdzonym zaświadczeniem Za życiem. Dodatkowa pula wynika z zaświadczenia, niezależnie od wylosowania karty.", "za_zyciem": true}
+  }
+}

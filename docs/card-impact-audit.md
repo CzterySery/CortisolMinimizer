@@ -74,19 +74,19 @@ Wskaźnik czasu w tym podglądzie opisuje dostępność rodzica w wskazanej alte
 
 **Podstawy:** [rehab](../Documents/legal/rules.md#rehab), [base](../Documents/legal/rules.md#base), [debt](../Documents/legal/rules.md#debt).
 
-## 1E · Dochód po likwidacji firmy
+## 1E · Sprawdź podstawę zasiłku
 
-**Porównanie:** Przyznane szczególne świadczenie po kwalifikującej utracie pracy zamiast braku tego świadczenia i braku pensji z zakończonej pracy.
+**Porównanie:** Sprawdzenie potwierdzonej podstawy zasiłku zamiast pozostawienia wyliczenia bez weryfikacji.
 
-**Okres:** Uprawniony okres przed porodem.
+**Okres:** Przygotowanie do świadczenia.
 
-**Pieniądze — wzrost:** W tym porównaniu należne, przyznane świadczenie daje dochód względem braku wypłaty. Przesłanki utraty zatrudnienia i prawo muszą być potwierdzone; nie dodajemy dawnej pensji.
+**Pieniądze — bez zmiany:** Samo sprawdzenie podstawy nie zmienia wynagrodzenia ani należnego zasiłku. Wyliczenie zależy od rzeczywistych wynagrodzeń i właściwego okresu.
 
-**Czas — bez zmiany:** Świadczenie nie tworzy urlopu u byłego pracodawcy. Nie zmienia faktu wcześniejszego zakończenia zatrudnienia.
+**Czas — bez zmiany:** Weryfikacja danych nie jest blokiem urlopu ani zwolnieniem z pracy.
 
-**Później:** Prawo po porodzie bada się w odrębnej sprawie; nie przedłuża się automatycznie tego świadczenia.
+**Później:** Potwierdzona podstawa służy do obliczania świadczeń; nie jest procentem pensji netto.
 
-**Podstawy:** [job-loss-before](../Documents/legal/rules.md#job-loss-before), [job-loss-after](../Documents/legal/rules.md#job-loss-after), [payer](../Documents/legal/rules.md#payer), [base](../Documents/legal/rules.md#base).
+**Podstawy:** [base](../Documents/legal/rules.md#base).
 
 ## 1F · Przygotuj rodzinny start
 

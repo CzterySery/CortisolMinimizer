@@ -123,6 +123,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/game/simulate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Simulate Plan */
+        post: operations["simulate_plan_api_v1_game_simulate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/game/scenarios": {
         parameters: {
             query?: never;
@@ -1046,6 +1063,30 @@ export interface components {
             /** Budget Target Ratio */
             budget_target_ratio: string;
         };
+        /** GameSimulation */
+        GameSimulation: {
+            scenario: components["schemas"]["ScenarioSummary"];
+            plan: components["schemas"]["Plan-Output"];
+            result: components["schemas"]["PlanResult"];
+            /** Statistics */
+            statistics: components["schemas"]["Statistic"][];
+            /** Candidates */
+            candidates: components["schemas"]["SimulatedCard"][];
+            /** Reservations */
+            reservations: {
+                [key: string]: number;
+            };
+            /**
+             * Horizon Start
+             * Format: date
+             */
+            horizon_start: string;
+            /**
+             * Horizon End
+             * Format: date
+             */
+            horizon_end: string;
+        };
         /** GameState */
         GameState: {
             /** Id */
@@ -1726,6 +1767,29 @@ export interface components {
             /** Break Days Same Period */
             break_days_same_period: number;
         };
+        /** SimulatedCard */
+        SimulatedCard: {
+            /** Id */
+            id: string;
+            /** Available */
+            available: boolean;
+            /** Issues */
+            issues: components["schemas"]["Issue"][];
+            /** Statistics */
+            statistics: components["schemas"]["Statistic"][];
+            pools: components["schemas"]["Pools"];
+        };
+        /** SimulationRequest */
+        SimulationRequest: {
+            /**
+             * Scenario Id
+             * @default standard
+             * @enum {string}
+             */
+            scenario_id?: "standard" | "hospital" | "za-zyciem";
+            /** Selected */
+            selected?: string[];
+        };
         /** Source */
         "Source-Input": {
             /** Id */
@@ -2022,6 +2086,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlanResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulate_plan_api_v1_game_simulate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimulationRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GameSimulation"];
                 };
             };
             /** @description Validation Error */

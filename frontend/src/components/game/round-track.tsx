@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Card, Stage } from "@/types/game";
+import { CardArtwork } from "./card-artwork";
 
 interface RoundTrackProps {
   stages: Stage[];
@@ -34,7 +35,7 @@ export function RoundTrack({ stages, currentRound, playedCards, draggedId, onPla
                 if (active && draggedId && event.dataTransfer.getData("application/x-zus-card") === draggedId) onPlayCard(draggedId);
               }}>
               <span className="round-number">0{round.id}</span>
-              {card ? <><span className="played-card-code">{card.id}</span><h3 className="played-card-title">{card.title}</h3><span className="slot-caption">Na stole ✓</span></> : <><span className="slot-mark" aria-hidden="true">{active ? "+" : "·"}</span><span className="slot-caption">{active ? "Przeciągnij tu kartę" : "Miejsce na kartę"}</span></>}
+              {card ? <><CardArtwork id={card.id} compact /><h3 className="played-card-title">{card.title}</h3><span className="slot-caption">Na stole ✓</span></> : <><span className="slot-mark" aria-hidden="true">{active ? "+" : "·"}</span><span className="slot-caption">{active ? "Przeciągnij tu kartę" : "Miejsce na kartę"}</span></>}
             </div>
             <p className="round-label">{round.title}</p>
           </li>

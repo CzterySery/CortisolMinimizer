@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "design_only_not_runtime_deck",
+  "status": "runtime_birth_scenarios_with_explicit_gates",
   "hand_size": 3,
   "rounds": 5,
   "cards_per_round": 6,
@@ -561,32 +561,24 @@
     {
       "id": "1E",
       "round_id": 1,
-      "title": "Dochód po likwidacji firmy",
-      "description": "Zabezpiecz szczególną ścieżkę świadczenia przed porodem po utracie zatrudnienia.",
-      "conditions": "Stosunek pracy ustał w ciąży wskutek śmierci, upadłości lub likwidacji pracodawcy; nie zapewniono innego zatrudnienia; dokumenty potwierdzają przesłanki.",
+      "title": "Sprawdź podstawę zasiłku",
+      "description": "Sprawdź wynagrodzenia i podstawę, od której będzie liczony zasiłek.",
+      "conditions": "Dostępna historia wynagrodzeń lub potwierdzona podstawa. Okres przyjmowany do obliczenia zależy od zatrudnienia i daty powstania prawa do świadczenia.",
       "effects": [
         {
-          "op": "add_block",
-          "who": "mother",
-          "kind": "job_loss_benefit",
-          "start": "facts.employment_end_next_day",
-          "days": "until:birth",
-          "only_if": "facts.job_loss.entitled"
-        },
-        {
-          "op": "mark_docs",
-          "bundle": "job_loss_before_birth",
-          "only_if": "facts.documents_available"
+          "op": "set_flag",
+          "name": "benefit_base_checked",
+          "value": true
         }
       ],
       "stats": {
         "money": {
           "kind": "derived",
-          "explanation": "Prognozuj należne świadczenie za okres przed porodem; nie dodawaj równolegle pensji z zakończonej pracy."
+          "explanation": "Weryfikacja pomaga zrozumieć wyliczenie; sama nie podnosi podstawy ani nie tworzy wypłaty."
         },
         "time": {
           "kind": "derived",
-          "explanation": "Brak zużycia podstawowego macierzyńskiego przed porodem; okres nie zwiększa jeszcze pokrycia opieki po narodzinach."
+          "explanation": "Sprawdzenie podstawy nie zwalnia z pracy i nie zużywa puli urlopów."
         },
         "happiness": {
           "kind": "game_balance",
@@ -597,26 +589,17 @@
         "chips": 10
       },
       "tags": [
-        "security",
+        "preparation",
         "documents",
-        "continuity"
+        "budget"
       ],
       "legal_rule_ids": [
-        "job-loss-before",
-        "base",
-        "payer"
+        "base"
       ],
       "parameter_refs": [
-        "rates.job_loss"
+        "contribution_deduction"
       ],
-      "combo": {
-        "with": [
-          "3F"
-        ],
-        "name": "Ciągłość wypłat",
-        "check": "touching",
-        "mult": "0.50"
-      },
+      "combo": null,
       "notes": "",
       "claims": [
         {
@@ -624,9 +607,7 @@
           "field": "description",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "job-loss-before",
-            "base",
-            "payer"
+            "base"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -635,9 +616,7 @@
           "field": "conditions",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "job-loss-before",
-            "base",
-            "payer"
+            "base"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -646,9 +625,7 @@
           "field": "stats.money",
           "kind": "derived",
           "rule_ids": [
-            "job-loss-before",
-            "base",
-            "payer"
+            "base"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -657,19 +634,17 @@
           "field": "stats.time",
           "kind": "derived",
           "rule_ids": [
-            "job-loss-before",
-            "base",
-            "payer"
+            "base"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
         {
-          "id": "1E.param.rates.job_loss",
-          "field": "parameter:rates.job_loss",
+          "id": "1E.param.contribution_deduction",
+          "field": "parameter:contribution_deduction",
           "kind": "legal_parameter",
-          "parameter_ref": "rates.job_loss",
+          "parameter_ref": "contribution_deduction",
           "rule_ids": [
-            "job-loss-before"
+            "base"
           ]
         },
         {
