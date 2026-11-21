@@ -54,7 +54,9 @@
     "last_child_age_years": 6,
     "part_time_max_fraction": "0.5",
     "part_time_cap_weeks_single": 82,
-    "part_time_cap_weeks_multiple": 86
+    "part_time_cap_weeks_multiple": 86,
+    "part_time_cap_weeks_za_zyciem_single": 130,
+    "part_time_cap_weeks_za_zyciem_multiple": 134
   },
   "paternity": {
     "days": 14,
@@ -70,6 +72,7 @@
   },
   "deadlines": {
     "averaged_request_days_after_birth": 21,
+    "parental_notice_days": 21,
     "part_time_notice_days": 21,
     "supplementary_notice_days_before_maternity_end": 21
   },

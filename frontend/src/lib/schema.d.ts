@@ -895,6 +895,8 @@ export interface components {
         Deadlines: {
             /** Averaged Request Days After Birth */
             averaged_request_days_after_birth: number;
+            /** Parental Notice Days */
+            parental_notice_days: number;
             /** Part Time Notice Days */
             part_time_notice_days: number;
             /** Supplementary Notice Days Before Maternity End */
@@ -1407,6 +1409,10 @@ export interface components {
             part_time_cap_weeks_single: number;
             /** Part Time Cap Weeks Multiple */
             part_time_cap_weeks_multiple: number;
+            /** Part Time Cap Weeks Za Zyciem Single */
+            part_time_cap_weeks_za_zyciem_single: number;
+            /** Part Time Cap Weeks Za Zyciem Multiple */
+            part_time_cap_weeks_za_zyciem_multiple: number;
         };
         /** Parental */
         "Parental-Output": {
@@ -1430,6 +1436,10 @@ export interface components {
             part_time_cap_weeks_single: number;
             /** Part Time Cap Weeks Multiple */
             part_time_cap_weeks_multiple: number;
+            /** Part Time Cap Weeks Za Zyciem Single */
+            part_time_cap_weeks_za_zyciem_single: number;
+            /** Part Time Cap Weeks Za Zyciem Multiple */
+            part_time_cap_weeks_za_zyciem_multiple: number;
         };
         /** ParseResult */
         ParseResult: {

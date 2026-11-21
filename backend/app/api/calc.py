@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException
 from app import params
 from app.calc.base import benefit_base
 from app.calc.plan import compute_plan
+from app.calc.rules import check
 from app.schemas import BaseRequest, BaseResult, Plan, PlanResult
 
 router = APIRouter(prefix="/calc", tags=["calculator"])
@@ -20,6 +21,9 @@ def base(req: BaseRequest) -> BaseResult:
 def plan(req: Plan) -> PlanResult:
     try:
         # shortcut: one params version (in force on the birth date) for the whole multi-year plan
-        return compute_plan(req, params.active(req.family.birth_date or req.family.due_date))
+        p = params.active(req.family.birth_date or req.family.due_date)
+        result = compute_plan(req, p)
+        result.issues = check(req, result, p)
+        return result
     except (ValueError, LookupError) as e:
         raise HTTPException(422, str(e)) from e

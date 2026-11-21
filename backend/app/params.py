@@ -66,6 +66,8 @@ class Parental(BaseModel):
     part_time_max_fraction: Decimal
     part_time_cap_weeks_single: int
     part_time_cap_weeks_multiple: int
+    part_time_cap_weeks_za_zyciem_single: int  # KP art. 182^1f § 1^1
+    part_time_cap_weeks_za_zyciem_multiple: int
 
 
 class Paternity(BaseModel):
@@ -102,6 +104,7 @@ class Supplementary(BaseModel):
 
 class Deadlines(BaseModel):
     averaged_request_days_after_birth: int
+    parental_notice_days: int  # KP art. 182^1d § 1
     part_time_notice_days: int
     supplementary_notice_days_before_maternity_end: int
 

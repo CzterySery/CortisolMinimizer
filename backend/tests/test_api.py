@@ -73,3 +73,7 @@ def test_calc_plan(client, monkeypatch):
                                    "total": "6200.00", "below_target": False}
     father_block = {"who": "father", "kind": "paternity", "start": "2027-03-01", "days": 7}
     assert client.post("/api/v1/calc/plan", json={**body, "blocks": [father_block]}).status_code == 422
+    assert result["issues"] == []
+    mother_paternity = {"who": "mother", "kind": "paternity", "start": "2027-03-01", "days": 7}
+    flagged = client.post("/api/v1/calc/plan", json={**body, "blocks": [mother_paternity]}).json()
+    assert [i["code"] for i in flagged["issues"]] == ["paternity.father-only"]

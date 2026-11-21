@@ -69,6 +69,22 @@ def parent_base(who: str, parent: Parent, first_event: date, p: Params, explain:
     return result.base
 
 
+def day_map(plan: Plan) -> dict[str, dict[date, Block]]:
+    """Day -> block per parent. Overlapping blocks of one parent are a rules.py error; the later start wins."""
+    blocks = sorted(plan.blocks, key=lambda b: b.start)
+    return {who: {b.start + timedelta(n): b for b in blocks if b.who == who for n in range(b.days)}
+            for who in ("mother", "father")}
+
+
+def pool_sizes(plan: Plan, p: Params) -> tuple[int, int]:
+    """(maternity, parental) entitlement in days: by number of children and Za życiem (KP art. 180, 182^1a)."""
+    f, pp, weeks = plan.family, p.parental, p.maternity.weeks_by_children
+    multiple = f.children > 1
+    parental = ((pp.weeks_za_zyciem_multiple if multiple else pp.weeks_za_zyciem_single) if f.za_zyciem
+                else (pp.weeks_multiple if multiple else pp.weeks_single))
+    return weeks[min(f.children, len(weeks)) - 1] * 7, parental * 7
+
+
 def compute_plan(plan: Plan, p: Params) -> PlanResult:
     family = plan.family
     birth = family.birth_date or family.due_date
@@ -80,8 +96,7 @@ def compute_plan(plan: Plan, p: Params) -> PlanResult:
 
     base = {who: parent_base(who, parent, min((b.start for b in blocks if b.who == who), default=birth), p, explain)
             for who, parent in parents.items()}
-    # day -> block per parent; overlapping blocks of one parent are a rules.py error, here the later start wins
-    days = {who: {b.start + timedelta(n): b for b in blocks if b.who == who for n in range(b.days)} for who in parents}
+    days = {who: d for who, d in day_map(plan).items() if who in parents}
 
     # The other parent's exclusive 9 weeks (counted from their first parental day) stay at 70% (art. 31 ust. 3f)
     father_exclusive: set[date] = set()
@@ -203,18 +218,12 @@ def _sick_payer(who: str, parent: Parent, days: dict[date, Block], p: Params) ->
 
 
 def _pools(plan: Plan, days: dict[str, dict[date, Block]], p: Params) -> Pools:
-    f = plan.family
-
     def used(kind: str, whos) -> Decimal:  # part-time days use (1 - work_fraction) of a day (KP art. 182^1f)
         return sum((ONE - b.work_fraction for w in whos for b in days.get(w, {}).values() if b.kind == kind),
                    Decimal(0))
 
-    weeks = p.maternity.weeks_by_children
-    maternity = weeks[min(f.children, len(weeks)) - 1] * 7
+    maternity, parental = pool_sizes(plan, p)
     pp = p.parental
-    multiple = f.children > 1
-    parental = 7 * ((pp.weeks_za_zyciem_multiple if multiple else pp.weeks_za_zyciem_single) if f.za_zyciem
-                    else (pp.weeks_multiple if multiple else pp.weeks_single))
     care_per_year = Counter(d.year for w in days for d, b in days[w].items() if b.kind == "care")
     return Pools(
         maternity_days_left=int(maternity - used("maternity", days)),
