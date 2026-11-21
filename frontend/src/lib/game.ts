@@ -10,7 +10,7 @@ const localPreview: GamePreview = {
   statistics: [
     { id: "money", label: "Pieniądze", value: null, unit: "zł", max: null },
     { id: "time", label: "Czas", value: null, unit: "dni", max: null },
-    { id: "happiness", label: "Szczęście", value: null, unit: "pkt", max: null },
+    { id: "knowledge", label: "Wiedza", value: 50, unit: "pkt", max: 100 },
   ],
   // Authored annotations are a preview, never executable effects or fabricated amounts.
   rounds: catalog.rounds.map((round) => ({ ...round,

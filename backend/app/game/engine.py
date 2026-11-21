@@ -34,7 +34,7 @@ def evaluate(plan: Plan, p: Params, horizon: tuple[date, date]):
     return result
 
 
-def statistics(plan: Plan, result, p: Params, choices: dict) -> list[Statistic]:
+def statistics(plan: Plan, result, p: Params, choices: dict, knowledge: int) -> list[Statistic]:
     birth = plan.family.birth_date or plan.family.due_date
     maternity, _ = pool_sizes(plan, p)
     # Sample care needs are stable across alternatives; simultaneous parents cover a day once.
@@ -54,10 +54,9 @@ def statistics(plan: Plan, result, p: Params, choices: dict) -> list[Statistic]:
     lowest = min((row.total for row in result.months), default=Decimal(0))
     money_ratio = min(Decimal(1), lowest / baseline) if baseline else Decimal(0)
     time_ratio = covered / len(needs) if needs else Decimal(0)
-    balance = int((money_ratio + time_ratio) * 50)
     return [Statistic(id="money", label="Pieniądze", value=int(lowest), max=int(baseline), unit="zł"),
             Statistic(id="time", label="Czas", value=int(covered), max=len(needs), unit="dni"),
-            Statistic(id="happiness", label="Szczęście", value=balance, max=100, unit="bilans")]
+            Statistic(id="knowledge", label="Wiedza", value=min(100, 50 + knowledge), max=100, unit="pkt")]
 
 
 def apply_card(plan: Plan, card: dict, p: Params, choices: dict, facts: dict, reservations: dict):
@@ -66,17 +65,6 @@ def apply_card(plan: Plan, card: dict, p: Params, choices: dict, facts: dict, re
     reservations = dict(reservations)
     birth = plan.family.birth_date or plan.family.due_date
     card_id = card["id"]
-    if card_id in {"1F", "2F"}:
-        raise Unavailable("Ta rodzina oczekuje narodzin; karta dotyczy adopcji lub pieczy.", "KP art. 183")
-    if card_id == "1C" and not facts.get("sick_verified"):
-        raise Unavailable("W tym scenariuszu nie ma stwierdzonej niezdolności do pracy ani e-ZLA.", "art. 6, 11")
-    if card_id in {"2D", "2E"} and not plan.family.hospitalization:
-        raise Unavailable("W tej historii nie ma kwalifikującej hospitalizacji dziecka.", "KP art. 180^2")
-    if card_id == "3E" and not plan.family.za_zyciem:
-        raise Unavailable("W tym scenariuszu nie ma zaświadczenia Za życiem.", "KP art. 182^1a § 2")
-    if card_id == "3F":
-        raise Unavailable("Umowa mamy trwa; ta karta dotyczy uprawnienia po ustaniu ubezpieczenia.", "art. 30")
-
     def after(kind, who=None):
         return max((last_day(b) + timedelta(days=1) for b in plan.blocks
                     if b.kind == kind and (who is None or b.who == who)), default=birth)
@@ -199,6 +187,7 @@ def simulate(scenario_id: str, selected: list[str], p: Params, data: dict, cards
         if errors:
             raise ValueError(errors[0].text)
     result = evaluate(plan, p, horizon)
+    knowledge = sum(by_id[card_id].get("game_points", {}).get("knowledge", 0) for card_id in selected)
     candidates = []
     for card in cards:
         if card["round_id"] != len(selected) + 1:
@@ -208,11 +197,12 @@ def simulate(scenario_id: str, selected: list[str], p: Params, data: dict, cards
             outcome = evaluate(candidate, p, horizon)
             errors = [issue for issue in outcome.issues if issue.severity == "error"]
             candidates.append(SimulatedCard(id=card["id"], available=not errors, issues=outcome.issues,
-                                           statistics=statistics(candidate, outcome, p, choices), pools=outcome.pools))
+                                           statistics=statistics(candidate, outcome, p, choices,
+                                                                 knowledge + card.get("game_points", {}).get("knowledge", 0)), pools=outcome.pools))
         except Unavailable as error:
             candidates.append(SimulatedCard(id=card["id"], available=False, issues=[error.issue],
                                            statistics=[], pools=result.pools))
     return GameSimulation(scenario=ScenarioSummary(id=scenario_id, title=facts["title"], description=facts["description"]),
-                          plan=plan, result=result, statistics=statistics(plan, result, p, choices),
+                          plan=plan, result=result, statistics=statistics(plan, result, p, choices, knowledge),
                           candidates=candidates, reservations=reservations,
                           horizon_start=horizon[0], horizon_end=horizon[1])

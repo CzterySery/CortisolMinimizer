@@ -2,7 +2,7 @@
 
 Po sześć kart na etap, trzy w ręce, jedna decyzja na rundę. Silnik strony głównej odtwarza jeden plan w trzech jawnych scenariuszach urodzenia; niewspierane lub niespełnione warunki blokują kartę. Starszy endpoint katalogu ma osobne 15 kart. Dane projektu: [deck-design.json](shared/deck-design.json). Zasady wspólne i tryby: [projekt działania](docs/card-grounding.md).
 
-Pieniądze i czas są wyliczane z planu, nigdy dodawane jako stały bonus. Szczęście jest umownym bilansem pieniędzy i czasu. Punkty combo to osobny projekt. Zerowy wpływ decyzji formalnej na pieniądze lub czas jest poprawny. Wartości ustawowe są odczytywane przez referencje do parametrów, a nie utrzymywane w treści kart.
+Pieniądze i czas są wyliczane z planu, nigdy dodawane jako stały bonus. Wiedza rośnie wyłącznie po zagraniu kart edukacyjnych; karty planujące urlopy nie zwiększają paska. Zerowy wpływ decyzji formalnej na pieniądze lub czas jest poprawny. Wartości ustawowe są odczytywane przez referencje do parametrów, a nie utrzymywane w treści kart.
 
 ## 1. Ciąża / przygotowanie do przyjęcia
 
@@ -17,9 +17,9 @@ Zachowaj całą dostępną pulę macierzyńskiego na czas po porodzie.
 
 **Czas:** Brak dodatkowych dni przed porodem; cała pula pozostaje po narodzinach.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -50,9 +50,9 @@ Rozpocznij macierzyński wcześniej i przygotuj się na narodziny.
 
 **Czas:** Wcześniejsze wolne zużywa tę samą pulę; mniej macierzyńskiego zostaje po porodzie.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -76,44 +76,29 @@ Rozpocznij macierzyński wcześniej i przygotuj się na narodziny.
 **Combo:** Wspólny start; partnerzy: [2A](#2a); warunek `overlap`; bonus mnożnika `0.25` po sprawdzeniu rzeczywistego planu.
 
 <a id="1c"></a>
-### 1C · Zdrowie na pierwszym miejscu
+### 1C · Poznaj zasady chorobowego
 
-Uporządkuj chorobowe w ciąży na podstawie wystawionego zwolnienia.
+Dowiedz się, kiedy ciąża, ubezpieczenie i e-ZLA mają znaczenie dla zasiłku chorobowego.
 
-**Kiedy:** Niezdolność jest faktem z e-ZLA; ubezpieczenie, wyczekiwanie albo wyjątek i pozostały okres muszą być potwierdzone. Karta nie pozwala wybrać choroby.
+**Kiedy:** Karta edukacyjna dostępna w każdej historii; nie stwierdza choroby ani nie składa wniosku.
 
-**Pieniądze:** Przelicz wynagrodzenie chorobowe i zasiłek właściwe dla tytułu; uwzględnij podstawę i wykorzystane dni.
+**Pieniądze:** To karta wiedzy: nie zmienia dochodu ani prawa do świadczenia.
 
-**Czas:** Dni niezdolności nie są automatycznie dniami zdolności do opieki; przed porodem nie zwiększają pokrycia potrzeb dziecka.
+**Czas:** Nie dodaje zwolnienia, dni wolnych ani czasu opieki.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +20 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
 ```json
-[
-  {
-    "op": "add_block",
-    "who": "mother",
-    "kind": "sick",
-    "start": "facts.ezla.start",
-    "days": "facts.ezla.days"
-  },
-  {
-    "op": "mark_docs",
-    "bundle": "sick",
-    "only_if": "facts.documents_available"
-  }
-]
+[]
 ```
 
-**Podstawy:** [sick-right](Documents/legal/rules.md#sick-right), [sick-money](Documents/legal/rules.md#sick-money), [sick-docs](Documents/legal/rules.md#sick-docs), [base](Documents/legal/rules.md#base), [debt](Documents/legal/rules.md#debt).
+**Podstawy:** [sick-right](Documents/legal/rules.md#sick-right), [sick-money](Documents/legal/rules.md#sick-money).
 
-**Parametry:** `rates.sick_pregnancy`, `sick.period_days_pregnancy`, `sick.waiting_days_mandatory`, `sick.waiting_days_voluntary`, `sick.employer_days`, `sick.employer_days_50plus`.
-
-**Combo:** Kompletna teczka; partnerzy: [3D](#3d); warunek `docs_complete`; bonus mnożnika `0.50` po sprawdzeniu rzeczywistego planu.
+**Parametry:** wymagają uzupełnienia przed wdrożeniem.
 
 <a id="1d"></a>
 ### 1D · Kto wypłaca świadczenie?
@@ -126,9 +111,9 @@ Sprawdź, kto będzie płatnikiem zasiłku i jakie dane trzeba przygotować.
 
 **Czas:** Bez zmiany urlopu i dostępnych dni; to informacja organizacyjna.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +20 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -159,9 +144,9 @@ Sprawdź wynagrodzenia i podstawę, od której będzie liczony zasiłek.
 
 **Czas:** Sprawdzenie podstawy nie zwalnia z pracy i nie zużywa puli urlopów.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +20 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -180,45 +165,29 @@ Sprawdź wynagrodzenia i podstawę, od której będzie liczony zasiłek.
 **Parametry:** `contribution_deduction`.
 
 <a id="1f"></a>
-### 1F · Przygotuj rodzinny start
+### 1F · Poznaj płatnika zasiłku
 
-Przygotuj plan i dokumenty na przyjęcie dziecka w adopcji albo pieczy niezawodowej.
+Sprawdź, kiedy zasiłek wypłaca pracodawca, a kiedy ZUS.
 
-**Kiedy:** Wyłącznie scenariusz przyjęcia. Rozdziel adopcję i pieczę; przyszłe zdarzenie nie tworzy dzisiejszego uprawnienia.
+**Kiedy:** Karta edukacyjna dostępna w każdej historii; próg zależy od ustawowego stanu zatrudnienia.
 
-**Pieniądze:** Tylko prognoza przyszłego świadczenia po spełnieniu przesłanek; bieżący pewny dochód bez zmiany.
+**Pieniądze:** To karta wiedzy: sama informacja nie zmienia kwoty świadczenia.
 
-**Czas:** Rezerwacja nie jest wykorzystaniem urlopu ani dniem zapewnionej opieki; pokazuje przyszły plan.
+**Czas:** Nie zmienia planu urlopów ani dostępnych dni.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +20 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
 ```json
-[
-  {
-    "op": "set_flag",
-    "name": "acceptance_plan",
-    "value": "prepared"
-  },
-  {
-    "op": "reserve",
-    "pool": "on_maternity_terms",
-    "who": "choice.parent",
-    "start": "event:acceptance",
-    "days": "derived.acceptance_entitlement",
-    "provisional": true
-  }
-]
+[]
 ```
 
-**Podstawy:** [adoption](Documents/legal/rules.md#adoption), [insured-parent](Documents/legal/rules.md#insured-parent), [standard-rates](Documents/legal/rules.md#standard-rates), [base](Documents/legal/rules.md#base).
+**Podstawy:** [payer](Documents/legal/rules.md#payer), [insured-parent](Documents/legal/rules.md#insured-parent).
 
-**Parametry:** `maternity.weeks_by_children`, `maternity.adoption_min_weeks`.
-
-**Combo:** Gotowi na przyjęcie; partnerzy: [2F](#2f); warunek `docs_complete`; bonus mnożnika `0.25` po sprawdzeniu rzeczywistego planu.
+**Parametry:** `payer_threshold_insured`.
 
 ## 2. Poród / przyjęcie
 
@@ -233,9 +202,9 @@ Zaplanuj cały dostępny ojcowski we wspólnym bloku po narodzinach.
 
 **Czas:** Zużyj pulę ojcowskiego; wspólne dni licz raz do pokrycia opieki, osobno do wspólnego czasu.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -266,11 +235,11 @@ Wykorzystaj pierwszą część ojcowskiego i zachowaj drugą na konkretną potrz
 
 **Pieniądze:** Teraz rozlicz tylko pierwszą część; za rezerwację brak wypłaty do czasu zaplanowania rzeczywistego bloku.
 
-**Czas:** Wpisz pierwszą część; pozostałe dni pozostają dostępne i nie są jeszcze pokrytą opieką.
+**Czas:** W tym wczesnym okresie tata korzysta tylko z pierwszej części. Pozostałe dni ojcowskiego nie przepadają — można je zaplanować później w terminie.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -310,9 +279,9 @@ Zarezerwuj ojcowski na czas, gdy najbardziej przyda się dodatkowa opieka.
 
 **Czas:** Bez bieżącego zużycia puli i bez dodatkowych pokrytych dni; późniejszy blok musi zostać zrealizowany.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -335,126 +304,79 @@ Zarezerwuj ojcowski na czas, gdy najbardziej przyda się dodatkowa opieka.
 **Combo:** Wykorzystana rezerwa; partnerzy: [4E](#4e); warunek `covers_need`; bonus mnożnika `0.50` po sprawdzeniu rzeczywistego planu.
 
 <a id="2d"></a>
-### 2D · Uzupełniający dla mamy
+### 2D · Poznaj dodatkowy urlop po hospitalizacji
 
-Po hospitalizacji dziecka zaplanuj należny uzupełniający dla mamy.
+Dowiedz się, kiedy pobyt dziecka w szpitalu może wydłużyć urlop macierzyński.
 
-**Kiedy:** Kwalifikująca hospitalizacja jest faktem. Prawo i wymiar obliczone; osiągalny termin, zaświadczenie, drugi rodzic nie korzysta z tego samego uprawnienia.
+**Kiedy:** Karta wiedzy dostępna niezależnie od historii; uprawnienie wymaga spełnienia ustawowych warunków.
 
-**Pieniądze:** Przelicz należny blok od podstawy mamy według stawki uzupełniającego; nie stosuj do niego automatycznie stawki uśrednionej.
+**Pieniądze:** To karta wiedzy: nie zakłada hospitalizacji ani nie dopisuje urlopu.
 
-**Czas:** Dodaj obliczony blok po macierzyńskim; nie odejmuj go z puli rodzicielskiego.
+**Czas:** Nie tworzy dni wolnych; wymiar zależy od udokumentowanych okoliczności.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +20 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
 ```json
-[
-  {
-    "op": "add_block",
-    "who": "mother",
-    "kind": "supplementary",
-    "start": "after:maternity",
-    "days": "derived.supplementary_days"
-  },
-  {
-    "op": "mark_docs",
-    "bundle": "supplementary",
-    "only_if": "facts.documents_available"
-  }
-]
+[]
 ```
 
-**Podstawy:** [supplementary](Documents/legal/rules.md#supplementary), [standard-rates](Documents/legal/rules.md#standard-rates), [base](Documents/legal/rules.md#base).
+**Podstawy:** [supplementary](Documents/legal/rules.md#supplementary).
 
-**Parametry:** `rates.supplementary`, `supplementary.extreme.cap_weeks`, `supplementary.preterm.cap_weeks`, `supplementary.term.cap_weeks`, `deadlines.supplementary_notice_days_before_maternity_end`.
-
-**Combo:** Bez luki; partnerzy: [4A](#4a); warunek `touching`; bonus mnożnika `0.50` po sprawdzeniu rzeczywistego planu.
+**Parametry:** wymagają uzupełnienia przed wdrożeniem.
 
 <a id="2e"></a>
-### 2E · Uzupełniający dla taty
+### 2E · Poznaj terminy wniosków urlopowych
 
-Po hospitalizacji dziecka zaplanuj należny uzupełniający dla taty.
+Sprawdź, kiedy zgłosić ojcowski i uzupełniający urlop macierzyński.
 
-**Kiedy:** Jak dla uzupełniającego mamy, ale uprawniony jest ojciec; wybór rodzica nie powiększa wymiaru. Sprawdź dokumenty po drugim rodzicu.
+**Kiedy:** Karta edukacyjna dostępna w każdej historii; terminy zależą od wybranego uprawnienia.
 
-**Pieniądze:** Zastąp dochód ojca odpowiednim świadczeniem; dochód mamy wynika z jej odrębnego statusu i faktycznego powrotu do pracy.
+**Pieniądze:** To karta wiedzy: nie składa wniosku ani nie przyznaje świadczenia.
 
-**Czas:** Jedna wspólna pula uzupełniającego; ten sam okres nie może zostać przyznany obojgu.
+**Czas:** Nie zmienia puli ani kalendarza urlopów.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +20 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
 ```json
-[
-  {
-    "op": "add_block",
-    "who": "father",
-    "kind": "supplementary",
-    "start": "after:maternity",
-    "days": "derived.supplementary_days"
-  },
-  {
-    "op": "mark_docs",
-    "bundle": "supplementary_other_parent",
-    "only_if": "facts.documents_available"
-  }
-]
+[]
 ```
 
-**Podstawy:** [supplementary](Documents/legal/rules.md#supplementary), [standard-rates](Documents/legal/rules.md#standard-rates), [base](Documents/legal/rules.md#base), [insured-parent](Documents/legal/rules.md#insured-parent).
+**Podstawy:** [paternity](Documents/legal/rules.md#paternity), [supplementary](Documents/legal/rules.md#supplementary).
 
-**Parametry:** `rates.supplementary`, `deadlines.supplementary_notice_days_before_maternity_end`.
-
-**Combo:** Bez luki; partnerzy: [4A](#4a); warunek `touching`; bonus mnożnika `0.50` po sprawdzeniu rzeczywistego planu.
+**Parametry:** wymagają uzupełnienia przed wdrożeniem.
 
 <a id="2f"></a>
-### 2F · Witaj w rodzinie
+### 2F · Poznaj dokumenty do zasiłku
 
-Uruchom plan świadczeń po przyjęciu dziecka na wychowanie.
+Zobacz, jakie dokumenty zwykle są potrzebne po narodzinach dziecka.
 
-**Kiedy:** Potwierdzone przyjęcie; dla adopcji także wystąpienie do sądu, dla pieczy jej niezawodowy charakter. Wiek, liczba dzieci i dokumenty sprawdzone.
+**Kiedy:** Karta edukacyjna dostępna w każdej historii; ostateczna lista zależy od płatnika i sytuacji rodziny.
 
-**Pieniądze:** Przelicz zasiłek od podstawy wybranego rodzica i właściwego wariantu; nie wypłacaj ponownie za rezerwację z 1F.
+**Pieniądze:** To karta wiedzy: nie składa wniosku i nie oznacza dokumentu jako złożonego.
 
-**Czas:** Wpisz rzeczywisty blok i właściwy wymiar dla wieku oraz ścieżki; nie używaj daty urodzenia jako daty przyjęcia.
+**Czas:** Nie zmienia planu urlopów, dochodu ani dostępnych dni.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +20 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
 ```json
-[
-  {
-    "op": "add_block",
-    "who": "choice.parent",
-    "kind": "maternity",
-    "start": "choice.acceptance_leave_start",
-    "days": "derived.acceptance_entitlement",
-    "context": "on_maternity_terms",
-    "merge_into": "baseline.acceptance"
-  },
-  {
-    "op": "mark_docs",
-    "bundle": "acceptance",
-    "only_if": "facts.documents_available"
-  }
-]
+[]
 ```
 
-**Podstawy:** [adoption](Documents/legal/rules.md#adoption), [insured-parent](Documents/legal/rules.md#insured-parent), [standard-rates](Documents/legal/rules.md#standard-rates), [base](Documents/legal/rules.md#base).
+**Podstawy:** [birth-docs](Documents/legal/rules.md#birth-docs), [payer](Documents/legal/rules.md#payer).
 
-**Parametry:** `maternity.weeks_by_children`, `maternity.adoption_min_weeks`.
-
-**Combo:** Gotowi na przyjęcie; partnerzy: [1F](#1f); warunek `docs_complete`; bonus mnożnika `0.25` po sprawdzeniu rzeczywistego planu.
+**Parametry:** wymagają uzupełnienia przed wdrożeniem.
 
 ## 3. Pierwszy miesiąc
 
@@ -469,9 +391,9 @@ Wybierz podstawowy wariant wypłat za macierzyński i rodzicielski.
 
 **Czas:** Wariant stawek sam nie dodaje dni i nie zmienia puli urlopów.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -501,9 +423,9 @@ Złóż w terminie wniosek o uśredniony wariant wypłat.
 
 **Czas:** Bez dodatkowych tygodni; pilnuj wykorzystania rodzicielskiego w pierwszym roku i ewentualnego wyrównania.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -538,9 +460,9 @@ Zaplanuj powrót mamy do pracy i przejęcie pozostałego macierzyńskiego przez 
 
 **Czas:** Przenieś dni, nie twórz nowej puli. Okres przedporodowy nie zastępuje wymaganego okresu po porodzie.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -563,118 +485,81 @@ Zaplanuj powrót mamy do pracy i przejęcie pozostałego macierzyńskiego przez 
 **Combo:** Zmiana warty; partnerzy: [1A](#1a); warunek `touching`; bonus mnożnika `0.50` po sprawdzeniu rzeczywistego planu.
 
 <a id="3d"></a>
-### 3D · Teczka bez braków
+### 3D · Poznaj listę dokumentów
 
-Uzupełnij dokumenty, potwierdź podstawę i sprawdź, kto wypłaci świadczenie.
+Sprawdź, jakie formularze i informacje mogą być potrzebne do zasiłku.
 
-**Kiedy:** Otwarta sprawa, dostępne wymagane dokumenty i fakty potwierdzające prawo; brak dokumentu nie może być samą kartą zmieniony w dokument dostępny.
+**Kiedy:** Karta edukacyjna dostępna w każdej historii; zestaw dokumentów zależy od płatnika i tytułu ubezpieczenia.
 
-**Pieniądze:** Nie zwiększa należnego świadczenia. Potwierdzone dane mogą zmienić wcześniejszą prognozę; kompletność nie gwarantuje konkretnego dnia przelewu.
+**Pieniądze:** To karta wiedzy: nie składa wniosków ani nie potwierdza dokumentów.
 
-**Czas:** Bez dodatkowych dni urlopu; mniej otwartych formalności w planie.
+**Czas:** Nie zmienia wypłaty, uprawnień ani puli urlopów.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +20 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
 ```json
-[
-  {
-    "op": "mark_docs",
-    "bundle": "current_entitlement",
-    "only_if": "facts.documents_available"
-  },
-  {
-    "op": "set_flag",
-    "name": "payer_and_base_checked",
-    "value": true
-  }
-]
+[]
 ```
 
-**Podstawy:** [birth-docs](Documents/legal/rules.md#birth-docs), [payer](Documents/legal/rules.md#payer), [base](Documents/legal/rules.md#base), [insured-parent](Documents/legal/rules.md#insured-parent), [debt](Documents/legal/rules.md#debt), [floor](Documents/legal/rules.md#floor).
+**Podstawy:** [birth-docs](Documents/legal/rules.md#birth-docs), [payer](Documents/legal/rules.md#payer), [base](Documents/legal/rules.md#base), [insured-parent](Documents/legal/rules.md#insured-parent), [debt](Documents/legal/rules.md#debt).
 
 **Parametry:** `payer_threshold_insured`, `debt_threshold_pct_min_wage`, `contribution_deduction`.
 
 **Combo:** Kompletna teczka; partnerzy: [1C](#1c), [1D](#1d), [2F](#2f); warunek `docs_complete`; bonus mnożnika `0.50` po sprawdzeniu rzeczywistego planu.
 
 <a id="3e"></a>
-### 3E · Uwzględnij dodatkowy wymiar
+### 3E · Poznaj dodatkowe uprawnienia
 
-Zaktualizuj pulę rodzicielskiego na podstawie zaświadczenia „Za życiem”.
+Dowiedz się, jak zaświadczenie „Za życiem” wpływa na wymiar urlopu rodzicielskiego.
 
-**Kiedy:** Wymagane zaświadczenie istnieje w scenariuszu i nie zostało już uwzględnione. Karta nie przyznaje diagnozy ani nie nagradza choroby.
+**Kiedy:** Karta edukacyjna dostępna w każdej historii; nie potwierdza stanu zdrowia ani nie składa wniosku.
 
-**Pieniądze:** Samo potwierdzenie nie wypłaca pieniędzy. Prognoza zmienia się po przypisaniu dostępnych okresów konkretnym rodzicom.
+**Pieniądze:** To karta wiedzy: nie zmienia uprawnień ani wypłaty w planie.
 
-**Czas:** Zaktualizuj uprawnioną pulę, osobno zachowaj części wyłączne; przy przyjęciu użyj właściwego wariantu.
+**Czas:** Nie dodaje urlopu; wymiar wymaga potwierdzenia właściwego zaświadczenia.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +20 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
 ```json
-[
-  {
-    "op": "set_flag",
-    "name": "za_zyciem_verified",
-    "value": true
-  },
-  {
-    "op": "mark_docs",
-    "bundle": "za_zyciem",
-    "only_if": "facts.documents_available"
-  }
-]
+[]
 ```
 
-**Podstawy:** [za-zyciem](Documents/legal/rules.md#za-zyciem), [parental-pool](Documents/legal/rules.md#parental-pool), [parental-docs](Documents/legal/rules.md#parental-docs).
+**Podstawy:** [za-zyciem](Documents/legal/rules.md#za-zyciem), [parental-pool](Documents/legal/rules.md#parental-pool).
 
-**Parametry:** `parental.weeks_za_zyciem_single`, `parental.weeks_za_zyciem_multiple`, `parental.exclusive_weeks`.
-
-**Combo:** Plan na potrzeby; partnerzy: [4D](#4d); warunek `covers_need`; bonus mnożnika `0.25` po sprawdzeniu rzeczywistego planu.
+**Parametry:** `parental.weeks_za_zyciem_single`, `parental.weeks_za_zyciem_multiple`.
 
 <a id="3f"></a>
-### 3F · Świadczenie po końcu umowy
+### 3F · Poznaj wybór wariantu wypłaty
 
-Potwierdź odrębne prawo do macierzyńskiego po ustaniu ubezpieczenia.
+Porównaj standardowy i uśredniony wariant zasiłku macierzyńskiego.
 
-**Kiedy:** Ustawowa przesłanka po ustaniu ubezpieczenia jest udokumentowana; nie zakładaj prawa po dowolnym zakończeniu pracy. Przypadki sporne i orzeczenia są faktami, nie wyborem gracza.
+**Kiedy:** Karta edukacyjna dostępna w każdej historii; wynik porównania zależy od podstawy i wykorzystanych urlopów.
 
-**Pieniądze:** Po potwierdzeniu przelicz podstawowy blok po porodzie; świadczenie sprzed porodu i po porodzie są odrębnymi okresami.
+**Pieniądze:** To karta wiedzy: nie zmienia wybranego wariantu ani wysokości wypłaty.
 
-**Czas:** Pokazuje okres pobierania świadczenia bez fikcyjnego urlopu u byłego pracodawcy.
+**Czas:** Nie dodaje urlopu i nie zmienia terminów wykorzystania puli.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +20 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
 ```json
-[
-  {
-    "op": "set_flag",
-    "name": "post_insurance_entitlement_verified",
-    "value": true
-  },
-  {
-    "op": "mark_docs",
-    "bundle": "post_insurance_maternity",
-    "only_if": "facts.documents_available"
-  }
-]
+[]
 ```
 
-**Podstawy:** [job-loss-after](Documents/legal/rules.md#job-loss-after), [insured-parent](Documents/legal/rules.md#insured-parent), [base](Documents/legal/rules.md#base), [payer](Documents/legal/rules.md#payer).
+**Podstawy:** [standard-rates](Documents/legal/rules.md#standard-rates), [averaged](Documents/legal/rules.md#averaged), [exclusive-rate](Documents/legal/rules.md#exclusive-rate).
 
-**Parametry:** `maternity.weeks_by_children`, `rates.maternity`.
-
-**Combo:** Ciągłość wypłat; partnerzy: [1E](#1e); warunek `touching`; bonus mnożnika `0.50` po sprawdzeniu rzeczywistego planu.
+**Parametry:** `rates.maternity`, `rates.parental`, `rates.averaged`.
 
 ## 4. Pierwszy rok
 
@@ -689,9 +574,9 @@ Ułóż rodzicielski w następujących po sobie blokach mamy i taty.
 
 **Czas:** Kolejne bloki wydłużają pokryty kalendarz; zużywają odpowiednie pule i części obojga.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -731,9 +616,9 @@ Zaplanuj wspólny blok rodzicielskiego na okres, gdy potrzebujecie być razem.
 
 **Czas:** Każdy rodzic zużywa własne dni; pokrycie tej samej potrzeby dziecka licz raz. Wspólny czas przechowuj osobno.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -773,9 +658,9 @@ Połącz rodzicielski z uzgodnioną pracą w części etatu.
 
 **Czas:** Wydłuż właściwy blok zgodnie z zasadami; nie uznawaj całego dnia pracy za zapewnioną osobistą opiekę.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -810,9 +695,9 @@ Zabezpiecz bieżącą opiekę i zachowaj konkretny blok rodzicielskiego na póź
 
 **Czas:** Rezerwa nie zużywa części ani dni i nie zwiększa pokrytej opieki, dopóki nie stanie się blokiem.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -852,9 +737,9 @@ Zamień zachowaną pulę ojcowskiego w konkretną opiekę przed upływem terminu
 
 **Czas:** Odejmij wykorzystane dni i część; przyznaj pokrycie wyłącznie za rzeczywiście zamkniętą potrzebę.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -888,9 +773,9 @@ Zaplanuj niewykorzystaną wyłączną część rodzicielskiego taty.
 
 **Czas:** Odejmij dni z części ojca i całej puli; nie dodawaj ich ponownie ponad pulę rodziny.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -925,9 +810,9 @@ Przeznacz pozostały rodzicielski na jeden blok adaptacji.
 
 **Czas:** Pokryj konkretne dni, zużyj pulę odpowiedniego rodzica i jedną część.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -961,9 +846,9 @@ Rozdziel pozostały rodzicielski między dwa okresy potrzebne rodzinie.
 
 **Czas:** Dwa bloki pokrywają dwie potrzeby i zużywają dwie części; sprawdź sumę wniosków obojga rodziców.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -1005,9 +890,9 @@ Wykorzystaj rodzicielski podczas adaptacji, łącząc go z częścią etatu.
 
 **Czas:** Oblicz wydłużenie i opiekę godzinową; pozostałe godziny wymagają innego opiekuna.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -1043,9 +928,9 @@ W kwalifikującej nagłej sytuacji zaplanuj opiekuńczy mamy.
 
 **Czas:** Pokryj rzeczywiste dni nagłej opieki; odejmij je ze wspólnego limitu rocznego rodziny.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -1082,9 +967,9 @@ W tej samej nagłej sytuacji zaplanuj opiekuńczy taty.
 
 **Czas:** Ta sama opieka i ten sam wspólny limit; drugi rodzic nie dostaje świadczenia za te same dni.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 
@@ -1121,9 +1006,9 @@ Podziel kwalifikującą nagłą opiekę na kolejne dni mamy i taty.
 
 **Czas:** Dwa rozłączne odcinki pokrywają jedną potrzebę; łączny limit rodziny maleje o rzeczywistą liczbę dni.
 
-**Szczęście:** pochodny bilans pieniędzy i czasu z [audytu wpływu](docs/card-impact-audit.md). Niepewne dane nie dają pewnego wyniku.
+**Wiedza:** +0 pkt; karty urlopowe nie zwiększają tego paska.
 
-**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika, niezależna od wskaźnika szczęścia.
+**Punkty combo (projekt):** 10 bazowych punktów; osobna autorska mechanika.
 
 **Zmiana stanu:**
 

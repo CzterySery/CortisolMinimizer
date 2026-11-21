@@ -70,8 +70,8 @@ class Catalog(Model):
 
 class Statistic(Model):
     """Sidebar stat. money = family budget, time = days a parent is home when the child needs care,
-    happiness = game score (chips x mult)."""
-    id: Literal["money", "time", "happiness"]
+    knowledge = points earned from educational cards."""
+    id: Literal["money", "time", "knowledge"]
     label: str
     value: int | None = None
     unit: str

@@ -29,13 +29,14 @@
           "kind": "derived",
           "explanation": "Brak dodatkowych dni przed porodem; cała pula pozostaje po narodzinach."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "reserve",
@@ -119,11 +120,11 @@
           ]
         },
         {
-          "id": "1A.happiness",
-          "field": "stats.happiness",
+          "id": "1A.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -152,13 +153,14 @@
           "kind": "derived",
           "explanation": "Wcześniejsze wolne zużywa tę samą pulę; mniej macierzyńskiego zostaje po porodzie."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "preparation",
@@ -251,79 +253,50 @@
           ]
         },
         {
-          "id": "1B.happiness",
-          "field": "stats.happiness",
+          "id": "1B.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
     {
       "id": "1C",
       "round_id": 1,
-      "title": "Zdrowie na pierwszym miejscu",
-      "description": "Uporządkuj chorobowe w ciąży na podstawie wystawionego zwolnienia.",
-      "conditions": "Niezdolność jest faktem z e-ZLA; ubezpieczenie, wyczekiwanie albo wyjątek i pozostały okres muszą być potwierdzone. Karta nie pozwala wybrać choroby.",
-      "effects": [
-        {
-          "op": "add_block",
-          "who": "mother",
-          "kind": "sick",
-          "start": "facts.ezla.start",
-          "days": "facts.ezla.days"
-        },
-        {
-          "op": "mark_docs",
-          "bundle": "sick",
-          "only_if": "facts.documents_available"
-        }
-      ],
+      "title": "Poznaj zasady chorobowego",
+      "description": "Dowiedz się, kiedy ciąża, ubezpieczenie i e-ZLA mają znaczenie dla zasiłku chorobowego.",
+      "conditions": "Karta edukacyjna dostępna w każdej historii; nie stwierdza choroby ani nie składa wniosku.",
+      "effects": [],
       "stats": {
         "money": {
           "kind": "derived",
-          "explanation": "Przelicz wynagrodzenie chorobowe i zasiłek właściwe dla tytułu; uwzględnij podstawę i wykorzystane dni."
+          "explanation": "To karta wiedzy: nie zmienia dochodu ani prawa do świadczenia."
         },
         "time": {
           "kind": "derived",
-          "explanation": "Dni niezdolności nie są automatycznie dniami zdolności do opieki; przed porodem nie zwiększają pokrycia potrzeb dziecka."
+          "explanation": "Nie dodaje zwolnienia, dni wolnych ani czasu opieki."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 20
       },
       "tags": [
-        "health",
-        "documents",
-        "continuity"
+        "knowledge",
+        "sick",
+        "information"
       ],
       "legal_rule_ids": [
         "sick-right",
-        "sick-money",
-        "sick-docs",
-        "base",
-        "debt"
+        "sick-money"
       ],
-      "parameter_refs": [
-        "rates.sick_pregnancy",
-        "sick.period_days_pregnancy",
-        "sick.waiting_days_mandatory",
-        "sick.waiting_days_voluntary",
-        "sick.employer_days",
-        "sick.employer_days_50plus"
-      ],
-      "combo": {
-        "with": [
-          "3D"
-        ],
-        "name": "Kompletna teczka",
-        "check": "docs_complete",
-        "mult": "0.50"
-      },
+      "parameter_refs": [],
+      "combo": null,
       "notes": "",
       "claims": [
         {
@@ -332,10 +305,7 @@
           "kind": "legal_interpretation",
           "rule_ids": [
             "sick-right",
-            "sick-money",
-            "sick-docs",
-            "base",
-            "debt"
+            "sick-money"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -345,10 +315,7 @@
           "kind": "legal_interpretation",
           "rule_ids": [
             "sick-right",
-            "sick-money",
-            "sick-docs",
-            "base",
-            "debt"
+            "sick-money"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -358,10 +325,7 @@
           "kind": "derived",
           "rule_ids": [
             "sick-right",
-            "sick-money",
-            "sick-docs",
-            "base",
-            "debt"
+            "sick-money"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -371,73 +335,16 @@
           "kind": "derived",
           "rule_ids": [
             "sick-right",
-            "sick-money",
-            "sick-docs",
-            "base",
-            "debt"
+            "sick-money"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
         {
-          "id": "1C.param.rates.sick_pregnancy",
-          "field": "parameter:rates.sick_pregnancy",
-          "kind": "legal_parameter",
-          "parameter_ref": "rates.sick_pregnancy",
-          "rule_ids": [
-            "sick-money"
-          ]
-        },
-        {
-          "id": "1C.param.sick.period_days_pregnancy",
-          "field": "parameter:sick.period_days_pregnancy",
-          "kind": "legal_parameter",
-          "parameter_ref": "sick.period_days_pregnancy",
-          "rule_ids": [
-            "sick-money"
-          ]
-        },
-        {
-          "id": "1C.param.sick.waiting_days_mandatory",
-          "field": "parameter:sick.waiting_days_mandatory",
-          "kind": "legal_parameter",
-          "parameter_ref": "sick.waiting_days_mandatory",
-          "rule_ids": [
-            "sick-right"
-          ]
-        },
-        {
-          "id": "1C.param.sick.waiting_days_voluntary",
-          "field": "parameter:sick.waiting_days_voluntary",
-          "kind": "legal_parameter",
-          "parameter_ref": "sick.waiting_days_voluntary",
-          "rule_ids": [
-            "sick-right"
-          ]
-        },
-        {
-          "id": "1C.param.sick.employer_days",
-          "field": "parameter:sick.employer_days",
-          "kind": "legal_parameter",
-          "parameter_ref": "sick.employer_days",
-          "rule_ids": [
-            "sick-money"
-          ]
-        },
-        {
-          "id": "1C.param.sick.employer_days_50plus",
-          "field": "parameter:sick.employer_days_50plus",
-          "kind": "legal_parameter",
-          "parameter_ref": "sick.employer_days_50plus",
-          "rule_ids": [
-            "sick-money"
-          ]
-        },
-        {
-          "id": "1C.happiness",
-          "field": "stats.happiness",
+          "id": "1C.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -463,13 +370,14 @@
           "kind": "derived",
           "explanation": "Bez zmiany urlopu i dostępnych dni; to informacja organizacyjna."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 20
       },
       "tags": [
         "preparation",
@@ -542,11 +450,11 @@
           ]
         },
         {
-          "id": "1D.happiness",
-          "field": "stats.happiness",
+          "id": "1D.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -572,13 +480,14 @@
           "kind": "derived",
           "explanation": "Sprawdzenie podstawy nie zwalnia z pracy i nie zużywa puli urlopów."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 20
       },
       "tags": [
         "preparation",
@@ -640,75 +549,52 @@
           ]
         },
         {
-          "id": "1E.happiness",
-          "field": "stats.happiness",
+          "id": "1E.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
     {
       "id": "1F",
       "round_id": 1,
-      "title": "Przygotuj rodzinny start",
-      "description": "Przygotuj plan i dokumenty na przyjęcie dziecka w adopcji albo pieczy niezawodowej.",
-      "conditions": "Wyłącznie scenariusz przyjęcia. Rozdziel adopcję i pieczę; przyszłe zdarzenie nie tworzy dzisiejszego uprawnienia.",
-      "effects": [
-        {
-          "op": "set_flag",
-          "name": "acceptance_plan",
-          "value": "prepared"
-        },
-        {
-          "op": "reserve",
-          "pool": "on_maternity_terms",
-          "who": "choice.parent",
-          "start": "event:acceptance",
-          "days": "derived.acceptance_entitlement",
-          "provisional": true
-        }
-      ],
+      "title": "Poznaj płatnika zasiłku",
+      "description": "Sprawdź, kiedy zasiłek wypłaca pracodawca, a kiedy ZUS.",
+      "conditions": "Karta edukacyjna dostępna w każdej historii; próg zależy od ustawowego stanu zatrudnienia.",
+      "effects": [],
       "stats": {
         "money": {
           "kind": "derived",
-          "explanation": "Tylko prognoza przyszłego świadczenia po spełnieniu przesłanek; bieżący pewny dochód bez zmiany."
+          "explanation": "To karta wiedzy: sama informacja nie zmienia kwoty świadczenia."
         },
         "time": {
           "kind": "derived",
-          "explanation": "Rezerwacja nie jest wykorzystaniem urlopu ani dniem zapewnionej opieki; pokazuje przyszły plan."
+          "explanation": "Nie zmienia planu urlopów ani dostępnych dni."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 20
       },
       "tags": [
-        "adoption",
-        "preparation",
-        "documents"
+        "knowledge",
+        "payer",
+        "information"
       ],
       "legal_rule_ids": [
-        "adoption",
-        "insured-parent",
-        "standard-rates",
-        "base"
+        "payer",
+        "insured-parent"
       ],
       "parameter_refs": [
-        "maternity.weeks_by_children",
-        "maternity.adoption_min_weeks"
+        "payer_threshold_insured"
       ],
-      "combo": {
-        "with": [
-          "2F"
-        ],
-        "name": "Gotowi na przyjęcie",
-        "check": "docs_complete",
-        "mult": "0.25"
-      },
+      "combo": null,
       "notes": "",
       "claims": [
         {
@@ -716,10 +602,8 @@
           "field": "description",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "adoption",
-            "insured-parent",
-            "standard-rates",
-            "base"
+            "payer",
+            "insured-parent"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -728,10 +612,8 @@
           "field": "conditions",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "adoption",
-            "insured-parent",
-            "standard-rates",
-            "base"
+            "payer",
+            "insured-parent"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -740,10 +622,8 @@
           "field": "stats.money",
           "kind": "derived",
           "rule_ids": [
-            "adoption",
-            "insured-parent",
-            "standard-rates",
-            "base"
+            "payer",
+            "insured-parent"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -752,38 +632,26 @@
           "field": "stats.time",
           "kind": "derived",
           "rule_ids": [
-            "adoption",
-            "insured-parent",
-            "standard-rates",
-            "base"
+            "payer",
+            "insured-parent"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
         {
-          "id": "1F.param.maternity.weeks_by_children",
-          "field": "parameter:maternity.weeks_by_children",
+          "id": "1F.param.payer_threshold_insured",
+          "field": "parameter:payer_threshold_insured",
           "kind": "legal_parameter",
-          "parameter_ref": "maternity.weeks_by_children",
+          "parameter_ref": "payer_threshold_insured",
           "rule_ids": [
-            "maternity-pool",
-            "adoption"
+            "payer"
           ]
         },
         {
-          "id": "1F.param.maternity.adoption_min_weeks",
-          "field": "parameter:maternity.adoption_min_weeks",
-          "kind": "legal_parameter",
-          "parameter_ref": "maternity.adoption_min_weeks",
-          "rule_ids": [
-            "adoption"
-          ]
-        },
-        {
-          "id": "1F.happiness",
-          "field": "stats.happiness",
+          "id": "1F.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -811,13 +679,14 @@
           "kind": "derived",
           "explanation": "Zużyj pulę ojcowskiego; wspólne dni licz raz do pokrycia opieki, osobno do wspólnego czasu."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "shared",
@@ -931,11 +800,11 @@
           ]
         },
         {
-          "id": "2A.happiness",
-          "field": "stats.happiness",
+          "id": "2A.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -968,15 +837,16 @@
         },
         "time": {
           "kind": "derived",
-          "explanation": "Wpisz pierwszą część; pozostałe dni pozostają dostępne i nie są jeszcze pokrytą opieką."
+          "explanation": "W tym wczesnym okresie tata korzysta tylko z pierwszej części. Pozostałe dni ojcowskiego nie przepadają — można je zaplanować później w terminie."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "reserve",
@@ -1085,11 +955,11 @@
           ]
         },
         {
-          "id": "2B.happiness",
-          "field": "stats.happiness",
+          "id": "2B.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -1117,13 +987,14 @@
           "kind": "derived",
           "explanation": "Bez bieżącego zużycia puli i bez dodatkowych pokrytych dni; późniejszy blok musi zostać zrealizowany."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "reserve",
@@ -1221,76 +1092,49 @@
           ]
         },
         {
-          "id": "2C.happiness",
-          "field": "stats.happiness",
+          "id": "2C.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
     {
       "id": "2D",
       "round_id": 2,
-      "title": "Uzupełniający dla mamy",
-      "description": "Po hospitalizacji dziecka zaplanuj należny uzupełniający dla mamy.",
-      "conditions": "Kwalifikująca hospitalizacja jest faktem. Prawo i wymiar obliczone; osiągalny termin, zaświadczenie, drugi rodzic nie korzysta z tego samego uprawnienia.",
-      "effects": [
-        {
-          "op": "add_block",
-          "who": "mother",
-          "kind": "supplementary",
-          "start": "after:maternity",
-          "days": "derived.supplementary_days"
-        },
-        {
-          "op": "mark_docs",
-          "bundle": "supplementary",
-          "only_if": "facts.documents_available"
-        }
-      ],
+      "title": "Poznaj dodatkowy urlop po hospitalizacji",
+      "description": "Dowiedz się, kiedy pobyt dziecka w szpitalu może wydłużyć urlop macierzyński.",
+      "conditions": "Karta wiedzy dostępna niezależnie od historii; uprawnienie wymaga spełnienia ustawowych warunków.",
+      "effects": [],
       "stats": {
         "money": {
           "kind": "derived",
-          "explanation": "Przelicz należny blok od podstawy mamy według stawki uzupełniającego; nie stosuj do niego automatycznie stawki uśrednionej."
+          "explanation": "To karta wiedzy: nie zakłada hospitalizacji ani nie dopisuje urlopu."
         },
         "time": {
           "kind": "derived",
-          "explanation": "Dodaj obliczony blok po macierzyńskim; nie odejmuj go z puli rodzicielskiego."
+          "explanation": "Nie tworzy dni wolnych; wymiar zależy od udokumentowanych okoliczności."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 20
       },
       "tags": [
-        "health",
-        "continuity",
-        "documents"
+        "knowledge",
+        "supplementary",
+        "information"
       ],
       "legal_rule_ids": [
-        "supplementary",
-        "standard-rates",
-        "base"
+        "supplementary"
       ],
-      "parameter_refs": [
-        "rates.supplementary",
-        "supplementary.extreme.cap_weeks",
-        "supplementary.preterm.cap_weeks",
-        "supplementary.term.cap_weeks",
-        "deadlines.supplementary_notice_days_before_maternity_end"
-      ],
-      "combo": {
-        "with": [
-          "4A"
-        ],
-        "name": "Bez luki",
-        "check": "touching",
-        "mult": "0.50"
-      },
+      "parameter_refs": [],
+      "combo": null,
       "notes": "",
       "claims": [
         {
@@ -1298,9 +1142,7 @@
           "field": "description",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "supplementary",
-            "standard-rates",
-            "base"
+            "supplementary"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -1309,9 +1151,7 @@
           "field": "conditions",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "supplementary",
-            "standard-rates",
-            "base"
+            "supplementary"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -1320,9 +1160,7 @@
           "field": "stats.money",
           "kind": "derived",
           "rule_ids": [
-            "supplementary",
-            "standard-rates",
-            "base"
+            "supplementary"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -1331,126 +1169,55 @@
           "field": "stats.time",
           "kind": "derived",
           "rule_ids": [
-            "supplementary",
-            "standard-rates",
-            "base"
+            "supplementary"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
         {
-          "id": "2D.param.rates.supplementary",
-          "field": "parameter:rates.supplementary",
-          "kind": "legal_parameter",
-          "parameter_ref": "rates.supplementary",
-          "rule_ids": [
-            "standard-rates"
-          ]
-        },
-        {
-          "id": "2D.param.supplementary.extreme.cap_weeks",
-          "field": "parameter:supplementary.extreme.cap_weeks",
-          "kind": "legal_parameter",
-          "parameter_ref": "supplementary.extreme.cap_weeks",
-          "rule_ids": [
-            "supplementary"
-          ]
-        },
-        {
-          "id": "2D.param.supplementary.preterm.cap_weeks",
-          "field": "parameter:supplementary.preterm.cap_weeks",
-          "kind": "legal_parameter",
-          "parameter_ref": "supplementary.preterm.cap_weeks",
-          "rule_ids": [
-            "supplementary"
-          ]
-        },
-        {
-          "id": "2D.param.supplementary.term.cap_weeks",
-          "field": "parameter:supplementary.term.cap_weeks",
-          "kind": "legal_parameter",
-          "parameter_ref": "supplementary.term.cap_weeks",
-          "rule_ids": [
-            "supplementary"
-          ]
-        },
-        {
-          "id": "2D.param.deadlines.supplementary_notice_days_before_maternity_end",
-          "field": "parameter:deadlines.supplementary_notice_days_before_maternity_end",
-          "kind": "legal_parameter",
-          "parameter_ref": "deadlines.supplementary_notice_days_before_maternity_end",
-          "rule_ids": [
-            "supplementary"
-          ]
-        },
-        {
-          "id": "2D.happiness",
-          "field": "stats.happiness",
+          "id": "2D.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
     {
       "id": "2E",
       "round_id": 2,
-      "title": "Uzupełniający dla taty",
-      "description": "Po hospitalizacji dziecka zaplanuj należny uzupełniający dla taty.",
-      "conditions": "Jak dla uzupełniającego mamy, ale uprawniony jest ojciec; wybór rodzica nie powiększa wymiaru. Sprawdź dokumenty po drugim rodzicu.",
-      "effects": [
-        {
-          "op": "add_block",
-          "who": "father",
-          "kind": "supplementary",
-          "start": "after:maternity",
-          "days": "derived.supplementary_days"
-        },
-        {
-          "op": "mark_docs",
-          "bundle": "supplementary_other_parent",
-          "only_if": "facts.documents_available"
-        }
-      ],
+      "title": "Poznaj terminy wniosków urlopowych",
+      "description": "Sprawdź, kiedy zgłosić ojcowski i uzupełniający urlop macierzyński.",
+      "conditions": "Karta edukacyjna dostępna w każdej historii; terminy zależą od wybranego uprawnienia.",
+      "effects": [],
       "stats": {
         "money": {
           "kind": "derived",
-          "explanation": "Zastąp dochód ojca odpowiednim świadczeniem; dochód mamy wynika z jej odrębnego statusu i faktycznego powrotu do pracy."
+          "explanation": "To karta wiedzy: nie składa wniosku ani nie przyznaje świadczenia."
         },
         "time": {
           "kind": "derived",
-          "explanation": "Jedna wspólna pula uzupełniającego; ten sam okres nie może zostać przyznany obojgu."
+          "explanation": "Nie zmienia puli ani kalendarza urlopów."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 20
       },
       "tags": [
-        "health",
-        "shared",
-        "continuity"
+        "knowledge",
+        "deadlines",
+        "information"
       ],
       "legal_rule_ids": [
-        "supplementary",
-        "standard-rates",
-        "base",
-        "insured-parent"
+        "paternity",
+        "supplementary"
       ],
-      "parameter_refs": [
-        "rates.supplementary",
-        "deadlines.supplementary_notice_days_before_maternity_end"
-      ],
-      "combo": {
-        "with": [
-          "4A"
-        ],
-        "name": "Bez luki",
-        "check": "touching",
-        "mult": "0.50"
-      },
+      "parameter_refs": [],
+      "combo": null,
       "notes": "",
       "claims": [
         {
@@ -1458,10 +1225,8 @@
           "field": "description",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "supplementary",
-            "standard-rates",
-            "base",
-            "insured-parent"
+            "paternity",
+            "supplementary"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -1470,10 +1235,8 @@
           "field": "conditions",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "supplementary",
-            "standard-rates",
-            "base",
-            "insured-parent"
+            "paternity",
+            "supplementary"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -1482,10 +1245,8 @@
           "field": "stats.money",
           "kind": "derived",
           "rule_ids": [
-            "supplementary",
-            "standard-rates",
-            "base",
-            "insured-parent"
+            "paternity",
+            "supplementary"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -1494,102 +1255,56 @@
           "field": "stats.time",
           "kind": "derived",
           "rule_ids": [
-            "supplementary",
-            "standard-rates",
-            "base",
-            "insured-parent"
+            "paternity",
+            "supplementary"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
         {
-          "id": "2E.param.rates.supplementary",
-          "field": "parameter:rates.supplementary",
-          "kind": "legal_parameter",
-          "parameter_ref": "rates.supplementary",
-          "rule_ids": [
-            "standard-rates"
-          ]
-        },
-        {
-          "id": "2E.param.deadlines.supplementary_notice_days_before_maternity_end",
-          "field": "parameter:deadlines.supplementary_notice_days_before_maternity_end",
-          "kind": "legal_parameter",
-          "parameter_ref": "deadlines.supplementary_notice_days_before_maternity_end",
-          "rule_ids": [
-            "supplementary"
-          ]
-        },
-        {
-          "id": "2E.happiness",
-          "field": "stats.happiness",
+          "id": "2E.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
     {
       "id": "2F",
       "round_id": 2,
-      "title": "Witaj w rodzinie",
-      "description": "Uruchom plan świadczeń po przyjęciu dziecka na wychowanie.",
-      "conditions": "Potwierdzone przyjęcie; dla adopcji także wystąpienie do sądu, dla pieczy jej niezawodowy charakter. Wiek, liczba dzieci i dokumenty sprawdzone.",
-      "effects": [
-        {
-          "op": "add_block",
-          "who": "choice.parent",
-          "kind": "maternity",
-          "start": "choice.acceptance_leave_start",
-          "days": "derived.acceptance_entitlement",
-          "context": "on_maternity_terms",
-          "merge_into": "baseline.acceptance"
-        },
-        {
-          "op": "mark_docs",
-          "bundle": "acceptance",
-          "only_if": "facts.documents_available"
-        }
-      ],
+      "title": "Poznaj dokumenty do zasiłku",
+      "description": "Zobacz, jakie dokumenty zwykle są potrzebne po narodzinach dziecka.",
+      "conditions": "Karta edukacyjna dostępna w każdej historii; ostateczna lista zależy od płatnika i sytuacji rodziny.",
+      "effects": [],
       "stats": {
         "money": {
           "kind": "derived",
-          "explanation": "Przelicz zasiłek od podstawy wybranego rodzica i właściwego wariantu; nie wypłacaj ponownie za rezerwację z 1F."
+          "explanation": "To karta wiedzy: nie składa wniosku i nie oznacza dokumentu jako złożonego."
         },
         "time": {
           "kind": "derived",
-          "explanation": "Wpisz rzeczywisty blok i właściwy wymiar dla wieku oraz ścieżki; nie używaj daty urodzenia jako daty przyjęcia."
+          "explanation": "Nie zmienia planu urlopów, dochodu ani dostępnych dni."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 20
       },
       "tags": [
-        "adoption",
-        "continuity",
-        "documents"
+        "knowledge",
+        "documents",
+        "information"
       ],
       "legal_rule_ids": [
-        "adoption",
-        "insured-parent",
-        "standard-rates",
-        "base"
+        "birth-docs",
+        "payer"
       ],
-      "parameter_refs": [
-        "maternity.weeks_by_children",
-        "maternity.adoption_min_weeks"
-      ],
-      "combo": {
-        "with": [
-          "1F"
-        ],
-        "name": "Gotowi na przyjęcie",
-        "check": "docs_complete",
-        "mult": "0.25"
-      },
+      "parameter_refs": [],
+      "combo": null,
       "notes": "",
       "claims": [
         {
@@ -1597,10 +1312,8 @@
           "field": "description",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "adoption",
-            "insured-parent",
-            "standard-rates",
-            "base"
+            "birth-docs",
+            "payer"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -1609,10 +1322,8 @@
           "field": "conditions",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "adoption",
-            "insured-parent",
-            "standard-rates",
-            "base"
+            "birth-docs",
+            "payer"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -1621,10 +1332,8 @@
           "field": "stats.money",
           "kind": "derived",
           "rule_ids": [
-            "adoption",
-            "insured-parent",
-            "standard-rates",
-            "base"
+            "birth-docs",
+            "payer"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -1633,38 +1342,17 @@
           "field": "stats.time",
           "kind": "derived",
           "rule_ids": [
-            "adoption",
-            "insured-parent",
-            "standard-rates",
-            "base"
+            "birth-docs",
+            "payer"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
         {
-          "id": "2F.param.maternity.weeks_by_children",
-          "field": "parameter:maternity.weeks_by_children",
-          "kind": "legal_parameter",
-          "parameter_ref": "maternity.weeks_by_children",
-          "rule_ids": [
-            "maternity-pool",
-            "adoption"
-          ]
-        },
-        {
-          "id": "2F.param.maternity.adoption_min_weeks",
-          "field": "parameter:maternity.adoption_min_weeks",
-          "kind": "legal_parameter",
-          "parameter_ref": "maternity.adoption_min_weeks",
-          "rule_ids": [
-            "adoption"
-          ]
-        },
-        {
-          "id": "2F.happiness",
-          "field": "stats.happiness",
+          "id": "2F.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -1689,13 +1377,14 @@
           "kind": "derived",
           "explanation": "Wariant stawek sam nie dodaje dni i nie zmienia puli urlopów."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "budget",
@@ -1794,11 +1483,11 @@
           ]
         },
         {
-          "id": "3A.happiness",
-          "field": "stats.happiness",
+          "id": "3A.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -1828,13 +1517,14 @@
           "kind": "derived",
           "explanation": "Bez dodatkowych tygodni; pilnuj wykorzystania rodzicielskiego w pierwszym roku i ewentualnego wyrównania."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "budget",
@@ -1944,11 +1634,11 @@
           ]
         },
         {
-          "id": "3B.happiness",
-          "field": "stats.happiness",
+          "id": "3B.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -1976,13 +1666,14 @@
           "kind": "derived",
           "explanation": "Przenieś dni, nie twórz nowej puli. Okres przedporodowy nie zastępuje wymaganego okresu po porodzie."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "shared",
@@ -2066,60 +1757,50 @@
           ]
         },
         {
-          "id": "3C.happiness",
-          "field": "stats.happiness",
+          "id": "3C.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
     {
       "id": "3D",
       "round_id": 3,
-      "title": "Teczka bez braków",
-      "description": "Uzupełnij dokumenty, potwierdź podstawę i sprawdź, kto wypłaci świadczenie.",
-      "conditions": "Otwarta sprawa, dostępne wymagane dokumenty i fakty potwierdzające prawo; brak dokumentu nie może być samą kartą zmieniony w dokument dostępny.",
-      "effects": [
-        {
-          "op": "mark_docs",
-          "bundle": "current_entitlement",
-          "only_if": "facts.documents_available"
-        },
-        {
-          "op": "set_flag",
-          "name": "payer_and_base_checked",
-          "value": true
-        }
-      ],
+      "title": "Poznaj listę dokumentów",
+      "description": "Sprawdź, jakie formularze i informacje mogą być potrzebne do zasiłku.",
+      "conditions": "Karta edukacyjna dostępna w każdej historii; zestaw dokumentów zależy od płatnika i tytułu ubezpieczenia.",
+      "effects": [],
       "stats": {
         "money": {
           "kind": "derived",
-          "explanation": "Nie zwiększa należnego świadczenia. Potwierdzone dane mogą zmienić wcześniejszą prognozę; kompletność nie gwarantuje konkretnego dnia przelewu."
+          "explanation": "To karta wiedzy: nie składa wniosków ani nie potwierdza dokumentów."
         },
         "time": {
           "kind": "derived",
-          "explanation": "Bez dodatkowych dni urlopu; mniej otwartych formalności w planie."
+          "explanation": "Nie zmienia wypłaty, uprawnień ani puli urlopów."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 20
       },
       "tags": [
+        "knowledge",
         "documents",
-        "security"
+        "information"
       ],
       "legal_rule_ids": [
         "birth-docs",
         "payer",
         "base",
         "insured-parent",
-        "debt",
-        "floor"
+        "debt"
       ],
       "parameter_refs": [
         "payer_threshold_insured",
@@ -2147,8 +1828,7 @@
             "payer",
             "base",
             "insured-parent",
-            "debt",
-            "floor"
+            "debt"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -2161,8 +1841,7 @@
             "payer",
             "base",
             "insured-parent",
-            "debt",
-            "floor"
+            "debt"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -2175,8 +1854,7 @@
             "payer",
             "base",
             "insured-parent",
-            "debt",
-            "floor"
+            "debt"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -2189,8 +1867,7 @@
             "payer",
             "base",
             "insured-parent",
-            "debt",
-            "floor"
+            "debt"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -2222,72 +1899,52 @@
           ]
         },
         {
-          "id": "3D.happiness",
-          "field": "stats.happiness",
+          "id": "3D.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
     {
       "id": "3E",
       "round_id": 3,
-      "title": "Uwzględnij dodatkowy wymiar",
-      "description": "Zaktualizuj pulę rodzicielskiego na podstawie zaświadczenia „Za życiem”.",
-      "conditions": "Wymagane zaświadczenie istnieje w scenariuszu i nie zostało już uwzględnione. Karta nie przyznaje diagnozy ani nie nagradza choroby.",
-      "effects": [
-        {
-          "op": "set_flag",
-          "name": "za_zyciem_verified",
-          "value": true
-        },
-        {
-          "op": "mark_docs",
-          "bundle": "za_zyciem",
-          "only_if": "facts.documents_available"
-        }
-      ],
+      "title": "Poznaj dodatkowe uprawnienia",
+      "description": "Dowiedz się, jak zaświadczenie „Za życiem” wpływa na wymiar urlopu rodzicielskiego.",
+      "conditions": "Karta edukacyjna dostępna w każdej historii; nie potwierdza stanu zdrowia ani nie składa wniosku.",
+      "effects": [],
       "stats": {
         "money": {
           "kind": "derived",
-          "explanation": "Samo potwierdzenie nie wypłaca pieniędzy. Prognoza zmienia się po przypisaniu dostępnych okresów konkretnym rodzicom."
+          "explanation": "To karta wiedzy: nie zmienia uprawnień ani wypłaty w planie."
         },
         "time": {
           "kind": "derived",
-          "explanation": "Zaktualizuj uprawnioną pulę, osobno zachowaj części wyłączne; przy przyjęciu użyj właściwego wariantu."
+          "explanation": "Nie dodaje urlopu; wymiar wymaga potwierdzenia właściwego zaświadczenia."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 20
       },
       "tags": [
-        "rights",
-        "reserve",
-        "documents"
+        "knowledge",
+        "information"
       ],
       "legal_rule_ids": [
         "za-zyciem",
-        "parental-pool",
-        "parental-docs"
+        "parental-pool"
       ],
       "parameter_refs": [
         "parental.weeks_za_zyciem_single",
-        "parental.weeks_za_zyciem_multiple",
-        "parental.exclusive_weeks"
+        "parental.weeks_za_zyciem_multiple"
       ],
-      "combo": {
-        "with": [
-          "4D"
-        ],
-        "name": "Plan na potrzeby",
-        "check": "covers_need",
-        "mult": "0.25"
-      },
+      "combo": null,
       "notes": "",
       "claims": [
         {
@@ -2296,8 +1953,7 @@
           "kind": "legal_interpretation",
           "rule_ids": [
             "za-zyciem",
-            "parental-pool",
-            "parental-docs"
+            "parental-pool"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -2307,8 +1963,7 @@
           "kind": "legal_interpretation",
           "rule_ids": [
             "za-zyciem",
-            "parental-pool",
-            "parental-docs"
+            "parental-pool"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -2318,8 +1973,7 @@
           "kind": "derived",
           "rule_ids": [
             "za-zyciem",
-            "parental-pool",
-            "parental-docs"
+            "parental-pool"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -2329,8 +1983,7 @@
           "kind": "derived",
           "rule_ids": [
             "za-zyciem",
-            "parental-pool",
-            "parental-docs"
+            "parental-pool"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -2353,82 +2006,55 @@
           ]
         },
         {
-          "id": "3E.param.parental.exclusive_weeks",
-          "field": "parameter:parental.exclusive_weeks",
-          "kind": "legal_parameter",
-          "parameter_ref": "parental.exclusive_weeks",
-          "rule_ids": [
-            "parental-pool",
-            "exclusive-rate"
-          ]
-        },
-        {
-          "id": "3E.happiness",
-          "field": "stats.happiness",
+          "id": "3E.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
     {
       "id": "3F",
       "round_id": 3,
-      "title": "Świadczenie po końcu umowy",
-      "description": "Potwierdź odrębne prawo do macierzyńskiego po ustaniu ubezpieczenia.",
-      "conditions": "Ustawowa przesłanka po ustaniu ubezpieczenia jest udokumentowana; nie zakładaj prawa po dowolnym zakończeniu pracy. Przypadki sporne i orzeczenia są faktami, nie wyborem gracza.",
-      "effects": [
-        {
-          "op": "set_flag",
-          "name": "post_insurance_entitlement_verified",
-          "value": true
-        },
-        {
-          "op": "mark_docs",
-          "bundle": "post_insurance_maternity",
-          "only_if": "facts.documents_available"
-        }
-      ],
+      "title": "Poznaj wybór wariantu wypłaty",
+      "description": "Porównaj standardowy i uśredniony wariant zasiłku macierzyńskiego.",
+      "conditions": "Karta edukacyjna dostępna w każdej historii; wynik porównania zależy od podstawy i wykorzystanych urlopów.",
+      "effects": [],
       "stats": {
         "money": {
           "kind": "derived",
-          "explanation": "Po potwierdzeniu przelicz podstawowy blok po porodzie; świadczenie sprzed porodu i po porodzie są odrębnymi okresami."
+          "explanation": "To karta wiedzy: nie zmienia wybranego wariantu ani wysokości wypłaty."
         },
         "time": {
           "kind": "derived",
-          "explanation": "Pokazuje okres pobierania świadczenia bez fikcyjnego urlopu u byłego pracodawcy."
+          "explanation": "Nie dodaje urlopu i nie zmienia terminów wykorzystania puli."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 20
       },
       "tags": [
-        "security",
-        "continuity",
-        "documents"
+        "knowledge",
+        "rates",
+        "information"
       ],
       "legal_rule_ids": [
-        "job-loss-after",
-        "insured-parent",
-        "base",
-        "payer"
+        "standard-rates",
+        "averaged",
+        "exclusive-rate"
       ],
       "parameter_refs": [
-        "maternity.weeks_by_children",
-        "rates.maternity"
+        "rates.maternity",
+        "rates.parental",
+        "rates.averaged"
       ],
-      "combo": {
-        "with": [
-          "1E"
-        ],
-        "name": "Ciągłość wypłat",
-        "check": "touching",
-        "mult": "0.50"
-      },
+      "combo": null,
       "notes": "",
       "claims": [
         {
@@ -2436,10 +2062,9 @@
           "field": "description",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "job-loss-after",
-            "insured-parent",
-            "base",
-            "payer"
+            "standard-rates",
+            "averaged",
+            "exclusive-rate"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -2448,10 +2073,9 @@
           "field": "conditions",
           "kind": "legal_interpretation",
           "rule_ids": [
-            "job-loss-after",
-            "insured-parent",
-            "base",
-            "payer"
+            "standard-rates",
+            "averaged",
+            "exclusive-rate"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -2460,10 +2084,9 @@
           "field": "stats.money",
           "kind": "derived",
           "rule_ids": [
-            "job-loss-after",
-            "insured-parent",
-            "base",
-            "payer"
+            "standard-rates",
+            "averaged",
+            "exclusive-rate"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
         },
@@ -2472,22 +2095,11 @@
           "field": "stats.time",
           "kind": "derived",
           "rule_ids": [
-            "job-loss-after",
-            "insured-parent",
-            "base",
-            "payer"
+            "standard-rates",
+            "averaged",
+            "exclusive-rate"
           ],
           "resolution": "show_relevant_rule_then_exact_unit_and_pdf"
-        },
-        {
-          "id": "3F.param.maternity.weeks_by_children",
-          "field": "parameter:maternity.weeks_by_children",
-          "kind": "legal_parameter",
-          "parameter_ref": "maternity.weeks_by_children",
-          "rule_ids": [
-            "maternity-pool",
-            "adoption"
-          ]
         },
         {
           "id": "3F.param.rates.maternity",
@@ -2499,11 +2111,30 @@
           ]
         },
         {
-          "id": "3F.happiness",
-          "field": "stats.happiness",
+          "id": "3F.param.rates.parental",
+          "field": "parameter:rates.parental",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.parental",
+          "rule_ids": [
+            "standard-rates",
+            "exclusive-rate"
+          ]
+        },
+        {
+          "id": "3F.param.rates.averaged",
+          "field": "parameter:rates.averaged",
+          "kind": "legal_parameter",
+          "parameter_ref": "rates.averaged",
+          "rule_ids": [
+            "averaged"
+          ]
+        },
+        {
+          "id": "3F.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -2538,13 +2169,14 @@
           "kind": "derived",
           "explanation": "Kolejne bloki wydłużają pokryty kalendarz; zużywają odpowiednie pule i części obojga."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "shared",
@@ -2662,11 +2294,11 @@
           ]
         },
         {
-          "id": "4A.happiness",
-          "field": "stats.happiness",
+          "id": "4A.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -2701,13 +2333,14 @@
           "kind": "derived",
           "explanation": "Każdy rodzic zużywa własne dni; pokrycie tej samej potrzeby dziecka licz raz. Wspólny czas przechowuj osobno."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "shared",
@@ -2831,11 +2464,11 @@
           ]
         },
         {
-          "id": "4B.happiness",
-          "field": "stats.happiness",
+          "id": "4B.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -2865,13 +2498,14 @@
           "kind": "derived",
           "explanation": "Wydłuż właściwy blok zgodnie z zasadami; nie uznawaj całego dnia pracy za zapewnioną osobistą opiekę."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "work",
@@ -2990,11 +2624,11 @@
           ]
         },
         {
-          "id": "4C.happiness",
-          "field": "stats.happiness",
+          "id": "4C.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -3029,13 +2663,14 @@
           "kind": "derived",
           "explanation": "Rezerwa nie zużywa części ani dni i nie zwiększa pokrytej opieki, dopóki nie stanie się blokiem."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "reserve",
@@ -3135,11 +2770,11 @@
           ]
         },
         {
-          "id": "4D.happiness",
-          "field": "stats.happiness",
+          "id": "4D.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -3168,13 +2803,14 @@
           "kind": "derived",
           "explanation": "Odejmij wykorzystane dni i część; przyznaj pokrycie wyłącznie za rzeczywiście zamkniętą potrzebę."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "reserve",
@@ -3284,11 +2920,11 @@
           ]
         },
         {
-          "id": "4E.happiness",
-          "field": "stats.happiness",
+          "id": "4E.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -3316,13 +2952,14 @@
           "kind": "derived",
           "explanation": "Odejmij dni z części ojca i całej puli; nie dodawaj ich ponownie ponad pulę rodziny."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "shared",
@@ -3423,11 +3060,11 @@
           ]
         },
         {
-          "id": "4F.happiness",
-          "field": "stats.happiness",
+          "id": "4F.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -3456,13 +3093,14 @@
           "kind": "derived",
           "explanation": "Pokryj konkretne dni, zużyj pulę odpowiedniego rodzica i jedną część."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "reserve",
@@ -3577,11 +3215,11 @@
           ]
         },
         {
-          "id": "5A.happiness",
-          "field": "stats.happiness",
+          "id": "5A.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -3618,13 +3256,14 @@
           "kind": "derived",
           "explanation": "Dwa bloki pokrywają dwie potrzeby i zużywają dwie części; sprawdź sumę wniosków obojga rodziców."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "flexibility",
@@ -3728,11 +3367,11 @@
           ]
         },
         {
-          "id": "5B.happiness",
-          "field": "stats.happiness",
+          "id": "5B.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -3763,13 +3402,14 @@
           "kind": "derived",
           "explanation": "Oblicz wydłużenie i opiekę godzinową; pozostałe godziny wymagają innego opiekuna."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "work",
@@ -3888,11 +3528,11 @@
           ]
         },
         {
-          "id": "5C.happiness",
-          "field": "stats.happiness",
+          "id": "5C.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -3924,13 +3564,14 @@
           "kind": "derived",
           "explanation": "Pokryj rzeczywiste dni nagłej opieki; odejmij je ze wspólnego limitu rocznego rodziny."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "emergency",
@@ -4029,11 +3670,11 @@
           ]
         },
         {
-          "id": "5D.happiness",
-          "field": "stats.happiness",
+          "id": "5D.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -4065,13 +3706,14 @@
           "kind": "derived",
           "explanation": "Ta sama opieka i ten sam wspólny limit; drugi rodzic nie dostaje świadczenia za te same dni."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "emergency",
@@ -4170,11 +3812,11 @@
           ]
         },
         {
-          "id": "5E.happiness",
-          "field": "stats.happiness",
+          "id": "5E.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     },
@@ -4212,13 +3854,14 @@
           "kind": "derived",
           "explanation": "Dwa rozłączne odcinki pokrywają jedną potrzebę; łączny limit rodziny maleje o rzeczywistą liczbę dni."
         },
-        "happiness": {
-          "kind": "game_balance",
-          "explanation": "Umowny bilans pieniędzy i czasu; niepewność wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia."
+        "knowledge": {
+          "kind": "authored_game_points",
+          "explanation": "Wiedza rośnie wyłącznie po zagraniu karty informacyjnej; planowanie urlopu nie dodaje punktów wiedzy."
         }
       },
       "game_points": {
-        "chips": 10
+        "chips": 10,
+        "knowledge": 0
       },
       "tags": [
         "emergency",
@@ -4317,11 +3960,11 @@
           ]
         },
         {
-          "id": "5F.happiness",
-          "field": "stats.happiness",
+          "id": "5F.knowledge",
+          "field": "stats.knowledge",
           "kind": "game_design",
           "rule_ids": [],
-          "explanation": "Autorski bilans pieniędzy i czasu, bez odrębnej podstawy prawnej. Punkty combo są oddzielne."
+          "explanation": "Punkty wiedzy przyznawane wyłącznie za karty edukacyjne; planowanie urlopu nie zwiększa paska."
         }
       ]
     }

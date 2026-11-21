@@ -10,13 +10,13 @@ Przejrzano warunki, efekty i źródła każdej karty. Kierunek dotyczy wskazaneg
 - Nie utożsamiamy e-ZLA lub rehabilitacji ze zdolnością do opieki. Złożenie wniosku nie jest przyznaniem świadczenia.
 - Wspólne urlopy dają więcej wspólnego czasu w konkretnym bloku, ale zużywają pulę obojga i mogą skrócić pokryty kalendarz. Dzień zapewnionej opieki nie jest liczony dwa razy.
 - Praca podczas rodzicielskiego oznacza mniej wolnych godzin teraz, nawet jeśli prawidłowo obliczony okres urlopu jest dłuższy.
-- Szczęście w UI jest równoważnym bilansem kierunków pieniędzy i czasu. Niepewność jednego wejścia pozostaje niepewnością wyniku. Nie jest miarą zdrowia ani punktem z ustawy.
+- Wiedza w UI to punkty za karty edukacyjne; karty urlopowe jej nie zwiększają. To niezależna mechanika gry, nie punkt z ustawy.
 
 ## Źródła i zakres
 
 Podstawą są dostarczone [akty i dokumenty](../Documents/legal/README.md) z [rejestrem dokładnych cytatów](../Documents/legal/rules.md). Dodatkowe sprawdzenie: [wysokość świadczenia — ZUS](https://www.zus.pl/pl/swiadczenia/zasilki/zasilek-macierzynski/wysokosc), [łączenie pracy i urlopu — PIP](https://www.pip.gov.pl/dla-pracodawcow/pytania-i-odpowiedzi/czy-pracownik-moze-laczyc-urlop-rodzicielski-z-wykonywaniem-pracy). Materiały mają różne daty: pierwszeństwo ma właściwy dla zdarzenia przepis. Podwyższenia, podatki i podstawy mogą zmieniać ostateczną różnicę wypłaty.
 
-Wskaźnik czasu w tym podglądzie opisuje dostępność rodzica w wskazanej alternatywie, nie obliczoną sumę dni opieki rodziny. Każda karta ma własny okres porównania. Nie wolno sumować tych znaków jak dni albo kwot ani traktować wysokości pasków jako rankingu całego planu. Bieżące i przyszłe skutki opisano osobno.
+Kierunki w tym audycie opisują wskazaną alternatywę i okres każdej karty. Nie wolno sumować tych znaków jak dni albo kwot. Paski gry są osobną ilustracją tematów zagranych kart: urlop daje czas, świadczenie symbolizuje wsparcie finansowe, a nauka i formalności dają wiedzę kosztem odrobiny czasu. Praca podczas urlopu ogranicza wolny czas; sama rezerwacja nie daje wypłaty ani wolnego teraz. Te autorskie efekty wizualne nie są kwotami, dniami, punktami ani prognozą kalkulatora. Źródła uzasadniają treść kart, nie siłę pasków. Profil końcowy wskazuje dominujący motyw; remisy pokazują wszystkie profile. Bieżące i przyszłe skutki kart opisano osobno.
 
 ## 1A · Macierzyński od narodzin
 
@@ -46,19 +46,19 @@ Wskaźnik czasu w tym podglądzie opisuje dostępność rodzica w wskazanej alte
 
 **Podstawy:** [prebirth](../Documents/legal/rules.md#prebirth), [maternity-pool](../Documents/legal/rules.md#maternity-pool), [standard-rates](../Documents/legal/rules.md#standard-rates), [base](../Documents/legal/rules.md#base).
 
-## 1C · Zdrowie na pierwszym miejscu
+## 1C · Poznaj zasady chorobowego
 
-**Porównanie:** Rozliczenie istniejącej, potwierdzonej niezdolności do pracy; choroba nie jest wyborem gracza.
+**Porównanie:** Poznanie zasad świadczenia chorobowego w ciąży, bez zmiany sytuacji rodziny.
 
-**Okres:** Okres z e-ZLA.
+**Okres:** Informacja ogólna.
 
-**Pieniądze — zależne od danych:** Sprawdza się ubezpieczenie, wyczekiwanie i wyjątki, wykorzystany okres oraz podział na wynagrodzenie chorobowe i zasiłek. Nie obiecujemy automatycznej wypłaty ani pełnej pensji netto.
+**Pieniądze — bez zmiany:** Karta edukacyjna nie zmienia ubezpieczenia, podstawy ani prawa do świadczenia.
 
-**Czas — bez zmiany:** Karta dokumentuje istniejącą niezdolność. Nie tworzy dodatkowego wolnego ani dowodu zdolności do opieki nad dzieckiem.
+**Czas — bez zmiany:** Karta nie tworzy zwolnienia ani dni wolnych.
 
-**Później:** Okres zasiłkowy jest zużywany; chorobowe nie odejmuje dni macierzyńskiego.
+**Później:** W indywidualnej sprawie znaczenie mają potwierdzone ubezpieczenie, e-ZLA i wykorzystany okres.
 
-**Podstawy:** [sick-right](../Documents/legal/rules.md#sick-right), [sick-money](../Documents/legal/rules.md#sick-money), [sick-docs](../Documents/legal/rules.md#sick-docs), [base](../Documents/legal/rules.md#base), [debt](../Documents/legal/rules.md#debt).
+**Podstawy:** [sick-right](../Documents/legal/rules.md#sick-right), [sick-money](../Documents/legal/rules.md#sick-money).
 
 ## 1D · Kto wypłaca świadczenie?
 
@@ -88,19 +88,19 @@ Wskaźnik czasu w tym podglądzie opisuje dostępność rodzica w wskazanej alte
 
 **Podstawy:** [base](../Documents/legal/rules.md#base).
 
-## 1F · Przygotuj rodzinny start
+## 1F · Poznaj płatnika zasiłku
 
-**Porównanie:** Przygotowanie dokumentów i rezerwacji przed przyjęciem dziecka zamiast braku przygotowanego planu.
+**Porównanie:** Poznanie zasad, kto wypłaca zasiłek, bez zmiany sytuacji rodziny.
 
-**Okres:** Przed przyjęciem dziecka.
+**Okres:** Informacja ogólna.
 
-**Pieniądze — bez zmiany:** Prognoza po przyszłym przyjęciu nie jest obecnym świadczeniem.
+**Pieniądze — bez zmiany:** Informacja o płatniku nie zmienia kwoty świadczenia.
 
-**Czas — bez zmiany:** Przygotowanie planu nie zwalnia jeszcze z pracy i nie zużywa dni urlopu.
+**Czas — bez zmiany:** Karta nie planuje urlopów ani bloków opieki.
 
-**Później:** Uprawnienie zależy od faktycznego przyjęcia, właściwej ścieżki, wieku dziecka, wniosku i ubezpieczenia.
+**Później:** Płatnik zależy od tytułu ubezpieczenia i ustawowego progu zatrudnienia.
 
-**Podstawy:** [adoption](../Documents/legal/rules.md#adoption), [insured-parent](../Documents/legal/rules.md#insured-parent), [base](../Documents/legal/rules.md#base).
+**Podstawy:** [payer](../Documents/legal/rules.md#payer), [insured-parent](../Documents/legal/rules.md#insured-parent).
 
 ## 2A · Razem na starcie
 
@@ -118,13 +118,13 @@ Wskaźnik czasu w tym podglądzie opisuje dostępność rodzica w wskazanej alte
 
 ## 2B · Tydzień teraz, reszta później
 
-**Porównanie:** Pierwsza część ojcowskiego teraz zamiast wykorzystania całej puli od razu.
+**Porównanie:** Pierwsza część ojcowskiego teraz zamiast wykorzystania całej puli w tym wczesnym okresie.
 
 **Okres:** Początek po narodzinach.
 
 **Pieniądze — zależne od danych:** Za wykorzystane dni jest zasiłek, za pozostałe faktycznie przepracowane dni wynagrodzenie. Kierunek dochodu wymaga porównania tych kwot.
 
-**Czas — spadek:** Ojciec ma teraz krótszy urlop niż przy wykorzystaniu całej puli. W dniach pozostawionych na później wraca do pracy.
+**Czas — spadek:** W porównaniu z wykorzystaniem całej puli od razu tata ma teraz krótszy urlop. Pozostałe dni nie przepadają — można je zaplanować później w legalnym terminie.
 
 **Później:** Pozostaje część ojcowskiego do wykorzystania w legalnym terminie; rezerwa nie jest jeszcze opieką ani wypłatą.
 
@@ -144,47 +144,47 @@ Wskaźnik czasu w tym podglądzie opisuje dostępność rodzica w wskazanej alte
 
 **Podstawy:** [paternity](../Documents/legal/rules.md#paternity), [standard-rates](../Documents/legal/rules.md#standard-rates), [base](../Documents/legal/rules.md#base).
 
-## 2D · Uzupełniający dla mamy
+## 2D · Poznaj dodatkowy urlop po hospitalizacji
 
-**Porównanie:** Uprawniony uzupełniający mamy zamiast jej powrotu do pracy po podstawowym macierzyńskim.
+**Porównanie:** Poznanie zasad dodatkowego urlopu po kwalifikującej hospitalizacji, bez dodawania dni.
 
-**Okres:** Blok bezpośrednio po macierzyńskim.
+**Okres:** Informacja ogólna.
 
-**Pieniądze — zależne od danych:** Świadczenie zastępuje pracę w tym bloku. Kierunek dochodu wobec wynagrodzenia zależy od indywidualnej podstawy.
+**Pieniądze — bez zmiany:** Karta informacyjna nie przyznaje zasiłku ani nie zmienia jego wysokości.
 
-**Czas — wzrost:** Dochodzi należny blok wolnego mamy, bez zużywania puli rodzicielskiego. Liczą się kwalifikujące pobyty szpitalne, a nie dowolna hospitalizacja.
+**Czas — bez zmiany:** Karta nie dodaje urlopu; wymiar zależy od warunków i udokumentowanej hospitalizacji.
 
-**Później:** Kolejne bloki trzeba przesunąć i ponownie sprawdzić terminy; brak drugiego uzupełniającego dla taty za tę samą sprawę.
+**Później:** Sprawdź przepisy i dokumenty w razie kwalifikującego pobytu dziecka w szpitalu.
 
-**Podstawy:** [supplementary](../Documents/legal/rules.md#supplementary), [standard-rates](../Documents/legal/rules.md#standard-rates), [base](../Documents/legal/rules.md#base).
+**Podstawy:** [supplementary](../Documents/legal/rules.md#supplementary).
 
-## 2E · Uzupełniający dla taty
+## 2E · Poznaj terminy wniosków urlopowych
 
-**Porównanie:** Uprawniony uzupełniający taty zamiast jego pracy po podstawowym macierzyńskim.
+**Porównanie:** Poznanie terminów wniosków urlopowych, bez zmiany planu rodziny.
 
-**Okres:** Blok bezpośrednio po macierzyńskim.
+**Okres:** Informacja ogólna.
 
-**Pieniądze — zależne od danych:** Zastępujemy pracę ojca zasiłkiem od jego podstawy. Nie zakładamy automatycznie powrotu mamy do pracy ani jej wynagrodzenia.
+**Pieniądze — bez zmiany:** Poznanie terminów nie zmienia świadczeń ani wynagrodzenia.
 
-**Czas — wzrost:** Ojciec korzysta z należnego bloku. Wybór rodzica nie powiększa łącznego wymiaru uzupełniającego.
+**Czas — bez zmiany:** Karta nie planuje ani nie przyznaje urlopu.
 
-**Później:** Uprawnienie jest realizowane jednorazowo przez jednego rodzica; kolejne okresy muszą uwzględniać nowy kalendarz.
+**Później:** Termin zależy od rodzaju urlopu i sytuacji rodziny.
 
-**Podstawy:** [supplementary](../Documents/legal/rules.md#supplementary), [standard-rates](../Documents/legal/rules.md#standard-rates), [insured-parent](../Documents/legal/rules.md#insured-parent), [base](../Documents/legal/rules.md#base).
+**Podstawy:** [paternity](../Documents/legal/rules.md#paternity), [supplementary](../Documents/legal/rules.md#supplementary).
 
-## 2F · Witaj w rodzinie
+## 2F · Poznaj dokumenty do zasiłku
 
-**Porównanie:** Rzeczywisty uprawniony blok po przyjęciu dziecka zamiast pracy wybranego rodzica w tym okresie.
+**Porównanie:** Poznanie dokumentów potrzebnych do zasiłku, bez ich składania.
 
-**Okres:** Blok po przyjęciu dziecka.
+**Okres:** Informacja ogólna.
 
-**Pieniądze — zależne od danych:** Kwotę ustala się z podstawy wybranego rodzica i właściwego wariantu; rezerwacja z wcześniejszej rundy nie była wypłatą.
+**Pieniądze — bez zmiany:** Karta nie składa wniosku ani nie wpływa na wysokość świadczenia.
 
-**Czas — wzrost:** Powstaje faktyczny okres korzystania z uprawnienia. Dla niepracownika opisujemy okres świadczenia, nie urlop pracowniczy.
+**Czas — bez zmiany:** Karta nie dodaje urlopu ani dni opieki.
 
-**Później:** Przyjęcie, postępowanie adopcyjne, piecza i granice wieku mają odrębne reguły; nie liczymy ich wszystkich od daty urodzenia.
+**Później:** Wymagane dokumenty zależą od płatnika i sytuacji rodzinnej.
 
-**Podstawy:** [adoption](../Documents/legal/rules.md#adoption), [insured-parent](../Documents/legal/rules.md#insured-parent), [standard-rates](../Documents/legal/rules.md#standard-rates), [base](../Documents/legal/rules.md#base).
+**Podstawy:** [birth-docs](../Documents/legal/rules.md#birth-docs), [payer](../Documents/legal/rules.md#payer).
 
 ## 3A · Więcej na początku
 
@@ -228,47 +228,47 @@ Wskaźnik czasu w tym podglądzie opisuje dostępność rodzica w wskazanej alte
 
 **Podstawy:** [transfer](../Documents/legal/rules.md#transfer), [maternity-pool](../Documents/legal/rules.md#maternity-pool), [standard-rates](../Documents/legal/rules.md#standard-rates), [base](../Documents/legal/rules.md#base).
 
-## 3D · Teczka bez braków
+## 3D · Poznaj listę dokumentów
 
-**Porównanie:** Skompletowanie dokumentów dla tego samego istniejącego uprawnienia i planu.
+**Porównanie:** Poznanie formularzy i danych potrzebnych do sprawy, bez składania wniosków.
 
-**Okres:** Etap formalności.
+**Okres:** Informacja ogólna.
 
-**Pieniądze — bez zmiany:** Samo uzupełnienie dokumentów nie podwyższa należnej kwoty. Korekta błędnych danych może zmienić wcześniejsze wyliczenie, ale wymaga faktycznej zmiany danych.
+**Pieniądze — bez zmiany:** Karta edukacyjna nie składa dokumentów ani nie zmienia kwoty świadczenia.
 
-**Czas — bez zmiany:** Formalności nie dodają dni wolnych. Nie przypisujemy im umownej liczby dni opieki.
+**Czas — bez zmiany:** Karta nie dodaje urlopu ani dni opieki.
 
-**Później:** Komplet dokumentów pomaga prowadzić sprawę, ale nie jest obietnicą określonego dnia przelewu.
+**Później:** Lista wymaganych dokumentów zależy od płatnika i tytułu ubezpieczenia.
 
-**Podstawy:** [birth-docs](../Documents/legal/rules.md#birth-docs), [payer](../Documents/legal/rules.md#payer), [base](../Documents/legal/rules.md#base), [debt](../Documents/legal/rules.md#debt), [floor](../Documents/legal/rules.md#floor).
+**Podstawy:** [birth-docs](../Documents/legal/rules.md#birth-docs), [payer](../Documents/legal/rules.md#payer), [base](../Documents/legal/rules.md#base), [debt](../Documents/legal/rules.md#debt).
 
-## 3E · Uwzględnij dodatkowy wymiar
+## 3E · Poznaj dodatkowe uprawnienia
 
-**Porównanie:** Potwierdzenie dodatkowego wymiaru z istniejącego zaświadczenia bez dopisania nowego bloku urlopu.
+**Porównanie:** Poznanie zasad dodatkowych uprawnień, bez potwierdzania zaświadczenia.
 
-**Okres:** Potwierdzenie uprawnienia.
+**Okres:** Informacja ogólna.
 
-**Pieniądze — bez zmiany:** Większa pula sama nie jest bieżącym dochodem; kwoty zmieniają się po wykorzystaniu zaplanowanych okresów.
+**Pieniądze — bez zmiany:** Karta nie przyznaje dodatkowego uprawnienia ani świadczenia.
 
-**Czas — bez zmiany:** Dostępny wymiar rośnie, ale bieżący czas wolny nie zmienia się, dopóki nowe dni nie zostaną rzeczywiście zaplanowane.
+**Czas — bez zmiany:** Karta nie dodaje urlopu do planu.
 
-**Później:** Nowe bloki mogą wydłużyć opiekę; nadal obowiązują części wyłączne, właściwa ścieżka przyjęcia i terminy.
+**Później:** Wymiar zależy od właściwego zaświadczenia oraz liczby dzieci.
 
-**Podstawy:** [za-zyciem](../Documents/legal/rules.md#za-zyciem), [parental-pool](../Documents/legal/rules.md#parental-pool), [parental-parts](../Documents/legal/rules.md#parental-parts), [parental-docs](../Documents/legal/rules.md#parental-docs).
+**Podstawy:** [za-zyciem](../Documents/legal/rules.md#za-zyciem), [parental-pool](../Documents/legal/rules.md#parental-pool).
 
-## 3F · Świadczenie po końcu umowy
+## 3F · Poznaj wybór wariantu wypłaty
 
-**Porównanie:** Udokumentowanie ustawowej ścieżki po ustaniu ubezpieczenia; bez założenia, że sprawa została już rozstrzygnięta.
+**Porównanie:** Poznanie standardowego i uśrednionego wariantu wypłaty, bez zmiany planu.
 
-**Okres:** Potwierdzanie prawa po porodzie.
+**Okres:** Informacja ogólna.
 
-**Pieniądze — zależne od danych:** Po potwierdzeniu przesłanek możliwa jest należna wypłata. Sam koniec umowy ani złożenie dokumentów nie daje automatycznej wypłaty; nie przywracamy pensji z byłej pracy.
+**Pieniądze — bez zmiany:** Karta nie wybiera wariantu ani nie zmienia wysokości świadczenia.
 
-**Czas — bez zmiany:** Dokumentowanie prawa do świadczenia nie zmienia samo w sobie czasu pracy ani puli dni już należnych w tym scenariuszu.
+**Czas — bez zmiany:** Karta nie dodaje urlopu ani dni opieki.
 
-**Później:** Świadczenie przed porodem i po porodzie mają odrębne przesłanki oraz okresy.
+**Później:** Porównanie wariantów wymaga rzeczywistej podstawy oraz planowanych okresów urlopu.
 
-**Podstawy:** [job-loss-after](../Documents/legal/rules.md#job-loss-after), [insured-parent](../Documents/legal/rules.md#insured-parent), [payer](../Documents/legal/rules.md#payer), [base](../Documents/legal/rules.md#base).
+**Podstawy:** [standard-rates](../Documents/legal/rules.md#standard-rates), [averaged](../Documents/legal/rules.md#averaged), [exclusive-rate](../Documents/legal/rules.md#exclusive-rate).
 
 ## 4A · Opieka na zmianę
 

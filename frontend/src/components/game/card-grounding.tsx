@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useId, useRef } from "react";
 import legal from "../../../../shared/legal-rules.json";
 import params from "../../../../backend/app/data/params.json";
 import manifest from "../../../../Documents/legal/manifest.json";
@@ -11,7 +11,7 @@ const sourceTitles: Record<string, string> = Object.fromEntries(manifest.map((so
 
 const labels: Record<string, string> = {
   description: "Co oznacza ta decyzja?", conditions: "Kiedy możesz skorzystać?",
-  "stats.money": "Pieniądze", "stats.time": "Czas", "stats.happiness": "Szczęście",
+  "stats.money": "Pieniądze", "stats.time": "Czas", "stats.knowledge": "Wiedza",
   "rates.sick_pregnancy": "Chorobowe w ciąży", "rates.maternity": "Macierzyński",
   "rates.parental": "Rodzicielski", "rates.averaged": "Wariant uśredniony",
   "rates.care": "Opiekuńczy", "rates.paternity": "Ojcowski", "rates.supplementary": "Uzupełniający",
@@ -61,39 +61,30 @@ function parameterValue(path: string) {
 export function CardGrounding({ card }: { card: Card }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const headingId = useId();
-  const [field, setField] = useState("description");
   const design = card.design;
   if (!design) return null;
-  const claims = design.claims;
   const signals = getCardSignals(card);
-  const explanation = field.startsWith("parameter:") ? "Wartość z konfiguracji podglądu. W konkretnej sprawie trzeba zastosować wersję właściwą dla daty zdarzenia i sprawdzić wyjątki." :
-    field === "description" ? design.description : field === "conditions" ? design.conditions :
-    field === "stats.money" ? signals?.moneyReason ?? design.stats.money.explanation : field === "stats.time" ? signals?.timeReason ?? design.stats.time.explanation :
-    "Szczęście jest umownym bilansem pieniędzy i czasu w opisanym porównaniu: poprawa jednego obszaru i pogorszenie drugiego równoważą się. Gdy wpływ na dochód lub czas jest nieznany, bilans też pozostaje niepewny. To mechanika gry, nie miara zdrowia ani gwarancja samopoczucia.";
-  const ruleIds = field === "stats.money" || field === "stats.time" ? signals?.ruleIds ?? [] : design.claims.find((claim) => claim.field === field)?.rule_ids ?? [];
+  const ruleIds = [...new Set([...design.claims.flatMap((claim) => claim.rule_ids), ...signals?.ruleIds ?? []])];
   const rules = legal.rules.filter((rule) => ruleIds.includes(rule.id));
-  function inspect(next: string) { setField(next); if (!dialog.current?.open) dialog.current?.showModal(); }
-  function hint(next: string, text: string) {
-    const refs = next === "stats.money" || next === "stats.time" ? signals?.ruleIds ?? [] : claims.find((claim) => claim.field === next)?.rule_ids ?? [];
-    const locators = legal.rules.filter((rule) => refs.includes(rule.id)).flatMap((rule) => rule.evidence.map((e) => `${sourceTitles[e.document_id]} · ${e.locator}`));
-    return `${text}\n${locators.slice(0, 3).join("; ")}\nKliknij, aby przeczytać uzasadnienie.`;
-  }
+  function inspect() { if (!dialog.current?.open) dialog.current?.showModal(); }
   return <>
-    <p className="grounded-description"><button className="grounded-text" onClick={() => inspect("description")}
-      title={hint("description", design.description)}>{design.description}<span aria-hidden="true"> ⓘ</span></button></p>
-    <button className="card-conditions" onClick={() => inspect("conditions")} title={hint("conditions", design.conditions)}>Warunki zagrania <span aria-hidden="true">↗</span></button>
+    <p className="grounded-description"><button className="grounded-text" onClick={inspect}
+      title="Otwórz pełne wyjaśnienie i źródła">{design.description}<span aria-hidden="true"> ⓘ</span></button></p>
+    <button className="card-conditions" onClick={inspect}>Warunki zagrania <span aria-hidden="true">↗</span></button>
     <dialog ref={dialog} className="evidence-dialog" aria-labelledby={headingId}
       onCancel={(event) => { event.preventDefault(); dialog.current?.close(); }}>
       <header className="dialog-heading"><div><p className="eyebrow">Karta {card.id} · {card.title}</p>
-        <h2 id={headingId}>{labels[field.replace("parameter:", "")] ?? "Podstawa informacji"}</h2></div>
+        <h2 id={headingId}>Jak działa ta karta?</h2></div>
         <button className="button" autoFocus onClick={() => dialog.current?.close()}>Zamknij wyjaśnienie</button></header>
     <div className="card-effects" aria-label="Wpływ decyzji">
-      <button onClick={() => inspect("stats.money")} title={hint("stats.money", signals?.moneyReason ?? design.stats.money.explanation)}><span aria-hidden="true">zł</span><strong>Pieniądze</strong><small>{signals?.money.label ?? "Budżet rodziny"}</small></button>
-      <button onClick={() => inspect("stats.time")} title={hint("stats.time", signals?.timeReason ?? design.stats.time.explanation)}><span aria-hidden="true">◷</span><strong>Czas</strong><small>{signals?.time.label ?? "Plan opieki"}</small></button>
-      <button onClick={() => inspect("stats.happiness")} title="Bilans pieniędzy i czasu; kliknij, aby poznać zasady."><span aria-hidden="true">☺</span><strong>Szczęście</strong><small>{signals?.happiness.label ?? "Bilans planu"}</small></button>
+      <section><span aria-hidden="true">zł</span><h3>Pieniądze · {signals?.money.label}</h3><p>{signals?.moneyReason ?? design.stats.money.explanation}</p></section>
+      <section><span aria-hidden="true">◷</span><h3>Czas · {signals?.time.label}</h3><p>{signals?.timeReason ?? design.stats.time.explanation}</p></section>
+      <section><span aria-hidden="true">i</span><h3>Wiedza · {signals?.knowledge.label}</h3><p>{signals?.knowledgeReason}</p></section>
     </div>
-      <p className="evidence-explanation">{explanation}</p>
-      {signals && !field.startsWith("parameter:") && <section className="impact-context" aria-label="Założenia porównania">
+      <p className="evidence-explanation">{design.description}</p>
+      <p><strong>Warunki:</strong> {design.conditions}</p>
+      <p className="muted">Paski są wizualną mechaniką gry. Źródła poniżej opisują zasady świadczeń i urlopów; nie określają siły pasków.</p>
+      {signals && <section className="impact-context" aria-label="Założenia porównania">
         <p><strong>Porównujemy:</strong> {signals.comparison}</p>
         <p><strong>Okres:</strong> {signals.period}.</p>
         <p><strong>Później:</strong> {signals.later}</p>
@@ -108,14 +99,10 @@ export function CardGrounding({ card }: { card: Card }) {
         </div>)}
         {rule.external_verification && <p className="muted"><a href={rule.external_verification.url} target="_blank" rel="noreferrer">Sprawdź pełny tekst ustawy: {rule.external_verification.locator} ↗</a></p>}
       </section>)}
-      {field !== "stats.happiness" && <>
         <p className="evidence-version">Materiał konkursowy ZUS. Cytat sprawdzony w dostarczonym pliku; zastosowanie przepisu zależy od daty i okoliczności sprawy.</p>
-        {design.parameter_refs.length > 0 && <details className="parameter-list"><summary>Wartości i limity powiązane z kartą</summary>
-          <p className="muted">Najedź na wartość lub kliknij ją, aby sprawdzić jej źródło.</p>
-          {design.parameter_refs.map((path) => <button key={path} className="parameter-item" onClick={() => { setField(`parameter:${path}`); if (dialog.current) dialog.current.scrollTop = 0; }}
-            title={hint(`parameter:${path}`, labels[path] ?? "Parametr świadczenia")}><span>{labels[path] ?? "Parametr świadczenia"}</span><strong>{parameterValue(path)} ⓘ</strong></button>)}
-        </details>}
-      </>}
+        {design.parameter_refs.length > 0 && <section className="parameter-list"><h3>Wartości i limity powiązane z kartą</h3>
+          {design.parameter_refs.map((path) => <div key={path} className="parameter-item"><span>{labels[path] ?? "Parametr świadczenia"}</span><strong>{parameterValue(path)}</strong></div>)}
+        </section>}
       {design.notes && <p className="muted">Ta ścieżka wymaga uzupełnienia parametrów przed uruchomieniem wyliczeń.</p>}
     </dialog>
   </>;

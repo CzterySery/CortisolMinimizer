@@ -15,6 +15,7 @@ const slot = (key: string) => ({ get: () => read(key), set: (v?: string) => writ
 
 export const userToken = slot("zp.user");
 export const adminToken = slot("zp.admin");
+export const savedGame = slot("zp.game.v1");
 
 // The plan the user built in the calculator, read by /applications (their own case, never a game result).
 export const myPlan = {

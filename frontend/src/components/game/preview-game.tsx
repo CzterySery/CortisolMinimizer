@@ -4,22 +4,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Card, GamePreview } from "@/types/game";
 import { api, type S } from "@/lib/api";
-import { planHandoff } from "@/lib/session";
+import { planHandoff, savedGame } from "@/lib/session";
+import { getCardSignals } from "@/lib/card-signals";
+import { gameProfiles, gameScores } from "@/lib/game-result";
 import { GameBoard } from "./game-board";
-import { DeckLibrary } from "./deck-library";
-import { CareCalendar } from "@/components/plan/care-calendar";
-import { BudgetChart } from "@/components/plan/budget-chart";
 
 type Simulation = S["GameSimulation"];
 type Scenario = NonNullable<S["SimulationRequest"]["scenario_id"]>;
 const scenarioLabels: Record<Scenario, string> = {
   standard: "Wspólny początek", hospital: "Powrót ze szpitala", "za-zyciem": "Dodatkowe wsparcie",
 };
-const modes = [
-  { id: "calm", title: "Kortyzol Minimizer", text: "Ciągłość opieki i stabilny budżet." },
-  { id: "benefits", title: "Zasiłki Maxing", text: "Dochód rodziny i należne świadczenia." },
-  { id: "aura", title: "Aura Farming", text: "Wspólny czas i podział opieki." },
-];
 
 function draw(pool: Card[], count: number): Card[] {
   const cards = [...pool];
@@ -36,17 +30,21 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
   const [hand, setHand] = useState<Card[]>([]);
   const [scenario, setScenario] = useState<Scenario>("standard");
   const [simulation, setSimulation] = useState<Simulation>();
-  const [mode, setMode] = useState(modes[0]);
-  const [library, setLibrary] = useState(false);
+  const [baseline, setBaseline] = useState<Simulation["statistics"]>();
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [dealKey, setDealKey] = useState(0);
   const [busy, setBusy] = useState(true);
+  const [ready, setReady] = useState(false);
   const [error, setError] = useState<string>();
   const router = useRouter();
   const generation = useRef(0);
   const playing = useRef(false);
   const round = preview.rounds[played.length];
   const focused = simulation?.candidates.find((card) => card.id === focusedId && card.available);
+  const signalCard = focused ? hand.find((card) => card.id === focused.id) : played.at(-1);
+  const playedSignals = played.flatMap((card) => { const signal = getCardSignals(card); return signal ? [signal] : []; });
+  const hoveredSignal = focused && signalCard ? getCardSignals(signalCard) : undefined;
+  const visualBalance = gameScores(hoveredSignal ? [...playedSignals, hoveredSignal] : playedSignals);
 
   async function load(selected: string[], scenarioId: Scenario) {
     const response = await api.POST("/api/v1/game/simulate", { body: { selected, scenario_id: scenarioId } });
@@ -71,7 +69,8 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
     try {
       const data = await load([], nextScenario);
       if (current !== generation.current) return;
-      setScenario(nextScenario); setSimulation(data); setPlayed([]); installHand(data, 0);
+      setScenario(nextScenario); setSimulation(data); setBaseline(data.statistics); setPlayed([]); installHand(data, 0);
+      setReady(true);
       setDealKey((key) => key + 1);
     } catch (cause) {
       if (current === generation.current) setError(cause instanceof Error ? cause.message : "Brak połączenia z kalkulatorem.");
@@ -80,10 +79,33 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
 
   useEffect(() => {
     let cancelled = false;
-    load([], "standard").then((data) => { if (!cancelled) { setSimulation(data); installHand(data, 0); setBusy(false); } })
+    let stored: { selected: string[]; hand: string[]; scenario: Scenario } | undefined;
+    try {
+      const value = JSON.parse(savedGame.get() ?? "null");
+      if (value && Object.hasOwn(scenarioLabels, value.scenario) && Array.isArray(value.selected)
+        && value.selected.length <= preview.total_rounds && value.selected.every((id: unknown, index: number) =>
+          preview.rounds[index]?.cards.some((card) => card.id === id))
+        && Array.isArray(value.hand) && value.hand.length === (value.selected.length === preview.total_rounds ? 0 : preview.hand_size)
+        && new Set(value.hand).size === value.hand.length && value.hand.every((id: unknown) =>
+          preview.rounds[value.selected.length]?.cards.some((card) => card.id === id))) stored = value;
+    } catch { /* Ignore malformed or unavailable storage. */ }
+    const scenarioId = stored?.scenario ?? "standard";
+    const selected = stored?.selected ?? [];
+    load(selected, scenarioId).then((data) => { if (!cancelled) {
+      setScenario(scenarioId); setSimulation(data); setBaseline(data.statistics);
+      setPlayed(selected.map((id, index) => preview.rounds[index].cards.find((card) => card.id === id)!));
+      if (stored) setHand(stored.hand.map((id) => preview.rounds[selected.length].cards.find((card) => card.id === id)!));
+      else installHand(data, 0);
+      setReady(true); setBusy(false);
+    } })
       .catch(() => { if (!cancelled) { setError("Nie można połączyć się z kalkulatorem. Użyj przycisku Nowe rozdanie."); setBusy(false); } });
     return () => { cancelled = true; };
-  }, [installHand]);
+  }, [installHand, preview]);
+
+  useEffect(() => {
+    if (ready && !busy) savedGame.set(JSON.stringify({ selected: played.map((card) => card.id),
+      hand: hand.map((card) => card.id), scenario }));
+  }, [ready, busy, played, hand, scenario]);
 
   async function play(cardId: string) {
     const card = hand.find((item) => item.id === cardId);
@@ -109,39 +131,22 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
   return <>
     <GameBoard mode="preview" stages={preview.rounds} currentRound={round?.id ?? null}
       totalRounds={preview.total_rounds} handSize={preview.hand_size}
-      statistics={simulation?.statistics ?? preview.statistics} projected={focused?.statistics}
+      statistics={simulation?.statistics ?? preview.statistics} baseline={baseline} projected={focused?.statistics}
+      simulation={{ signals: getCardSignals(signalCard), title: signalCard?.title, hovering: !!focused, balance: visualBalance }}
       played={played} hand={hand} dealKey={dealKey} busy={busy} unavailable={unavailable}
       onFocusCard={setFocusedId} onUnfocusCard={(id) => setFocusedId((current) => current === id ? null : current)}
       onPlay={play} onReset={() => void restart()}
+      finishedHand={simulation && <section className="game-result" aria-labelledby="game-result-title" role="status">
+          <p className="eyebrow">Twój profil · {gameProfiles(playedSignals).length > 1 ? "Remis" : "Koniec gry"}</p>
+          <h2 id="game-result-title">{gameProfiles(playedSignals).map((profile) => profile.title).join(" + ")}</h2>
+          <p>Twój styl wynika z zagranych kart: czasu na opiekę, wsparcia finansowego i zdobytej wiedzy.</p>
+          <div className="actions">
+          <button className="button button-primary" onClick={() => { planHandoff.put(simulation.plan); router.push("/calculator"); }}>Pokaż ten scenariusz w kalkulatorze</button>
+          </div>
+        </section>}
       belowHand={<>
         {error && <p className="game-error" role="alert">{error}</p>}
         {busy && <p className="sr-only" role="status">Przeliczam wspólny plan rodziny.</p>}
-        {simulation && played.length === preview.total_rounds && <div className="actions">
-          <button className="button button-primary" onClick={() => { planHandoff.put(simulation.plan); router.push("/calculator"); }}>Przelicz ten plan w kalkulatorze</button>
-        </div>}
-        <section className="deck-toolbar" aria-label="Talia i historia rodziny">
-          <div><p className="eyebrow">Talia rodzicielskich decyzji</p><h2>30 kart. Wasz własny układ.</h2><p>5 etapów · po 6 kart w puli · 3 karty w ręce</p></div>
-          <div className="deck-toolbar-actions"><button className="button" onClick={() => setLibrary(true)}>Przejrzyj 30 kart</button>
-            <button className="button button-primary" onClick={() => void restart()} disabled={busy}>Nowe rozdanie</button></div>
-          <label className="scenario-picker">Przykładowa historia <select value={scenario} disabled={busy} onChange={(event) => void restart(event.target.value as Scenario)}>
-            {Object.entries(scenarioLabels).map(([id, title]) => <option value={id} key={id}>{title}</option>)}
-          </select></label>
-          <p className="deck-disclaimer">{simulation?.scenario.description} Kwoty są orientacyjne: kalkulator pomija PIT i upraszcza pensję za część miesiąca. Stosuje parametry z dnia narodzin do całego planu.</p>
-        </section>
-        {simulation && <details className="game-plan-details"><summary>Wasze dni i podstawa planu</summary>
-          <p>Rodzicielski: <strong>{(focused?.pools ?? simulation.result.pools).parental_days_left} dni</strong> do zaplanowania · Ojcowski: <strong>{(focused?.pools ?? simulation.result.pools).paternity_days_left} dni</strong> · Części rodzicielskiego: {(focused?.pools ?? simulation.result.pools).parental_parts_used} wykorzystanych.</p>
-          <p>Pełny macierzyński jest w planie od początku. Dni przed porodem skracają część po porodzie. Rezerwacje nie są dodatkowym urlopem.</p>
-          <div className="actions"><a href="/sources/labour-code#article-180" target="_blank" rel="noreferrer">Macierzyński: art. 180 ↗</a><a href="/sources/labour-code#article-1821a" target="_blank" rel="noreferrer">Rodzicielski: art. 182¹a ↗</a><a href="/sources/labour-code#article-1823" target="_blank" rel="noreferrer">Ojcowski: art. 182³ ↗</a></div>
-          <p>Paski: najniższy miesięczny dochód oraz pokrycie potrzeb opieki w stałym okresie {simulation.horizon_start} – {simulation.horizon_end}. Szczęście jest równym bilansem obu wskaźników, nie wynikiem medycznym.</p>
-          <CareCalendar calendar={simulation.result.calendar} />
-          <BudgetChart months={simulation.result.months} />
-          <ul className="explain">{simulation.result.explain.map((item, index) => <li key={index}>{item.text} <cite>{item.rule}</cite></li>)}</ul>
-          {simulation.result.issues.map((issue) => <p key={issue.code}>{issue.text} · {issue.rule}</p>)}
-        </details>}
       </>} />
-    <section className="mode-footer" aria-label="Cele planowania"><div className="mode-options" role="group" aria-label="Wybierz cel planu">
-      {modes.map((item) => <button key={item.id} className={`mode-option ${mode.id === item.id ? "selected" : ""}`} aria-pressed={mode.id === item.id} onClick={() => setMode(item)}><strong>{item.title}</strong><span>{item.text}</span></button>)}
-    </div></section>
-    <DeckLibrary open={library} onClose={() => setLibrary(false)} rounds={preview.rounds} />
   </>;
 }

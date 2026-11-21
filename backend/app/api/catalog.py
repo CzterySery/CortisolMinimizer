@@ -35,7 +35,7 @@ def preview() -> Preview:
         statistics=[
             Statistic(id="money", label="Pieniądze", unit="zł"),
             Statistic(id="time", label="Czas", unit="dni"),
-            Statistic(id="happiness", label="Szczęście", unit="pkt"),
+            Statistic(id="knowledge", label="Wiedza", value=50, max=100, unit="pkt"),
         ],
         rounds=get_catalog().rounds,
     )

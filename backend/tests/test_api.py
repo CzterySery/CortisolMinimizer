@@ -62,7 +62,7 @@ def test_catalog(client):
 
 def test_board_preview(client):
     preview = client.get("/api/v1/game/preview").json()
-    assert [s["id"] for s in preview["statistics"]] == ["money", "time", "happiness"]
+    assert [s["id"] for s in preview["statistics"]] == ["money", "time", "knowledge"]
     assert len(preview["rounds"]) == 5
 
 

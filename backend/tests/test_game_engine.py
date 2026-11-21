@@ -68,17 +68,17 @@ def test_part_time_consumes_pool_once_for_extended_calendar():
     assert state.result.pools.parental_days_left == P.parental.weeks_single * 7 - amount
 
 
-def test_medical_and_special_cards_need_facts():
+def test_educational_cards_are_playable_without_special_facts():
     assert candidate(run(), "1D").available
-    assert not candidate(run(), "1C").available
-    assert candidate(run(scenario="hospital"), "1C").available
-    assert not candidate(run("1A"), "2D").available
-    assert candidate(run("1A", scenario="hospital"), "2D").available
-    assert not candidate(run("1A", "2C"), "3E").available
-    assert candidate(run("1A", "2C", scenario="za-zyciem"), "3E").available
+    for card_id in ["1C", "1F"]:
+        assert candidate(run(), card_id).available
+    for card_id in ["2D", "2E", "2F"]:
+        assert candidate(run("1A"), card_id).available
+    for card_id in ["3E", "3F"]:
+        assert candidate(run("1A", "2C"), card_id).available
 
 
-def test_medical_fact_is_preserved_without_drawing_health_card():
+def test_medical_fact_is_preserved_when_playing_an_educational_card():
     baseline = run(scenario="hospital")
     kept = run("1A", scenario="hospital")
     documented = run("1C", scenario="hospital")
@@ -92,15 +92,19 @@ def test_paperwork_does_not_create_money_or_time():
     before, after = run(), run("1E")
     assert before.result.months == after.result.months
     assert before.result.pools == after.result.pools
-    assert before.statistics == after.statistics
+    assert before.statistics[:2] == after.statistics[:2]
+    assert before.statistics[2].value == 50
+    assert after.statistics[2].value == 58
 
 
 @pytest.mark.parametrize("scenario", ["standard", "hospital", "za-zyciem"])
-def test_complete_plan_valid_and_happiness_derived(scenario):
+def test_complete_plan_valid_and_knowledge_only_increases_on_education(scenario):
     state = run("1C" if scenario == "hospital" else "1B", "2B", "3B", "4D", "5F", scenario=scenario)
     assert not [issue for issue in state.result.issues if issue.severity == "error"]
-    money, time, balance = state.statistics
-    assert balance.value == int((min(1, money.value / money.max) + time.value / time.max) * 50)
+    knowledge = state.statistics[2]
+    assert knowledge.value == 50 + (8 if scenario == "hospital" else 0)
+    assert candidate(run("1A"), "2D").statistics[2].value == 58
+    assert candidate(run("1A"), "2A").statistics[2].value == 50
     assert state.result.pools.care_days_left == P.care.days_per_year_child_under_14 - DATASET["choices"]["emergency_days"]
 
 
@@ -110,13 +114,13 @@ def test_rounds_cannot_be_skipped_or_duplicated():
             run(*selected)
 
 
-GATED = {"1D", "1F", "2F", "3F"}  # rehab, adoption/foster, end of insurance: no scenario has those facts
+GATED: set[str] = set()
 
 
-def test_every_hand_is_playable_and_every_ungated_card_completes_a_legal_plan():
+def test_every_hand_is_playable_and_every_card_completes_a_legal_plan():
     """Three walks per scenario, each round playing the least-played available card. simulate() replays the
     whole plan and raises on any legal error, so reaching round 5 proves the plan is legal. A one-off exhaustive
-    search of all ~4 350 paths (~100 s) found no round without a playable card and the same gated set."""
+    search of all ~4 350 paths (~100 s) found no round without a playable card and identified the previously gated cards."""
     played = Counter()
     for scenario in DATASET["scenarios"]:
         for _ in range(3):

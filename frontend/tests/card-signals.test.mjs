@@ -1,52 +1,66 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFile } from "node:fs/promises";
-import { combineDirections, balanceRange, getCardSignals } from "../src/lib/card-signals.ts";
+import { getCardSignals } from "../src/lib/card-signals.ts";
+import { gameProfiles, gameScores } from "../src/lib/game-result.ts";
 
 const deck = JSON.parse(await readFile(new URL("../../shared/deck-design.json", import.meta.url), "utf8"));
+const legal = JSON.parse(await readFile(new URL("../../shared/legal-rules.json", import.meta.url), "utf8"));
 const card = (id) => ({ id, design: deck.cards.find((item) => item.id === id) });
 
-test("every designed card has a sourced comparison and derived balance", () => {
+test("all 30 visual profiles have explanations and existing legal source references", () => {
   assert.equal(deck.cards.length, 30);
   for (const item of deck.cards) {
     const result = getCardSignals(card(item.id));
     assert.ok(result?.comparison && result?.period && result?.later && result?.ruleIds.length);
-    assert.equal(result.happiness.direction, combineDirections(result.money.direction, result.time.direction));
-  }
-});
-test("uncertain income cannot silently become certain happiness", () => {
-  for (const time of ["up", "same", "down", "depends"]) assert.equal(combineDirections("depends", time), "depends");
-  assert.deepEqual(balanceRange("depends", "up"), [0, 1]);
-  assert.deepEqual(balanceRange("depends", "down"), [-1, 0]);
-});
-test("equal opposite tradeoffs cancel; the balance is symmetric and monotone", () => {
-  assert.equal(combineDirections("up", "down"), "same");
-  assert.equal(combineDirections("same", "same"), "same");
-  assert.equal(combineDirections("up", "same"), "up");
-  assert.equal(combineDirections("down", "same"), "down");
-  for (const money of ["down", "same", "up", "depends"]) {
-    let previous = -Infinity;
-    for (const time of ["down", "same", "up"]) {
-      const range = balanceRange(money, time);
-      assert.deepEqual(range, balanceRange(time, money));
-      assert.ok(range[0] >= previous && range[0] <= range[1]);
-      previous = range[0];
+    assert.ok(result.moneyReason && result.timeReason && result.knowledgeReason);
+    for (const id of result.ruleIds) assert.ok(legal.rules.some((rule) => rule.id === id), `${item.id}: ${id}`);
+    for (const id of ["money", "time", "knowledge"]) {
+      assert.ok(Number.isFinite(result[id].emphasis));
+      assert.equal(/\d/.test(result[id].label), false);
     }
   }
 });
-test("deferral and part-time do not invent present free time", () => {
-  for (const id of ["1A", "2B", "2C", "4C", "4D", "5C"]) {
+test("reservations give no payout; work reduces time; leave adds time and support", () => {
+  for (const id of ["2C", "4D"]) {
     const result = getCardSignals(card(id));
     assert.equal(result.time.direction, "down", id);
-    assert.equal(result.money.direction, "depends", id);
+    assert.equal(result.money.direction, "same", id);
   }
+  for (const id of ["4C", "5C"]) assert.equal(getCardSignals(card(id)).time.direction, "down");
+  for (const id of ["1A", "1B", "2A", "2B", "3C", "4A", "4B", "4E", "4F", "5A", "5B", "5D", "5E", "5F"]) {
+    assert.equal(getCardSignals(card(id)).time.direction, "up", id);
+    assert.equal(getCardSignals(card(id)).money.direction, "up", id);
+  }
+  assert.ok(getCardSignals(card("2B")).time.emphasis < getCardSignals(card("2A")).time.emphasis);
 });
-test("paperwork/reservations do not create income, leave or happiness", () => {
-  for (const id of ["1F", "3D", "3E"]) {
+test("learning and paperwork add knowledge at a small time cost without granting money", () => {
+  for (const id of ["1C", "1D", "1E", "1F", "2D", "2E", "2F", "3D", "3E", "3F"]) {
     const result = getCardSignals(card(id));
-    assert.equal(result.money.direction, "same");
-    assert.equal(result.time.direction, "same");
-    assert.equal(result.happiness.direction, "same");
+    assert.equal(result.knowledge.direction, "up", id);
+    assert.equal(result.money.direction, "same", id);
+    assert.equal(result.time.direction, "down", id);
+    assert.ok(Math.abs(result.time.emphasis) < result.knowledge.emphasis);
   }
+  for (const id of ["1A", "1B", "2A", "2B", "4A", "5F"]) assert.equal(getCardSignals(card(id)).knowledge.direction, "same", id);
+  for (const id of ["2C", "3B", "4D"]) assert.equal(getCardSignals(card(id)).knowledge.direction, "up", id);
   assert.equal(getCardSignals({ id: "2C" }), undefined);
+});
+
+const signals = (...ids) => ids.map((id) => getCardSignals(card(id)));
+test("final profiles follow visual card themes with ties", () => {
+  assert.deepEqual(gameProfiles(signals("1A", "2A", "3C", "4A", "5A")).map((p) => p.id), ["time"]);
+  assert.deepEqual(gameProfiles(signals("1A", "2B", "3A", "4C", "5C")).map((p) => p.id), ["money"]);
+  assert.deepEqual(gameProfiles(signals("1C", "2D", "3D", "4D", "5B")).map((p) => p.id), ["knowledge"]);
+  assert.deepEqual(gameProfiles(signals("2B")).map((p) => p.id), ["time", "money"]);
+});
+test("hover previews accumulate on the played balance without committing or using API numbers", () => {
+  const played = signals("1A", "2A");
+  const before = gameScores(played);
+  const preview = gameScores([...played, ...signals("3D")]);
+  assert.equal(before.money, preview.money);
+  assert.ok(preview.time < before.time);
+  assert.ok(preview.knowledge > before.knowledge);
+  assert.deepEqual(gameScores(played), before);
+  assert.deepEqual(gameScores([]), { money: 50, time: 50, knowledge: 50 });
 });

@@ -1674,14 +1674,14 @@ export interface components {
         /**
          * Statistic
          * @description Sidebar stat. money = family budget, time = days a parent is home when the child needs care,
-         *     happiness = game score (chips x mult).
+         *     knowledge = points earned from educational cards.
          */
         Statistic: {
             /**
              * Id
              * @enum {string}
              */
-            id: "money" | "time" | "happiness";
+            id: "money" | "time" | "knowledge";
             /** Label */
             label: string;
             /** Value */

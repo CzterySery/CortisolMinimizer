@@ -14,15 +14,15 @@ Karta z samą rezerwacją nie zużywa puli, nie zajmuje części i nie daje bie�
 
 Efekty w JSON są deklaratywną specyfikacją: `add_block`, `set_rate_variant`, `set_flag`, `reserve`, `mark_docs`, `transfer_maternity`, `add_care`. `choice.*` to wybór gracza zatwierdzony przez serwer, `facts.*` to potwierdzone fakty, `needs.*` to datowane potrzeby opieki, `derived.*` to wynik reguł, `params.*` to aktywna konfiguracja. `only_if`, `merge_into` i `consume_reservation` wymagają implementacji. Brak takiej implementacji blokuje włączenie talii do runtime.
 
-## Pieniądze, czas i szczęście
+## Pieniądze, czas i wiedza
 
 | Statystyka | Znaczenie | Zmiana po karcie |
 | --- | --- | --- |
 | Pieniądze | Najniższy miesięczny dochód rodziny w z góry ustalonym horyzoncie scenariusza | Ponowne obliczenie wynagrodzeń, świadczeń i podwyższeń; delta do tego samego planu i horyzontu |
 | Czas | Liczba dni, w których zapewniono wymaganą opiekę | Unia pokrytych potrzeb, bez podwójnego liczenia wspólnych dni; przy pracy częściowej wymagane pokrycie godzinowe |
-| Szczęście | Umowny bilans kierunków pieniędzy i czasu | Równe wagi; poprawa i pogorszenie znoszą się. Niepewność jednego wejścia pozostaje niepewnością bilansu. To autorska mechanika, nie miara zdrowia. |
+| Wiedza | Punkty przypisane kartom edukacyjnym | Pasek zaczyna się od połowy; rośnie wyłącznie po kartach wiedzy. Karty urlopowe i planistyczne nie dodają punktów. |
 
-Każda karta ma opis wpływu na wszystkie trzy statystyki. Nie wymuszamy niezerowej zmiany: samo uporządkowanie dokumentów nie podnosi należnego świadczenia ani nie daje urlopu. Punkty przyznajemy za organizację planu, nie za chorobę czy diagnozę. Zdarzenia związane ze śmiercią dziecka lub matki i porzuceniem nie są punktowanymi kartami tej talii.
+Każda karta opisuje swoje skutki dla pieniędzy i czasu; tylko wybrane karty edukacyjne podnoszą wiedzę. Nie wymuszamy niezerowej zmiany: samo uporządkowanie dokumentów nie podnosi należnego świadczenia ani nie daje urlopu. Punktów wiedzy nie przyznajemy za chorobę czy diagnozę.
 
 Kwoty: `Decimal`, grosze, dzienna stawka zgodna z odpowiednimi przepisami, indywidualna podstawa, jawny model wynagrodzenia i podatków. Opis karty nie może obiecywać pensji netto. Wariant uśredniony nie jest automatycznie korzystniejszy w sumie. Zaokrąglenia i kolejność etapów obliczenia muszą być udokumentowane przez kalkulator.
 
@@ -40,9 +40,9 @@ Tryb nie zmienia prawa, stawek, dostępności kart ani kwot. Dostępny jest ten 
 
 Dla samotnego rodzica cele aury dotyczą samodzielnej opieki i zorganizowanego wsparcia; nie wymagają nieistniejącego partnera. Nie wymagamy równego podziału za wszelką cenę. Brak celów danej kategorii wyłącza ją z mianownika i przeskalowuje pozostałe wagi. Wynik pieniędzy porównujemy dla tej samej sytuacji i tych samych ograniczeń, nie między rodzinami. Maksimum nie może pochodzić z niewykonalnego układu. Jeśli brak dodatniego należnego świadczenia, cel ma status „nie dotyczy”, a nie karę za brak ubezpieczenia.
 
-Wskaźnik szczęścia nie korzysta z dawnych bazowych punktów kart. W UI powstaje wyłącznie z pieniędzy i czasu dla jawnie wskazanego porównania. Niepewny dochód nie staje się pewnym szczęściem; szrafowany pasek pokazuje umowną ilustrację zakresu, nie przewidywaną kwotę ani pomiar samopoczucia. Nie sumujemy znaków z różnych okresów jako liczby dni lub punktów całego planu. [Audyt wszystkich kart](card-impact-audit.md) rozdziela skutki w porównywanym okresie od późniejszych.
+Pasek wiedzy jest niezależny od kalkulatora i zaczyna się od 50/100. Rośnie wyłącznie po kartach edukacyjnych; decyzje o urlopach nie wpływają na niego. [Audyt wszystkich kart](card-impact-audit.md) nadal opisuje pieniądze i czas w porównywanym okresie.
 
-Punkty combo i ewentualna premia wybranego celu pozostają oddzielnym, niewdrożonym projektem punktacji (`game_points`), nie wpływają na obecny wskaźnik szczęścia. Choroba ani diagnoza nie daje samodzielnego bonusu.
+Punkty combo i premie celów pozostają oddzielnym projektem punktacji. Choroba ani diagnoza nie daje bonusu.
 
 Punkty po mnożniku zaokrąglamy do liczby całkowitej metodą ROUND_HALF_UP raz przy rozliczeniu zagrania; premię końcową analogicznie raz przy zakończeniu. Obliczenia balansu używają Decimal. Te reguły są autorską częścią punktacji, niezależną od zasad zaokrąglania świadczeń.
 
@@ -59,7 +59,7 @@ Oznaczenie w obu kartach nie tworzy dwóch bonusów. Klucz combo: nazwa + posort
 - `legal_parameter`: pojedyncza wartość pobierana z `parameter_ref`; po najechaniu własna reguła i właściwy parametr wersji.
 - `legal_interpretation`: opis lub warunek z listą jednostek niezbędnych do jego potwierdzenia. To parafraza; nie przedstawiamy jej jako cytatu ustawy.
 - `derived`: pieniądze, data lub pula — fakty wejściowe, wynik i kroki kalkulatora, każdy z własnym `rule_id`. Lista reguł projektu jest punktem startowym; runtime musi zawęzić ją do faktycznie użytych kroków.
-- `game_design`: szczęście, combo i cele — objaśnienie mechaniki, bez udawanej podstawy prawnej.
+- `game_design`: wiedza, combo i cele — objaśnienie mechaniki, bez udawanej podstawy prawnej.
 
 Tekst renderujemy segmentami o stabilnych `claim_id`, nie przez wyszukiwanie liczb w opisie. Jedna zmiana liczby lub tłumaczenia nie może zerwać cytowania. Nazwa karty i tekst czysto narracyjny nie wymagają sztucznej podstawy prawnej. Dane rodziny wskazują swoje pochodzenie: formularz użytkownika, scenariusz albo symulacja ZUS.
 

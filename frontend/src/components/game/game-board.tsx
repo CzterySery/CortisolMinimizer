@@ -15,17 +15,19 @@ export interface GameBoardProps {
   totalRounds: number;
   handSize: number;
   statistics: Statistic[];
+  baseline?: Statistic[];
   projected?: Statistic[]; // stats if the focused card were played (server preview)
   played: Card[];
   hand: Card[];
   onPlay: (cardId: string) => void | Promise<void>;
   onFocusCard?: (cardId: string) => void;
   onUnfocusCard?: (cardId: string) => void;
-  simulation?: { signals?: CardSignals; title?: string; hovering: boolean };
+  simulation?: { signals?: CardSignals; title?: string; hovering: boolean; balance?: Record<"money" | "time" | "knowledge", number> };
   onReset?: () => void;
   previewGoal?: string;
   dealKey?: number;
   belowHand?: ReactNode;
+  finishedHand?: ReactNode;
   unavailable?: Record<string, string>;
   busy?: boolean;
 }
@@ -133,10 +135,11 @@ export function GameBoard(props: GameBoardProps) {
         </section>
         <RoundTrack stages={stages} currentRound={currentRound} playedCards={played} draggedId={draggedId} onPlayCard={playCard} />
         <section className="hand-section" aria-labelledby="hand-title">
-          <div className="section-heading hand-heading"><h2 id="hand-title">{complete ? "Kompletny stół" : "Twoja ręka"}</h2>{mode === "game" && <span>{complete ? `${played.length} zagranych kart` : `${handSize} karty · przeciągnij jedną na podświetlone miejsce`}</span>}
+          <div className="section-heading hand-heading"><h2 id="hand-title">{complete ? "Twój profil" : "Twoja ręka"}</h2>{mode === "game" && <span>{complete ? `${played.length} zagranych kart` : `${handSize} karty · przeciągnij jedną na podświetlone miejsce`}</span>}
             {onReset && <button className="deck-stack" ref={deckRef} onClick={resetBoard} disabled={props.busy} aria-label="Rozdaj karty ze stosu" title="Nowe rozdanie"><span /><span /><span><b>c.</b></span></button>}
           </div>
           <div className="hand-and-balance">
+          {complete && props.finishedHand}
           {!complete && <div className="hand" key={`${stage.id}-${props.dealKey ?? 0}`}>{hand.map((card, index) => (
             <div className={`hand-card ${props.unavailable?.[card.id] ? "is-unavailable" : ""} ${draggedId === card.id ? "is-dragging" : ""} ${playingId === card.id ? "is-playing" : ""}`} key={card.id} draggable={!props.busy && !props.unavailable?.[card.id]} tabIndex={0} role="group" data-card-id={card.id}
               aria-label={`Karta: ${card.title}. Enter lub spacja, aby zagrać.`}
@@ -165,7 +168,7 @@ export function GameBoard(props: GameBoardProps) {
               <button className="play-card-button" disabled={props.busy || playingId !== null || !!props.unavailable?.[card.id]} onClick={() => void playCard(card.id)} aria-label={`Zagraj kartę: ${card.title}`}>{props.unavailable?.[card.id] ? "Niedostępna" : "Połóż na stole"} <span aria-hidden="true">↑</span></button>
             </div>
           ))}</div>}
-          <Statistics statistics={statistics} projected={projected} simulation={props.simulation} hideValues={mode === "preview"} />
+          <Statistics statistics={statistics} baseline={props.baseline} projected={projected} simulation={props.simulation} hideValues={mode === "preview"} startAtMidpoint={played.length === 0 && !projected} />
           </div>
           <div className="board-controls">
             <p className="preview-note">{note}</p>
