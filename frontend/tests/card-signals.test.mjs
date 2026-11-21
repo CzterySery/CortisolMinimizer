@@ -95,6 +95,7 @@ test("decision tree produces 3 mutually exclusive choices per round and branches
   const r1 = getDecisionTreeRound(0, [], stages);
   assert.equal(r1.cards.length, 3);
   assert.deepEqual(r1.activeNodes.map((n) => n.branchTag), ["birth", "adoption", "foster"]);
+  assert.deepEqual(r1.activeNodes.map((n) => n.strategyBadge), ["", "", ""]);
 
   const r2Birth = getDecisionTreeRound(1, ["1A"], stages);
   const r2Adoption = getDecisionTreeRound(1, ["1B"], stages);

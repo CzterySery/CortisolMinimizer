@@ -1,46 +1,32 @@
 "use client";
 
-import Link from "next/link";
+import { STRATEGIES } from "@/lib/decision-tree";
 
-interface Step {
-  num: string;
-  title: string;
-  desc: string;
-}
-
-const STEPS: Step[] = [
+const STEPS = [
   {
     num: "01",
-    title: "Odpowiedz na 5 pytań za pomocą kart",
-    desc: "W każdej z 5 rund wybierasz jedną z 3 wykluczających się kart, określając Waszą sytuację (narodziny, adopcja, rodzina zastępcza) oraz priorytety (czas z dzieckiem, maksymalny budżet lub równowaga).",
+    title: "Określ sytuację rodziny",
+    desc: "W pierwszym kroku wybierasz Waszą sytuację (narodziny dziecka, adopcja lub rodzina zastępcza), co dopasowuje kolejne pytania i przepisy ZUS.",
   },
   {
     num: "02",
-    title: "Zobacz symulację czasu i budżetu",
-    desc: "Drzewo decyzyjne na żywo dobiera kolejne opcje ZUS i przelicza wpływ Twoich wyborów na domowe finanse oraz liczbę dni opieki dla obojga rodziców.",
+    title: "Wybieraj karty według strategii",
+    desc: "W kolejnych rundach każda karta jest oznaczona jedną z 3 strategii poniżej — wybierasz jedną kartę na rundę, budując swój plan.",
   },
   {
     num: "03",
-    title: "Zgłęb temat i wdróż gotowy plan",
-    desc: "Wybierz interesujące Cię zagadnienia z talii wiedzy prawnej, a cały scenariusz przenieś jednym kliknięciem do szczegółowego kalkulatora zasiłków i wniosków ZUS.",
+    title: "Dopasuj kwoty w kalkulatorze",
+    desc: "Po 5 krokach przenosisz ułożony scenariusz do kalkulatora, gdzie możesz wprowadzić ostatnie poprawki i obliczyć dokładne świadczenia ZUS.",
   },
 ];
 
 export function LandingFeatures() {
-  function scrollToGame(e: React.MouseEvent) {
-    e.preventDefault();
-    const gameSection = document.getElementById("gra-otwartekarty");
-    if (gameSection) {
-      gameSection.scrollIntoView({ behavior: "smooth" });
-    }
-  }
-
   return (
-    <section className="landing-features-container" aria-label="Prosta ścieżka — jak to działa">
+    <section className="landing-features-container" aria-label="Jak to działa i strategie">
       <div className="landing-steps-box">
         <div className="steps-header">
-          <span className="eyebrow">Prosta ścieżka</span>
-          <h2 className="steps-title">Jak to działa w 3 krokach?</h2>
+          <span className="eyebrow">Jak to działa</span>
+          <h2 className="steps-title">3 kroki i 3 strategie planowania</h2>
         </div>
 
         <div className="landing-steps-grid">
@@ -53,19 +39,15 @@ export function LandingFeatures() {
           ))}
         </div>
 
-        <div className="steps-cta-bar">
-          <p className="steps-cta-text">
-            Gotowi, by przejść drzewo decyzji i sprawdzić optymalny wariant dla Waszej rodziny?
-          </p>
-          <div className="steps-cta-buttons">
-            <a href="#gra-otwartekarty" className="landing-cta-button primary-cta" onClick={scrollToGame}>
-              <span>Rozpocznij grę poniżej</span>
-              <span aria-hidden="true">↓</span>
-            </a>
-            <Link href="/calculator" className="landing-cta-button secondary-cta">
-              <span>Szczegółowy kalkulator</span>
-              <span aria-hidden="true">→</span>
-            </Link>
+        <div className="steps-strategies-divider">
+          <span className="eyebrow">Oznaczenia strategii na kartach (od 2. rundy)</span>
+          <div className="strategies-upfront-grid">
+            {STRATEGIES.map((s) => (
+              <div key={s.id} className={`strategy-upfront-card strategy-upfront-${s.id}`}>
+                <strong className="strategy-upfront-badge">{s.badge}</strong>
+                <p className="strategy-upfront-desc">{s.shortDesc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

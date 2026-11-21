@@ -42,13 +42,13 @@ export interface DecisionNodeSpec {
   recommendedKnowledgeIds: string[];
 }
 
-// Round 1: Mutually exclusive family situation
+// Round 1: Mutually exclusive family situation (no strategy tags before first choice is made)
 const ROUND_1_NODES: DecisionNodeSpec[] = [
   {
     cardId: "1A",
     branchTag: "birth",
     strategyId: "sytuacja",
-    strategyBadge: "🧭 Ścieżka: Narodziny",
+    strategyBadge: "",
     badge: "Sytuacja · Narodziny",
     title: "Urodzenie dziecka",
     description:
@@ -59,7 +59,7 @@ const ROUND_1_NODES: DecisionNodeSpec[] = [
     cardId: "1B",
     branchTag: "adoption",
     strategyId: "sytuacja",
-    strategyBadge: "🧭 Ścieżka: Adopcja",
+    strategyBadge: "",
     badge: "Sytuacja · Adopcja",
     title: "Adopcja (przysposobienie)",
     description:
@@ -70,7 +70,7 @@ const ROUND_1_NODES: DecisionNodeSpec[] = [
     cardId: "1D",
     branchTag: "foster",
     strategyId: "sytuacja",
-    strategyBadge: "🧭 Ścieżka: Rodzina zastępcza",
+    strategyBadge: "",
     badge: "Sytuacja · Piecza zastępcza",
     title: "Rodzina zastępcza niezawodowa",
     description:
