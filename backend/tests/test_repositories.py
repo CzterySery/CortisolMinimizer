@@ -1,6 +1,6 @@
 """Integration tests against a real PostgreSQL. Opt-in:
-TEST_DATABASE_URL=postgresql://zp:zp@localhost:5432/zp uv run pytest -m integration
-Each test runs in a fresh `zp_test` schema, so pointing at the dev database leaves its tables alone."""
+TEST_DATABASE_URL=postgresql://otwartekarty:otwartekarty@localhost:5432/otwartekarty uv run pytest -m integration
+Each test runs in a fresh `otwartekarty_test` schema, so pointing at the dev database leaves its tables alone."""
 import json
 import os
 from datetime import date
@@ -24,9 +24,9 @@ SEED = json.loads((repositories.DATA / "params.json").read_text(encoding="utf-8"
 def test_schema(monkeypatch):
     url = os.environ["TEST_DATABASE_URL"]
     with psycopg.connect(url, autocommit=True) as conn:
-        conn.execute("DROP SCHEMA IF EXISTS zp_test CASCADE")
-        conn.execute("CREATE SCHEMA zp_test")
-    monkeypatch.setenv("DATABASE_URL", make_conninfo(url, options="-c search_path=zp_test"))
+        conn.execute("DROP SCHEMA IF EXISTS otwartekarty_test CASCADE")
+        conn.execute("CREATE SCHEMA otwartekarty_test")
+    monkeypatch.setenv("DATABASE_URL", make_conninfo(url, options="-c search_path=otwartekarty_test"))
     repositories.init()
 
 

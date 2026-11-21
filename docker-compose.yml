@@ -1,16 +1,17 @@
 # Both app images build from the repo root: backend and frontend read shared/cards.json.
 # Local backend dev only needs the database: `docker compose up -d db`.
+name: otwartekarty  # containers, images and the pgdata volume are prefixed with this
 services:
   db:
     image: postgres:17-alpine
     environment:
-      POSTGRES_USER: zp
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-zp}  # dev default; set a real one when deploying
-      POSTGRES_DB: zp
+      POSTGRES_USER: otwartekarty
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-otwartekarty}  # dev default; set a real one when deploying
+      POSTGRES_DB: otwartekarty
     ports: ["5432:5432"]  # for the backend and integration tests run outside Docker
     volumes: [pgdata:/var/lib/postgresql/data]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U zp -d zp"]
+      test: ["CMD-SHELL", "pg_isready -U otwartekarty -d otwartekarty"]
       interval: 2s
       timeout: 3s
       retries: 15
@@ -20,7 +21,7 @@ services:
     ports: ["8000:8000"]
     environment:
       ADMIN_TOKEN: ${ADMIN_TOKEN:-dev}
-      DATABASE_URL: postgresql://zp:${POSTGRES_PASSWORD:-zp}@db:5432/zp
+      DATABASE_URL: postgresql://otwartekarty:${POSTGRES_PASSWORD:-otwartekarty}@db:5432/otwartekarty
       SESSION_SECRET: ${SESSION_SECRET:-}  # mObywatel mock tokens; empty = random per start
     depends_on:
       db: { condition: service_healthy }

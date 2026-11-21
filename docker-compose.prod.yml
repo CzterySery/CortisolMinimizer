@@ -15,7 +15,7 @@ services:
     environment:
       ADMIN_TOKEN: ${ADMIN_TOKEN:?set ADMIN_TOKEN}
       SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET}
-      DATABASE_URL: postgresql://zp:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/zp
+      DATABASE_URL: postgresql://otwartekarty:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/otwartekarty
     restart: unless-stopped
 
   frontend:

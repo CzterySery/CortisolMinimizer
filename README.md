@@ -1,4 +1,4 @@
-# Cortisol Minimizer
+# OtwarteKarty
 
 Kliknięcie powierzchni karty, Enter/spacja lub przeciągnięcie zagrywa ją na stół; przyciski informacji otwierają źródła. Rozdania animują przejście kart ze stosu do ręki, a kliknięcie stosu rozpoczyna nowe rozdanie. Cele planowania znajdują się pod planszą. [Audyt wpływu 30 kart](docs/card-impact-audit.md) określa porównanie, okres, skutek teraz i później oraz podstawy prawne. Nieznany dochód pozostaje nieznany; szczęście jest bilansem pieniędzy i czasu, nie osobną premią.
 
@@ -41,7 +41,7 @@ scripts/sync_cards.py   # eksport 15 kart z cards.md
 
 Wymagane Python 3.11+, Node.js 20.9+ z npm oraz Docker (baza PostgreSQL).
 
-Baza, z katalogu głównego (port 5432, użytkownik i hasło `zp`):
+Baza, z katalogu głównego (port 5432, użytkownik i hasło `otwartekarty`):
 
 ```sh
 docker compose up -d db
@@ -131,7 +131,7 @@ Trwałe dane są w [repositories.py](backend/app/repositories.py): katalog kart 
 
 ```sh
 cd backend && uv run pytest && uv run ruff check app tests   # testy jednostkowe, bez bazy
-TEST_DATABASE_URL=postgresql://zp:zp@localhost:5432/zp uv run pytest -m integration   # SQL na prawdziwym PostgreSQL (schemat zp_test)
+TEST_DATABASE_URL=postgresql://otwartekarty:otwartekarty@localhost:5432/otwartekarty uv run pytest -m integration   # SQL na prawdziwym PostgreSQL (schemat otwartekarty_test)
 cd frontend && npm run typecheck && npm run lint && npm run build
 cd frontend && npx playwright install chromium && npm run e2e   # ścieżka jurora na działającym stosie (docker compose up --build)
 ```

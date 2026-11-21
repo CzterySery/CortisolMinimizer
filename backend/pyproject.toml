@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "cortisol-minimizer-api"
+name = "otwartekarty-api"
 version = "0.1.0"
-description = "API gry Cortisol Minimizer"
+description = "API gry OtwarteKarty"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115,<1",

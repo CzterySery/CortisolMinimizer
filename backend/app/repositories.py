@@ -14,7 +14,7 @@ from app.schemas import Catalog
 
 DEFAULT_CATALOG = Path(__file__).resolve().parents[2] / "shared" / "cards.json"
 DATA = Path(__file__).parent / "data"
-LOCAL_DATABASE = "postgresql://zp:zp@localhost:5432/zp"  # `docker compose up -d db`
+LOCAL_DATABASE = "postgresql://otwartekarty:otwartekarty@localhost:5432/otwartekarty"  # `docker compose up -d db`
 
 
 def get_catalog() -> Catalog:

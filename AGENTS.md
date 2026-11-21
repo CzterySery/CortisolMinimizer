@@ -1,4 +1,4 @@
-# Cortisol Minimizer: project plan & agent guide
+# OtwarteKarty: project plan & agent guide
 
 > Keep this file current: any change to code, structure, tooling or the plan, and any non-obvious discovery, gets recorded here in the same piece of work.
 
@@ -26,7 +26,7 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 - **Backend:** Python 3.11+ + FastAPI + PostgreSQL 17 (Docker image `postgres:17-alpine`).
 - **Frontend:** Next.js 16 (App Router, `src/`) with plain CSS.
 - **No AI inside the app.** All rules are deterministic. Say so in the submission.
-- **Naming:** use Cortisol Minimizer in code, UI metadata and new artifacts. The earlier gambling-related working name is retired.
+- **Naming:** the project is **OtwarteKarty**: use it in docs, UI metadata and new artifacts, and `otwartekarty` for technical identifiers (package names, Postgres user/database `otwartekarty`, test schema `otwartekarty_test`, sessionStorage keys `otwartekarty.*`, compose project `otwartekarty`). Earlier working names are retired; never reintroduce them or their abbreviations in project-level places (README, docs titles, package names, app metadata, API title). The game mode "Kortyzol Minimizer" (card/mode name) stays as it is.
 - **Contract-first REST under `/api/v1`.** Pydantic models are described in OpenAPI, and the frontend generates its types from them.
 - **The UI design comes from the team's board** (commit `0219fc3`/`1f0d26a`, pitygiusz). Every other screen follows its look.
 
@@ -61,7 +61,7 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 - `card-grounding.tsx` exposes description, conditions, money/time effects, authored score and per-parameter references via native modal dialogs. Hover hints supplement click/touch/keyboard access. The library and evidence dialogs use native focus containment and Escape behavior.
 - `/sources/[id]` prerenders six allowlisted transcriptions with legal-unit/page anchors. `scripts/prepare-legal-assets.mjs` runs before frontend dev/build, verifies source SHA-256 and exports only public manifest-listed originals and Markdown to ignored `frontend/public/legal/`. Docker now includes only legal transcriptions/public participant references from Documents; restricted sample cases remain excluded. No extra dependencies added.
 - Designed 30 cards with conditions, declarative effects, derived money/time, authored happiness points and validated cross-round combos. No changes to the other product flows except replacing the retired brand in shared header/metadata/API title.
-- Modes: Cortisol Minimizer, Zasiłki Maxing, Aura Farming use the same legal calculator; only objective scoring changes. Detailed proposed formulas and fairness rules are in `docs/card-grounding.md`.
+- Modes: Kortyzol Minimizer, Zasiłki Maxing, Aura Farming use the same legal calculator; only objective scoring changes. Detailed proposed formulas and fairness rules are in `docs/card-grounding.md`.
 - Authoring data lives in `scripts/build_deck_design.py`; run it to rebuild `cards-30.md`, `shared/deck-design.json`, `shared/legal-rules.json`, and `Documents/legal/rules.md`. `--check` verifies generated artifacts, 30 unique cards / six per stage, exact excerpts within their legal units, source hashes, parameter paths, unique anchors and reciprocal combo consistency.
 - `scripts/extract_legal_sources.py` requires `scripts/requirements-legal.txt` (pypdf, authoring-only). It reads only the public reference-material directory, never restricted case files. DOCX is read via standard-library XML; its table layout is not reconstructed. Original filenames use decomposed Unicode: resolve actual paths, do not invent normalized filesystem paths.
 - Source caveats: supplied act includes future-effective 2027 provisions; guide is dated 2026-04-01 and has older form names; act extract omits care articles 32–35. Care is grounded in the local guide and verified against the official Sejm consolidated text. See legal README for URLs and temporal caveats; `checked_against_supplied_file` is evidence validation, not legal certification.
@@ -136,19 +136,19 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 
 ## Conventions
 - **Backend:**
-  - Start the database first: `docker compose up -d db` (from the repo root; port 5432, user/password/db `zp`).
+  - Start the database first: `docker compose up -d db` (from the repo root; port 5432, user/password/db `otwartekarty`).
   - Run from `backend/`: `uv sync --extra dev` then `ADMIN_TOKEN=dev uv run uvicorn app.main:app --reload`. pip also works: `pip install -e './backend[dev]'`.
   - Lint with `uv run ruff check app tests` (ruff sorts imports).
 - **Tests:**
   - **Unit tests never touch a database.** `uv run pytest` runs them; the API `client` fixture stubs `repositories.init`. Calculator and game logic are pure functions, so their tests stay unit tests.
-  - **Integration tests** (`@pytest.mark.integration`, `tests/test_repositories.py`) cover the SQL against real Postgres and are skipped unless `TEST_DATABASE_URL` is set: `TEST_DATABASE_URL=postgresql://zp:zp@localhost:5432/zp uv run pytest -m integration`. Each test recreates a `zp_test` schema, so pointing at the dev database leaves its tables alone (the schema stays behind until the next run).
+  - **Integration tests** (`@pytest.mark.integration`, `tests/test_repositories.py`) cover the SQL against real Postgres and are skipped unless `TEST_DATABASE_URL` is set: `TEST_DATABASE_URL=postgresql://otwartekarty:otwartekarty@localhost:5432/otwartekarty uv run pytest -m integration`. Each test recreates a `otwartekarty_test` schema, so pointing at the dev database leaves its tables alone (the schema stays behind until the next run).
   - Docs are at `/docs`. Health is at `/api/v1/health`; there is no root `/health`.
 - **Frontend:** `cd frontend && npm install && npm run dev`. Check with `npm run typecheck && npm run lint && npm run build`.
 - **API contract** lives in `backend/app/schemas.py`. Every model inherits `Model`, which sets `json_schema_serialization_defaults_required`, so defaulted fields are **required in responses and optional in requests**.
 - **After any schema change**, with the backend running: `cd frontend && npm run gen:api` (writes `src/lib/schema.d.ts`; never edit it), then typecheck.
   - Models used both in requests and responses are split into `S["X-Input"]` / `S["X-Output"]` (e.g. `Plan-Input`, `Card-Output`, `Source-Output`). Others keep their plain name (`GameSimulation`, `Statistic`, `Round`, `Preview`, `PlanResult`).
   - Board components import friendly aliases from `src/types/game.ts`; everything else uses `S[...]` from `src/lib/api.ts`.
-- **Persistence lives only in `backend/app/repositories.py`:** the card catalog (`shared/cards.json`, or `CARDS_DATA_PATH`) plus PostgreSQL via `psycopg` 3 (`DATABASE_URL`, default `postgresql://zp:zp@localhost:5432/zp` = the compose `db`). Tables `config` (versioned params, JSONB), `games` and `submissions` are created and seeded by `init()` at startup; there are no migrations yet (`CREATE TABLE IF NOT EXISTS`), so a column change needs a manual `ALTER` or a fresh volume. Callers use its functions, never SQL.
+- **Persistence lives only in `backend/app/repositories.py`:** the card catalog (`shared/cards.json`, or `CARDS_DATA_PATH`) plus PostgreSQL via `psycopg` 3 (`DATABASE_URL`, default `postgresql://otwartekarty:otwartekarty@localhost:5432/otwartekarty` = the compose `db`). Tables `config` (versioned params, JSONB), `games` and `submissions` are created and seeded by `init()` at startup; there are no migrations yet (`CREATE TABLE IF NOT EXISTS`), so a column change needs a manual `ALTER` or a fresh volume. Callers use its functions, never SQL.
 - **Legal numbers live only in `backend/app/data/params.json`.** They are admin-editable and versioned by `effective_from`. Never hardcode a rate, duration or limit in code, and that includes the frontend.
   - **Versions ≤ 1 are the code's seeds, refreshed on every startup** (`repositories.init()` upserts `seed_params()`): version 1 = `params.json` (current), versions -n..-1 = older years from `params-history.json` (overrides on top of `params.json`). New legal fields reach existing databases without a reset. Admin edits are versions ≥ 2 and are never touched; a version ≥ 2 saved before a new `Params` field was added fails validation until it's re-saved through the admin panel.
 - **Money is `Decimal`, rounded ROUND_HALF_UP to grosze.** The daily rate is monthly/30 (art. 36 ust. 3). Money crosses the API as decimal strings; the frontend only formats it (`src/lib/format.ts`). The sidebar stat `money` is a whole-złoty `int` for display.

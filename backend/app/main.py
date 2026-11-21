@@ -14,7 +14,7 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title="Cortisol Minimizer API", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="OtwarteKarty API", version="0.1.0", lifespan=lifespan)
 # The frontend calls the API server-side (Next proxy); CORS only matters for direct browser use, e.g. /docs.
 app.add_middleware(
     CORSMiddleware,
