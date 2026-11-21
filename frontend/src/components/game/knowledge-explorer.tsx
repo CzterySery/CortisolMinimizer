@@ -16,7 +16,7 @@ const TOPICS: TopicGroup[] = [
   {
     id: "recommended",
     label: "Polecane dla Twojej ścieżki",
-    subtitle: "Karty wiedzy dobrane automatycznie do wyborów, które podejmujesz w drzewie decyzyjnym powyżej.",
+    subtitle: "",
     cardIds: ["1C", "3F", "2E"],
   },
   {
@@ -53,7 +53,6 @@ export function KnowledgeExplorer({
   playedIds: string[];
 }) {
   const [activeTopicId, setActiveTopicId] = useState<string>("recommended");
-  const [exploredIds, setExploredIds] = useState<string[]>([]);
 
   const allCards = stages.flatMap((s) => s.cards);
 
@@ -78,24 +77,13 @@ export function KnowledgeExplorer({
     .map((id) => allCards.find((c) => c.id === id))
     .filter((c): c is Card => Boolean(c));
 
-  function toggleExplored(id: string) {
-    setExploredIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
-    );
-  }
-
   return (
     <section className="knowledge-explorer" aria-labelledby="knowledge-explorer-title">
       <div className="knowledge-explorer-header">
         <div>
-          <p className="eyebrow">Talia wiedzy prawnej ZUS · Otwórz przepisy i cytaty</p>
           <h2 id="knowledge-explorer-title" className="knowledge-explorer-title">
             O czym chcesz się dowiedzieć?
           </h2>
-          <p className="knowledge-explorer-desc">
-            Wybierz interesujący Cię temat, aby przejrzeć karty wiedzy z oficjalną podstawą prawną,
-            cytatami z ustaw i dokumentami PDF — bez zabierania ruchów w drzewie decyzyjnym.
-          </p>
         </div>
       </div>
 
@@ -120,15 +108,14 @@ export function KnowledgeExplorer({
         })}
       </div>
 
-      <p className="knowledge-topic-subtitle">{activeTopic.subtitle}</p>
+      {activeTopic.subtitle && <p className="knowledge-topic-subtitle">{activeTopic.subtitle}</p>}
 
       <div className="knowledge-cards-grid">
         {displayedCards.map((card, index) => {
-          const isRead = exploredIds.includes(card.id);
           return (
             <div
               key={card.id}
-              className={`knowledge-card-wrapper ${isRead ? "is-read" : ""}`}
+              className="knowledge-card-wrapper"
               onClick={(event) => {
                 if ((event.target as HTMLElement).closest("button, a, dialog, summary")) return;
                 const trigger = event.currentTarget.querySelector<HTMLButtonElement>(".grounded-text");
@@ -136,30 +123,6 @@ export function KnowledgeExplorer({
               }}
             >
               <DecisionCard card={card} index={index} category="Karta wiedzy ZUS" />
-              <div className="knowledge-card-actions">
-                <button
-                  type="button"
-                  className="knowledge-open-btn"
-                  onClick={(event) => {
-                    const wrapper = event.currentTarget.closest(".knowledge-card-wrapper");
-                    const trigger = wrapper?.querySelector<HTMLButtonElement>(".grounded-text");
-                    trigger?.click();
-                    if (!isRead) toggleExplored(card.id);
-                  }}
-                >
-                  <span>Sprawdź przepisy i źródła ZUS</span>
-                  <span aria-hidden="true">ⓘ</span>
-                </button>
-                <button
-                  type="button"
-                  className={`knowledge-mark-btn ${isRead ? "active" : ""}`}
-                  onClick={() => toggleExplored(card.id)}
-                  aria-pressed={isRead}
-                  title={isRead ? "Oznacz jako nieprzeczytane" : "Oznacz temat jako poznany"}
-                >
-                  {isRead ? "✓ Poznano" : "Oznacz"}
-                </button>
-              </div>
             </div>
           );
         })}

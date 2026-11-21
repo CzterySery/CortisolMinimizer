@@ -25,8 +25,7 @@ export function LandingFeatures() {
     <section className="landing-features-container" aria-label="Jak to działa i strategie">
       <div className="landing-steps-box">
         <div className="steps-header">
-          <span className="eyebrow">Jak to działa</span>
-          <h2 className="steps-title">3 kroki i 3 strategie planowania</h2>
+          <h2 className="steps-title">Jak to działa?</h2>
         </div>
 
         <div className="landing-steps-grid">
@@ -40,11 +39,11 @@ export function LandingFeatures() {
         </div>
 
         <div className="steps-strategies-divider">
-          <span className="eyebrow">Oznaczenia strategii na kartach (od 2. rundy)</span>
+          <span className="eyebrow">3 strategie · od 2. rundy</span>
           <div className="strategies-upfront-grid">
             {STRATEGIES.map((s) => (
               <div key={s.id} className={`strategy-upfront-card strategy-upfront-${s.id}`}>
-                <strong className="strategy-upfront-badge">{s.badge}</strong>
+                <strong className="strategy-upfront-badge">{s.name}</strong>
                 <p className="strategy-upfront-desc">{s.shortDesc}</p>
               </div>
             ))}

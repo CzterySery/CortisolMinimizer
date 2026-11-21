@@ -15,19 +15,19 @@ export const STRATEGIES: StrategyInfo[] = [
     id: "kortyzol",
     name: "Kortyzol Minimizer",
     badge: "🧘 Kortyzol Minimizer",
-    shortDesc: "Maksimum czasu z dzieckiem, przewidywalne 81,5% i spokojna sztafeta opieki bez pośpiechu.",
+    shortDesc: "Więcej czasu z dzieckiem i spokojna opieka.",
   },
   {
     id: "zasilki",
     name: "Zasiłki Maxing",
     badge: "💰 Zasiłki Maxing",
-    shortDesc: "Maksymalizacja wpływów do budżetu: 100% zasiłku na starcie oraz łączenie urlopu z pracą na część etatu.",
+    shortDesc: "Więcej środków w rodzinnym budżecie.",
   },
   {
     id: "aura",
     name: "Aura Farming",
     badge: "✨ Aura Farming",
-    shortDesc: "Świadomy balans i partnerstwo: zmiana warty rodziców, rezerwa urlopu na adaptację i podział dyżurów.",
+    shortDesc: "Równowaga i partnerski podział opieki.",
   },
 ];
 

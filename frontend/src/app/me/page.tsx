@@ -28,7 +28,8 @@ export default function Me() {
   if (!loggedIn) return (
     <main className="page">
       <PageHeader eyebrow="Moje dane" title="Co wie o Was" accent="ZUS?" />
-      <p className="muted">Najpierw <Link href="/login">zaloguj się przez mObywatel</Link> (symulacja).</p>
+      <p className="muted">Zaloguj się, aby zobaczyć swoje dane z ZUS (symulacja).</p>
+      <div className="actions"><Link className="button button-primary" href="/login">Zaloguj się przez mObywatel</Link></div>
     </main>
   );
   if (!account) return <main className="page"><ApiResult error={error} /></main>;

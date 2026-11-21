@@ -1,19 +1,18 @@
 import Link from "next/link";
 
 const nav = [
-  ["/", "Gra"],
+  ["/", "Strona główna"],
   ["/calculator", "Kalkulator"],
   ["/cases", "Sprawdź sprawę"],
   ["/applications", "Wnioski"],
   ["/help", "Pomoc"],
   ["/me", "Moje dane"],
-  ["/login", "mObywatel"],
 ] as const;
 
 export function SiteHeader() {
   return (
     <header className="site-header">
-      <Link className="chapter-brand" href="/" aria-label="Nowy rozdział. Wasze zasady. — strona główna"><span>Nowy rozdział. <em>Wasze zasady.</em></span></Link>
+      <Link className="chapter-brand" href="/" aria-label="Otwarte Karty — strona główna"><em>Otwarte Karty</em></Link>
       <nav className="site-nav" aria-label="Główna nawigacja">
         {nav.map(([href, label]) => <Link key={href} href={href}>{label}</Link>)}
       </nav>

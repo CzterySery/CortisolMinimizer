@@ -70,11 +70,6 @@ export function CardGrounding({ card }: { card: Card }) {
   return <>
     <p className="grounded-description"><button className="grounded-text" onClick={inspect}
       title="Kliknij, aby otworzyć pełne wyjaśnienie i podstawę prawną ZUS">{design.description}<span aria-hidden="true"> ⓘ</span></button></p>
-    <button className="card-conditions card-learn-more-pill" onClick={inspect}>
-      <span aria-hidden="true">📖</span>
-      <span>Kliknij, aby poznać szczegóły i przepisy ZUS</span>
-      <span aria-hidden="true">↗</span>
-    </button>
     <dialog ref={dialog} className="evidence-dialog" aria-labelledby={headingId}
       onCancel={(event) => { event.preventDefault(); dialog.current?.close(); }}>
       <header className="dialog-heading"><div><p className="eyebrow">Karta {card.id} · {card.title}</p>

@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { Card, Stage } from "@/types/game";
 import { CardArtwork } from "./card-artwork";
 
+const instructions = ["Wybierz sytuację rodziny.", "Określ, na jakim jesteście etapie.", "Wybierz wariant wypłaty.", "Podzielcie czas opieki.", "Zaplanujcie kolejne miesiące."];
+
 interface RoundTrackProps {
   stages: Stage[];
   currentRound: number | null;
@@ -38,6 +40,7 @@ export function RoundTrack({ stages, currentRound, playedCards, draggedId, onPla
               {card ? <><CardArtwork id={card.id} compact /><h3 className="played-card-title">{card.title}</h3><span className="slot-caption">Na stole ✓</span></> : <><span className="slot-mark" aria-hidden="true">{active ? "+" : "·"}</span><span className="slot-caption">{active ? "Przeciągnij tu kartę" : "Miejsce na kartę"}</span></>}
             </div>
             <p className="round-label">{round.title}</p>
+            <p className="round-instruction">{instructions[round.id - 1]}</p>
           </li>
         );})}
       </ol>

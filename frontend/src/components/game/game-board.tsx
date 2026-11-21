@@ -204,7 +204,7 @@ export function GameBoard(props: GameBoardProps) {
   return (
     <main className={`game-layout ${mode === "preview" ? "preview-board" : ""} ${tableInView ? "table-visible" : "table-pending"} ${canRevealHand ? "hand-visible" : "hand-pending"}`} ref={boardRef}>
       <div className="main-board">
-        <section className="board-context" aria-labelledby="story-title">
+        <section className="board-context sr-only" aria-labelledby="story-title">
           <p className="eyebrow">{complete ? "Wasz plan jest na stole" : `Runda 0${stage.id} / 0${totalRounds} · ${stage.title}`}</p>
           <h1 id="story-title" className="sr-only">{complete ? "Wasz plan rodziny" : `Runda ${stage.id}: ${stage.title}`}</h1>
           {mode === "game" && <p>{complete ? "Wszystkie miejsca są już zajęte. Możesz rozłożyć karty jeszcze raz i sprawdzić inny układ." : stage.description}</p>}
@@ -212,38 +212,9 @@ export function GameBoard(props: GameBoardProps) {
         </section>
         <RoundTrack stages={stages} currentRound={currentRound} playedCards={played} draggedId={draggedId} onPlayCard={playCard} />
         <section className="hand-section" aria-labelledby="hand-title">
-          {!complete && props.decisionPrompt && (
-            <div className="decision-tree-prompt" aria-live="polite">
-              {props.decisionPrompt.path.length > 0 && (
-                <div className="decision-tree-path" aria-label="Twoja dotychczasowa ścieżka">
-                  <span className="path-label">Twoja ścieżka:</span>
-                  {props.decisionPrompt.path.map((stepTitle, i) => (
-                    <span key={i} className="path-chip">
-                      {i > 0 && <span className="path-arrow" aria-hidden="true">→</span>}
-                      <span>{stepTitle}</span>
-                    </span>
-                  ))}
-                </div>
-              )}
-              <h3 className="decision-tree-question">{props.decisionPrompt.question}</h3>
-              <p className="decision-tree-subtitle">{props.decisionPrompt.subtitle}</p>
-            </div>
-          )}
           <div className="section-heading hand-heading">
             <h2 id="hand-title">{complete ? "Twój profil" : "Wybierz jedną kartę"}</h2>
             {mode === "game" && <span>{complete ? `${played.length} zagranych kart` : `${handSize} karty · przeciągnij jedną na podświetlone miejsce`}</span>}
-            {onReset && (
-              <button
-                type="button"
-                className="clear-reset-button"
-                ref={deckRef}
-                onClick={resetBoard}
-                disabled={props.busy}
-                aria-label="Resetuj karty i zacznij od początku"
-              >
-                <span aria-hidden="true">↺</span> Resetuj karty
-              </button>
-            )}
           </div>
           <div className="hand-and-balance">
           {complete && props.finishedHand}
@@ -272,14 +243,15 @@ export function GameBoard(props: GameBoardProps) {
               }} onDragEnd={() => { setDraggedId(null); ignoreClickUntil.current = Date.now() + 250; }}>
               <DecisionCard card={card} index={index} category={stage.title} />
               {props.unavailable?.[card.id] && <p className="card-unavailable-reason">{props.unavailable[card.id]}</p>}
-              <button className="play-card-button" disabled={props.busy || playingId !== null || !!props.unavailable?.[card.id]} onClick={() => void playCard(card.id)} aria-label={`Zagraj kartę: ${card.title}`}>{props.unavailable?.[card.id] ? "Niedostępna" : "Połóż na stole"} <span aria-hidden="true">↑</span></button>
             </div>
           ))}</div>}
-          <Statistics statistics={statistics} baseline={props.baseline} projected={projected} simulation={props.simulation} hideValues={mode === "preview"} startAtMidpoint={played.length === 0 && !projected} />
+          <Statistics statistics={statistics} baseline={props.baseline} projected={projected} simulation={props.simulation} hideValues={mode === "preview"} startAtMidpoint={played.length === 0 && !projected}
+            deckSlot={onReset && <button type="button" className="deck-stack" ref={deckRef} onClick={resetBoard} disabled={props.busy} aria-label="Resetuj karty i zacznij od początku" title="Rozdaj od nowa">
+              <span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true"><b>↺</b></span>
+            </button>}
+          />
           </div>
-          <div className="board-controls">
-            <p className="preview-note">{note}</p>
-          </div>
+          {complete && <p className="preview-note">{note}</p>}
           <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
         </section>
         {props.belowHand}

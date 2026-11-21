@@ -32,8 +32,8 @@ export function LandingHero() {
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion) {
-      setProgress(1);
-      return;
+      const frame = window.requestAnimationFrame(() => setProgress(1));
+      return () => window.cancelAnimationFrame(frame);
     }
 
     function runAnimation(now: number) {
@@ -124,7 +124,7 @@ export function LandingHero() {
     <section className="landing-hero" aria-label="Wprowadzenie do przewodnika rodzicielskiego OtwarteKarty">
       <div className="landing-hero-content">
         <h1 className="landing-title">
-          Witaj w <em>OtwarteKarty</em>.
+          Witaj w <em>Otwarte Karty</em>.
         </h1>
         <p className="landing-subtitle">
           Przewodnik po urlopach i zasiłkach rodzicielskich ZUS. Ułóż plan dla Waszej rodziny
