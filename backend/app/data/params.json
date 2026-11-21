@@ -1,6 +1,7 @@
 {
   "effective_from": "2026-01-01",
   "contribution_deduction": "0.1371",
+  "employee_contributions": {"pension": "0.0976", "disability": "0.015", "sickness": "0.0245"},
   "min_wage": "4806.00",
   "voluntary_base_cap": "20321.30",
   "parental_benefit_floor": "1000.00",

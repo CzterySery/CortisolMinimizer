@@ -45,8 +45,11 @@ def init() -> None:
         """)
         for kind in SEEDED_KINDS:
             data = json.loads((DATA / f"{kind}.json").read_text(encoding="utf-8"))
+            # version 1 is the seed shipped with the code: refreshed on every start so new legal
+            # fields reach existing databases; admin edits are versions >= 2 and stay untouched
             c.execute("""INSERT INTO config (kind, version, effective_from, data) VALUES (%s, 1, %s, %s)
-                         ON CONFLICT DO NOTHING""",
+                         ON CONFLICT (kind, version) DO UPDATE
+                         SET effective_from = EXCLUDED.effective_from, data = EXCLUDED.data""",
                       (kind, data.get("effective_from", "1970-01-01"), Jsonb(data)))
 
 

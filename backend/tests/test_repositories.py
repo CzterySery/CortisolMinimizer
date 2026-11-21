@@ -35,6 +35,13 @@ def test_init_seeds_once():
     assert str(params.active().rates.parental) == SEED["rates"]["parental"]
 
 
+def test_init_refreshes_seed_version():
+    with repositories.db() as c:  # simulate a database seeded by an older params.json
+        c.execute("""UPDATE config SET data = data || '{"min_wage": "1"}' WHERE kind = 'params' AND version = 1""")
+    repositories.init()
+    assert str(params.active().min_wage) == SEED["min_wage"]
+
+
 def test_versions_and_effective_dates():
     newer = {**SEED, "rates": {**SEED["rates"], "parental": "0.75"}}
     future = {**SEED, "effective_from": "2099-01-01", "rates": {**SEED["rates"], "parental": "0.80"}}

@@ -573,8 +573,18 @@ export interface components {
              * Format: date
              */
             event_date: string;
-            /** Months */
-            months: components["schemas"]["MonthPay-Input"][];
+            /**
+             * Months
+             * @default []
+             */
+            months?: components["schemas"]["MonthPay-Input"][];
+            /**
+             * Full Time
+             * @default true
+             */
+            full_time?: boolean;
+            /** Contract Monthly */
+            contract_monthly?: number | string | null;
         };
         /** BaseResult */
         BaseResult: {
@@ -941,6 +951,30 @@ export interface components {
             /** Code B */
             code_b: boolean;
         };
+        /**
+         * EmployeeContributions
+         * @description Contributions withheld from an employee's pay, each rounded on its own by payroll (art. 3 pkt 3).
+         */
+        "EmployeeContributions-Input": {
+            /** Pension */
+            pension: number | string;
+            /** Disability */
+            disability: number | string;
+            /** Sickness */
+            sickness: number | string;
+        };
+        /**
+         * EmployeeContributions
+         * @description Contributions withheld from an employee's pay, each rounded on its own by payroll (art. 3 pkt 3).
+         */
+        "EmployeeContributions-Output": {
+            /** Pension */
+            pension: string;
+            /** Disability */
+            disability: string;
+            /** Sickness */
+            sickness: string;
+        };
         /** Explain */
         Explain: {
             /** Text */
@@ -1204,6 +1238,7 @@ export interface components {
             effective_from: string;
             /** Contribution Deduction */
             contribution_deduction: number | string;
+            employee_contributions: components["schemas"]["EmployeeContributions-Input"];
             /** Min Wage */
             min_wage: number | string;
             /** Voluntary Base Cap */
@@ -1233,6 +1268,7 @@ export interface components {
             effective_from: string;
             /** Contribution Deduction */
             contribution_deduction: string;
+            employee_contributions: components["schemas"]["EmployeeContributions-Output"];
             /** Min Wage */
             min_wage: string;
             /** Voluntary Base Cap */

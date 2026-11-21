@@ -4,7 +4,7 @@ import json
 import pytest
 from fastapi.testclient import TestClient
 
-from app import repositories
+from app import params, repositories
 
 AUTH = {"Authorization": "Bearer test-token"}
 
@@ -52,3 +52,12 @@ def test_board_preview(client):
     preview = client.get("/api/v1/game/preview").json()
     assert [s["id"] for s in preview["statistics"]] == ["money", "time", "happiness"]
     assert len(preview["rounds"]) == 5
+
+
+def test_calc_base(client, monkeypatch):
+    seed = params.Params.model_validate_json((repositories.DATA / "params.json").read_text(encoding="utf-8"))
+    monkeypatch.setattr(params, "active", lambda on=None: seed)
+    body = {"employment": "employee", "event_date": "2026-07-15", "months": [{"month": "2026-06", "gross": "6000"}]}
+    result = client.post("/api/v1/calc/base", json=body).json()
+    assert result["base"] == "5177.40" and result["steps"][-1]["rule"] == "art. 36"
+    assert client.post("/api/v1/calc/base", json={**body, "months": []}).status_code == 422

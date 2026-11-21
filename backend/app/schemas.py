@@ -207,8 +207,10 @@ class PlanResult(Model):
 
 class BaseRequest(Model):
     employment: Employment
-    event_date: date
-    months: list[MonthPay]
+    event_date: date  # start of the incapacity / birth; the 12-month window ends the month before
+    months: list[MonthPay] = []  # pay (employee) or declared contribution base (non-employee) per month
+    full_time: bool = True  # the minimum-wage floor (art. 45) applies to full-time employees only
+    contract_monthly: Decimal | None = None  # monthly pay from the contract, used when no full month exists (art. 37)
 
 
 class BaseResult(Model):

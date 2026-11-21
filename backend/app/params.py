@@ -7,6 +7,13 @@ from pydantic import BaseModel, Field
 from app import repositories
 
 
+class EmployeeContributions(BaseModel):
+    """Contributions withheld from an employee's pay, each rounded on its own by payroll (art. 3 pkt 3)."""
+    pension: Decimal
+    disability: Decimal
+    sickness: Decimal
+
+
 class Rates(BaseModel):
     sick: Decimal
     sick_pregnancy: Decimal
@@ -104,8 +111,9 @@ class Game(BaseModel):
 class Params(BaseModel):
     effective_from: date
     contribution_deduction: Decimal = Field(ge=0, lt=1)
+    employee_contributions: EmployeeContributions
     min_wage: Decimal = Field(gt=0)
-    voluntary_base_cap: Decimal = Field(gt=0)
+    voluntary_base_cap: Decimal = Field(gt=0)  # cap on the final base, i.e. AFTER the 13.71% deduction (23 550 x 0.8629)
     parental_benefit_floor: Decimal = Field(ge=0)
     payer_threshold_insured: int
     debt_threshold_pct_min_wage: Decimal
