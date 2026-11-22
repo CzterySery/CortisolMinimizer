@@ -53,14 +53,23 @@ export function suggestedField(form: OfficialForm, field: PdfField, doc: GuideDo
 
 export type FilledField = { value: string; source: string };
 
+function parentProfile(doc: GuideDoc, account?: S["ZusAccount"]) {
+  if (account?.persona.who === doc.who) return {
+    name: account.persona.name, personalData: account.personal_data, insurance: account.insurance,
+  };
+  const related = account?.related_parents?.find((parent) => parent.who === doc.who);
+  return related ? { name: related.name, personalData: related.personal_data, insurance: related.insurance ?? [] } : undefined;
+}
+
 // Use a unique covering period, or the explicitly requested former payer certificate.
 // Never copy the logged-in parent's payer into the other parent's paperwork.
 function payerPeriod(doc: GuideDoc, account?: S["ZusAccount"]): S["InsurancePeriod"] | undefined {
-  if (account?.persona.who !== doc.who || !doc.start || !doc.end) return undefined;
-  const periods = account.insurance.filter((p) => p.start <= doc.start! && (!p.end || p.end >= doc.end!));
+  const profile = parentProfile(doc, account);
+  if (!profile || !doc.start || !doc.end) return undefined;
+  const periods = profile.insurance.filter((p) => p.start <= doc.start! && (!p.end || p.end >= doc.end!));
   if (periods.length) return periods.length === 1 ? periods[0] : undefined;
   if (documentIssuer(doc) === "employer" && doc.note.includes("były")) {
-    const ended = account.insurance.filter((p) => p.end && p.end < doc.start!).sort((a, b) => b.end!.localeCompare(a.end!));
+    const ended = profile.insurance.filter((p) => p.end && p.end < doc.start!).sort((a, b) => b.end!.localeCompare(a.end!));
     if (ended.length && (!ended[1] || ended[0].end !== ended[1].end)) return ended[0];
   }
   return undefined;
@@ -79,12 +88,17 @@ export function prefilledFields(form: OfficialForm, doc: GuideDoc, plan?: S["Pla
   account?: S["ZusAccount"]): Record<string, FilledField> {
   if (doc.rule === "Oficjalny wzór ZUS") return {};
   const result: Record<string, FilledField> = {};
-  const ownName = name ?? (account?.persona.who === doc.who ? account.persona.name : undefined);
+  const profile = parentProfile(doc, account);
+  const ownName = name?.trim() ? name : profile?.name;
   // Two components are unambiguous for the sample personas. Longer names need manual separation.
   const parts = ownName?.trim().split(/\s+/);
   const payer = knownPayer(doc, account);
-  const payerData = payerPeriod(doc, account)?.payer_data;
-  const personal = account?.persona.who === doc.who ? account.personal_data : undefined;
+  const insurancePeriod = payerPeriod(doc, account);
+  const payerData = insurancePeriod?.payer_data;
+  const personal = profile?.personalData;
+  const insuredParent = plan?.family[doc.who];
+  const insuredFrom = insuredParent?.insured_since ?? insurancePeriod?.start;
+  const insuredUntil = insuredParent?.insured_until ?? insurancePeriod?.end;
   const block = documentBlock(doc, plan);
   const adoption = plan?.family.adoption;
   const checkbox = block?.kind === "maternity" ? (adoption ? "nawarunkach" : "macierzynskiego")
@@ -175,6 +189,33 @@ export function prefilledFields(form: OfficialForm, doc: GuideDoc, plan?: S["Pla
       if (leave && parent?.employment === "employee" && (!parent.insured_until || parent.insured_until >= block.start)
           && field.name === `topmostSubform[0].Page3[0].${leave}[0]` && field.label.startsWith("Zaznacz, jeśli pracownikowi udzielono"))
         result[field.id] = { value: "X", source: "Rodzaj urlopu pracownika w planie" };
+    }
+    if (form.id === "z3a" && page.number === 3 && insuredParent) {
+      const sicknessCoverage = insurancePeriod?.sickness_insurance ??
+        (insuredParent.employment === "contract" ? insuredParent.voluntary_sickness : undefined);
+      if (field.type === "CheckBox" && insuredParent.employment === "contract") {
+        if (sicknessCoverage === true && field.name === "topmostSubform[0].Page3[0].Informacje1A[0]")
+          result[field.id] = { value: "X", source: "Ubezpieczenie chorobowe potwierdzone w danych planu lub konta" };
+        if (sicknessCoverage === false && field.name === "topmostSubform[0].Page3[0].Informacje1B[0]")
+          result[field.id] = { value: "X", source: "Brak dobrowolnego ubezpieczenia chorobowego w danych planu lub konta" };
+        if (field.name === "topmostSubform[0].Page3[0].ZaznaczX2[0]")
+          result[field.id] = { value: "X", source: "Tytuł ubezpieczenia: umowa zlecenia w danych planu" };
+      }
+      if (field.type === "Text" && field.name === "topmostSubform[0].Page3[0].UCHpodlega[0]") {
+        if (insuredFrom) result[field.id] = { value: insuredUntil ? `${day(insuredFrom)} – ${day(insuredUntil)}` : day(insuredFrom),
+          source: "Okres ubezpieczenia chorobowego podany w planie lub na koncie" };
+      }
+      if (insuredUntil && field.type === "CheckBox"
+          && field.name === "topmostSubform[0].Page3[0].Informacje3TAK[0]")
+        result[field.id] = { value: "X", source: "Data ustania tytułu ubezpieczenia podana w planie" };
+      if (insuredUntil && field.type === "Text"
+          && field.name === "topmostSubform[0].Page3[0].Data3[0]")
+        result[field.id] = { value: day(insuredUntil), source: "Data ustania tytułu ubezpieczenia podana w planie lub na koncie" };
+    }
+    if (form.id === "z3a" && page.number === 4 && field.type === "CheckBox" && insuredParent?.payer_insured_count) {
+      const thresholdField = insuredParent.payer_insured_count <= 20 ? "PozostaleA" : "PozostaleB";
+      if (field.name === `topmostSubform[0].Page4[0].${thresholdField}[0]`)
+        result[field.id] = { value: "X", source: "Liczba ubezpieczonych wskazana w danych płatnika" };
     }
   }
   return result;

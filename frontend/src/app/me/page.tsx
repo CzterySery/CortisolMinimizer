@@ -44,13 +44,17 @@ export default function Me() {
     return () => controller.abort();
   }, [reload]);
 
-  const plan = savedPlan ?? account?.plan;
-  const logout = () => { userToken.set(); setToken(undefined); setAccount(undefined); setExpired(false); setReload((n) => n + 1); };
+  const plan = savedPlan;
+  const firstName = account?.persona.name.trim().split(/\s+/)[0];
+  const logout = () => {
+    userToken.set(); myPlan.clear(); setSavedPlan(undefined);
+    setToken(undefined); setAccount(undefined); setExpired(false); setReload((n) => n + 1);
+  };
 
   return (
     <main className="page">
-      <PageHeader title="Moje dane">
-        {account ? `${account.persona.name} · ${account.persona.description}` : "Podgląd danych ubezpieczenia, historii e-ZLA oraz lista dokumentów do złożenia."}
+      <PageHeader title={firstName ? `Witaj ${firstName}!` : "Moje dane"}>
+        {account ? "Moje dane i dokumenty" : "Podgląd danych ubezpieczenia, historii e-ZLA oraz lista dokumentów do złożenia."}
       </PageHeader>
       {loading && !account && !plan ? <p className="muted" role="status">Wczytuję dane i statusy dokumentów…</p> : <>
         {expired && <p className="notice" role="status">Sesja wygasła. Zaloguj się ponownie, aby pobrać złożone dokumenty z konta.</p>}
@@ -81,7 +85,7 @@ export default function Me() {
             {account.insurance.map((insurance) => <p key={`${insurance.title}|${insurance.start}`}>{insurance.payer}: podstawa składek {pln(insurance.contribution_base)}</p>)}
           </section>
         </> : <MobywatelLogin onLogin={() => { setToken(userToken.get()); setExpired(false); setReload((n) => n + 1); }} />}
-        <DocumentsSection plan={plan} account={account} token={token} allowSending={!expired && (!token || !!account)}
+        <DocumentsSection key={token ?? "anonymous"} plan={plan} account={account} token={token} allowSending={!expired && (!token || !!account)}
           onSubmitted={() => { if (token) setReload((n) => n + 1); }} />
       </>}
     </main>

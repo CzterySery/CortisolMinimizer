@@ -57,7 +57,7 @@ export default function Cases() {
   };
 
   return (
-    <main className="page">
+    <main className="page cases-page">
       <PageHeader title="Sprawdź sprawę">
         Weryfikacja prawa do zasiłku i wyliczonych kwot na podstawie przykładowych spraw lub wgranego pliku PDF.
       </PageHeader>

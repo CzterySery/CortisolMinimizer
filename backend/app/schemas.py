@@ -377,6 +377,14 @@ class InsurancePeriod(Model):
     payer_data: "DemoPayerData | None" = None
 
 
+class RelatedDemoParent(Model):
+    """Fictional identity and insurance records for the other parent in a demo account."""
+    who: Who
+    name: str
+    personal_data: DemoPersonalData
+    insurance: list[InsurancePeriod] = []
+
+
 class DemoPayerData(Model):
     """Complete fictional payer identity for form previews, attached to its insurance period."""
     name: str
@@ -423,6 +431,7 @@ class ZusAccount(Model):
     applications: list[FiledApplication]  # already filed, including those sent from this app
     plan: Plan  # ZUS records plus the person's own entries (partner, planned leave), ready for the calculator
     personal_data: DemoPersonalData | None = None
+    related_parents: list[RelatedDemoParent] = []
 
 
 class PueMessage(Model):

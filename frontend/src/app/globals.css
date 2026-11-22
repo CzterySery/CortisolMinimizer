@@ -138,6 +138,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .page-header { max-width: 100%; container-type: inline-size; }
 .page-header h1 { color: #1c1d1f; font-family: Georgia, 'Times New Roman', serif; font-weight: 400; font-size: min(clamp(22px, 3.6vw, 48px), calc(175cqi / var(--heading-length, 40))); line-height: 1.2; letter-spacing: -.025em; margin: 0 0 10px; white-space: nowrap; }
 .page-header .lead { color: #527561; font-size: 15px; line-height: 1.65; max-width: 720px; }
+.calculator-page .page-header .lead, .cases-page .page-header .lead { max-width: none; }
 .lead { margin: 0; font-size: 14px; line-height: 1.8; color: var(--muted-strong); }
 .muted { color: var(--muted-strong); font-size: 13px; }
 .notice { margin: 0; padding: 12px 16px; border-left: 3px solid var(--warm); background: #faf6ed; font-size: 13px; }

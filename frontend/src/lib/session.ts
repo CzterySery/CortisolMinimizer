@@ -11,6 +11,17 @@ function write(key: string, value?: string) {
   } catch { /* storage unavailable: feature degrades to "not remembered" */ }
 }
 
+// A full browser refresh should discard the cached calculator checklist so /me cannot
+// resurrect an outdated plan. SPA navigation keeps the freshly prepared plan available.
+function clearPlanCacheAfterReload() {
+  if (typeof window === "undefined") return;
+  const navigation = window.performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+  if (navigation?.type !== "reload") return;
+  try { window.sessionStorage.removeItem("otwartekarty.myplan"); } catch { /* storage may be unavailable */ }
+}
+
+clearPlanCacheAfterReload();
+
 const slot = (key: string) => ({ get: () => read(key), set: (v?: string) => write(key, v) });
 
 export const userToken = slot("otwartekarty.user");
@@ -21,6 +32,7 @@ export const applicationReceipts = slot("otwartekarty.receipts.v1");
 // The plan the user built in the calculator, read by /me (their own case, never a game result).
 export const myPlan = {
   put: (plan: unknown) => write("otwartekarty.myplan", JSON.stringify(plan)),
+  clear: () => write("otwartekarty.myplan"),
   get: (): unknown => {
     try { return JSON.parse(read("otwartekarty.myplan") ?? "null") ?? undefined; } catch { return undefined; }
   },

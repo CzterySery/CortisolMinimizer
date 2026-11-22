@@ -21,8 +21,8 @@ const readReceipts = (): Receipt[] => {
       && v.payload && v.official_fields) : []; } catch { return []; }
 };
 
-// The user's own paperwork, from the plan saved in the calculator or "Moje dane". The game never produces
-// applications. Documents ZUS already has (simulated eZUS account) are ticked off; the rest can be filled in and sent.
+// Required paperwork is generated only from a plan saved by the calculator. Without one, show sent account
+// documents only; neither login alone nor the sample game creates a checklist for the user's case.
 export function DocumentsSection({ plan, account, token, allowSending = true, onSubmitted }: {
   plan?: S["Plan-Input"]; account?: S["ZusAccount"]; token?: string; allowSending?: boolean; onSubmitted?: () => void;
 }) {
@@ -53,7 +53,11 @@ export function DocumentsSection({ plan, account, token, allowSending = true, on
   const filed = new Set([...receipts.map((r) => r.key), ...(account?.applications ?? []).map(documentKey)]);
 
   useEffect(() => {
-    if (!plan) return;
+    if (!plan) {
+      setDocuments(undefined);
+      setError(undefined);
+      return;
+    }
     const controller = new AbortController();
     api.POST("/api/v1/calc/plan", { body: plan, signal: controller.signal }).then(({ data, error }) => {
       if (controller.signal.aborted) return;
@@ -63,7 +67,7 @@ export function DocumentsSection({ plan, account, token, allowSending = true, on
     return () => controller.abort();
   }, [plan]);
 
-  const combined = new Map((documents ?? []).map((d) => [documentKey(d), { ...d, done: d.done || filed.has(documentKey(d)) }]));
+  const combined = new Map((plan ? documents ?? [] : []).map((d) => [documentKey(d), { ...d, done: d.done || filed.has(documentKey(d)) }]));
   for (const item of account?.applications ?? []) {
     const identity = documentKey(item);
     if (!combined.has(identity)) combined.set(identity, { form: item.form, who: item.who, recipient: item.recipient,
@@ -77,12 +81,18 @@ export function DocumentsSection({ plan, account, token, allowSending = true, on
     <section ref={section} id="dokumenty" aria-labelledby="documents-title" className="stack account-documents">
       <h2 id="documents-title">Twoje dokumenty</h2>
       <p className="muted">
-        Lista dla Twojego planu z kalkulatora. {account ? "Dokumenty, które ZUS już ma, są odhaczone." : "Po zalogowaniu przez mObywatel odhaczymy dokumenty, które ZUS już ma."}
+        {plan ? "Lista dokumentów wynika z planu przygotowanego w kalkulatorze. Dokumenty już wysłane są oznaczone." : account
+          ? "Lista pokazuje tylko dokumenty wysłane z Twojego konta mObywatel."
+          : "Wymagane dokumenty pojawią się tutaj po zalogowaniu lub przygotowaniu planu w kalkulatorze."}
       </p>
-      {!plan && <p className="muted"><Link href="/calculator">Policz swój plan w kalkulatorze</Link> albo zaloguj się przez mObywatel, aby zobaczyć wymagane dokumenty.</p>}
+      {!plan && (account
+        ? <p className="notice">Skorzystaj z kalkulatora, aby dowiedzieć się, których dokumentów jeszcze potrzebujesz.</p>
+        : <p className="muted"><Link href="/calculator">Przejdź do kalkulatora i przygotuj swój plan</Link>, aby zobaczyć wymagane dokumenty.</p>)}
       {error ? <ApiResult error={error} /> : null}
       {sent && <p className="notice" role="status">{sent}</p>}
-      {(plan || shown.length > 0) && <><p className="muted">Kliknij niewysłany wniosek, aby uzupełnić dane i wysłać go w symulacji. Wysłane dokumenty i zaświadczenia możesz podejrzeć.</p>
+      {(plan || shown.length > 0) && <><p className="muted">{plan
+        ? "Kliknij niewysłany wniosek, aby uzupełnić dane i wysłać go w symulacji. Wysłane dokumenty i zaświadczenia możesz podejrzeć."
+        : "Wysłane dokumenty i zaświadczenia możesz podejrzeć."}</p>
         <DocsChecklist documents={shown} compact
           actionLabel={(doc) => canSend(doc) ? selected === documentKey(doc) ? "Zwiń formularz" : "Wypełnij i wyślij (symulacja)" : "Zobacz dokument ↗"}
           onInspect={(doc) => {
@@ -95,7 +105,8 @@ export function DocumentsSection({ plan, account, token, allowSending = true, on
           }}
           renderEditor={(doc) => canSend(doc) && selected === documentKey(doc) && <ApplicationForm
             key={`${documentKey(doc)}|${account?.persona.id}`} doc={doc} auth={auth}
-            name={account?.persona.who === doc.who ? account.persona.name : ""}
+            name={account?.persona.who === doc.who ? account.persona.name
+              : account?.related_parents?.find((parent) => parent.who === doc.who)?.name ?? ""}
             birth={plan?.family.birth_date ?? ""} plan={plan} account={account}
             onSent={(id, payload, official_fields) => {
               const receipt = { scope: token ?? "anonymous", key: documentKey(doc), payload, official_fields };
@@ -111,7 +122,7 @@ export function DocumentsSection({ plan, account, token, allowSending = true, on
             <dl>{Object.entries({ ...r.payload, ...r.official_fields }).map(([label, value]) => <div key={label}>
               <dt>{label}</dt><dd>{value || "—"}</dd></div>)}</dl></section>)}
         </details>}
-        <p className="muted">Zaświadczenie płatnika (Z-3 / Z-3a) wypełnia pracodawca lub zleceniodawca, a e-ZLA wystawia lekarz. Dlatego nie wyświetlamy dla nich przycisku samodzielnego wysłania.</p></>}
+        {plan && <p className="muted">Zaświadczenie płatnika (Z-3 / Z-3a) wypełnia pracodawca lub zleceniodawca, a e-ZLA wystawia lekarz. Dlatego nie wyświetlamy dla nich przycisku samodzielnego wysłania.</p>}</>}
       {guide && <DocumentGuide key={`${key(guide.doc)}|${guide.doc.start}`} doc={guide.doc} plan={plan} name={guide.name} account={account}
         fieldEdits={guide.fieldEdits} onClose={() => setGuide(undefined)} />}
     </section>

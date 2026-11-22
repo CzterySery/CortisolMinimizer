@@ -1279,6 +1279,15 @@ export interface components {
             contribution_base: string;
             payer_data: components["schemas"]["DemoPayerData"] | null;
         };
+        /** RelatedDemoParent */
+        RelatedDemoParent: {
+            /** Who */
+            who: "mother" | "father";
+            /** Name */
+            name: string;
+            personal_data: components["schemas"]["DemoPersonalData"];
+            insurance: components["schemas"]["InsurancePeriod"][];
+        };
         /** Issue */
         Issue: {
             /** Code */
@@ -2122,6 +2131,7 @@ export interface components {
             applications: components["schemas"]["FiledApplication"][];
             plan: components["schemas"]["Plan-Output"];
             personal_data: components["schemas"]["DemoPersonalData"] | null;
+            related_parents: components["schemas"]["RelatedDemoParent"][];
         };
     };
     responses: never;
