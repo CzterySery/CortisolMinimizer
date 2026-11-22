@@ -88,22 +88,22 @@ export function LandingHero() {
 
   const p = progress;
 
-  // Stage 1: Expecting couple on the left
+  // Stage 1: Expecting couple on the left (bump disappears right as koszyk appears)
   const parentsEnter = 1;
-  const parentsPregnant = 1 - smoothstep(0.14, 0.28, p);
+  const parentsPregnant = 1 - smoothstep(0.04, 0.18, p);
 
   // Stage 2: Baby in Koszyk (Nosidełko) with straight rim and baby head partially peeking out
   const carrierEnter = smoothstep(0.04, 0.18, p);
   const carrierRock = Math.sin(p * Math.PI * 10) * 2.8 * (1 - smoothstep(0.50, 0.64, p));
   const babyInCarrierAlpha = 1 - smoothstep(0.42, 0.52, p);
 
-  // Stage 3: Crawling Baby
+  // Stage 3: Crawling Baby (natural cross-crawl on hands and bent knees)
   const crawlEnter = smoothstep(0.40, 0.50, p);
   const crawlMove = smoothstep(0.42, 0.68, p);
   const crawlFade = 1 - smoothstep(0.64, 0.74, p);
   const crawlAlpha = crawlEnter * crawlFade;
   const crawlX = lerp(655, 825, crawlMove);
-  const crawlSwing = Math.sin(crawlMove * Math.PI * 6) * 6;
+  const crawlPhase = Math.sin(crawlMove * Math.PI * 5);
 
   // Stage 4 -> 5: Child stands up, walks right, grows smoothly
   const walkEnter = smoothstep(0.63, 0.73, p);
@@ -388,48 +388,54 @@ export function LandingHero() {
             )}
 
             {/* ================================================================= */}
-            {/* 3. CENTER: CRAWLING BABY (Clean rounded limbs behind romper)      */}
+            {/* 3. CENTER: CRAWLING BABY (Natural hands-and-knees cross-crawl)    */}
             {/* ================================================================= */}
             {crawlAlpha > 0.01 && (
               <g transform={`translate(${crawlX}, 0)`} opacity={crawlAlpha}>
-                {/* All 4 limbs drawn behind the romper torso so joints are 100% seamless */}
-                <g transform={`rotate(${-crawlSwing}, 36, 524)`}>
+                {/* Back leg (bent 90 deg at knee, shin & tiny foot trailing backward) */}
+                <g transform={`translate(${-crawlPhase * 6 - 5}, ${-Math.max(0, -crawlPhase) * 2.5 - 1})`}>
                   <path
-                    d="M 28 522 L 16 564 C 14 572 24 576 28 568 L 42 526 Z"
-                    className="fill-white ink"
-                  />
-                </g>
-                <g transform={`rotate(${crawlSwing}, 42, 524)`}>
-                  <path
-                    d="M 34 522 L 24 566 C 22 574 33 576 36 568 L 48 526 Z"
-                    className="fill-white ink"
-                  />
-                </g>
-                <g transform={`rotate(${crawlSwing}, 88, 522)`}>
-                  <path
-                    d="M 82 520 L 90 566 C 91 574 101 574 100 566 L 94 518 Z"
-                    className="fill-white ink"
-                  />
-                </g>
-                <g transform={`rotate(${-crawlSwing}, 84, 522)`}>
-                  <path
-                    d="M 78 520 L 76 566 C 76 574 87 574 88 566 L 90 520 Z"
+                    d="M 30 534 L 29 564 L 13 566 C 11 561 7 559 4 562 C 2 565 2 576 9 576 L 36 576 C 43 576 46 571 45 565 L 44 534 Z"
                     className="fill-white ink"
                   />
                 </g>
 
-                {/* Cozy one-piece baby romper overlapping limb joints cleanly */}
+                {/* Back arm (soft elbow curve down to little palm flat on floor) */}
+                <g transform={`translate(${crawlPhase * 5 + 6}, ${-Math.max(0, crawlPhase) * 2.5})`}>
+                  <path
+                    d="M 78 532 Q 75 552 80 569 L 80 576 H 96 C 100 576 100 569 94 568 L 91 568 Q 89 550 92 532 Z"
+                    className="fill-white ink"
+                  />
+                </g>
+
+                {/* Front leg (bent knee crawling in opposite phase) */}
+                <g transform={`translate(${crawlPhase * 6}, ${-Math.max(0, crawlPhase) * 2.5})`}>
+                  <path
+                    d="M 30 534 L 29 564 L 13 566 C 11 561 7 559 4 562 C 2 565 2 576 9 576 L 36 576 C 43 576 46 571 45 565 L 44 534 Z"
+                    className="fill-white ink"
+                  />
+                </g>
+
+                {/* Front arm (reaching forward in cross-crawl phase with back leg) */}
+                <g transform={`translate(${-crawlPhase * 5}, ${-Math.max(0, -crawlPhase) * 2.5})`}>
+                  <path
+                    d="M 78 532 Q 75 552 80 569 L 80 576 H 96 C 100 576 100 569 94 568 L 91 568 Q 89 550 92 532 Z"
+                    className="fill-white ink"
+                  />
+                </g>
+
+                {/* Cozy one-piece baby romper overlapping hip and shoulder joints cleanly */}
                 <path
-                  d="M 24 520 C 20 498 42 488 74 490 C 96 492 106 504 102 522 C 96 538 32 538 24 520 Z"
+                  d="M 24 532 C 22 512 42 502 72 504 C 94 506 102 518 98 536 C 92 548 34 548 24 532 Z"
                   className="fill-blue ink"
                 />
 
-                {/* Cute Baby Head with delicate top curl (no dark bar across forehead) */}
-                <circle cx="110" cy="484" r="22" className="fill-white ink" />
-                <path d="M 105 462 C 110 455 118 457 116 463" fill="none" className="ink" />
-                <circle cx="113" cy="482" r="1.9" className="fill-dark" />
-                <circle cx="123" cy="483" r="1.9" className="fill-dark" />
-                <path d="M 113 494 Q 118 498 123 494" fill="none" className="ink-thin" />
+                {/* Cute Baby Head looking forward-right */}
+                <circle cx="110" cy="494" r="22" className="fill-white ink" />
+                <path d="M 105 472 C 110 465 118 467 116 473" fill="none" className="ink" />
+                <circle cx="113" cy="492" r="1.9" className="fill-dark" />
+                <circle cx="123" cy="493" r="1.9" className="fill-dark" />
+                <path d="M 113 504 Q 118 508 123 504" fill="none" className="ink-thin" />
               </g>
             )}
 

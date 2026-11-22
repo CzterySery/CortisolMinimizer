@@ -57,7 +57,7 @@ test("game → calculator → applications → mObywatel → cases → help → 
   await expect(page.getByText("Wynik kalkulatora jest zgodny.")).toBeVisible();
   await shot(page, info, "07-cases");
 
-  await page.goto("/#pomoc");
+  await page.goto("/help");
   await page.getByLabel("Twoje pytanie").fill("Ile trwa urlop ojcowski?");
   await page.getByRole("button", { name: "Wyślij pytanie" }).click();
   // The wording comes from the local answer or, with a model key, from Gemini; both state the 14-day pool.

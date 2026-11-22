@@ -5,7 +5,7 @@ import { api, type S } from "@/lib/api";
 import { userToken } from "@/lib/session";
 import { ApiResult } from "@/components/api-result";
 
-// Former /help page, now the bottom of the home page: first the assistant chat, then all links.
+// Assistant chat lives on /help; HelpLinks lives inside "Przydatne Informacje" on home.
 const QUICK_QUESTIONS = [
   "Ile trwa urlop ojcowski?",
   "Jak działa wniosek o 81,5% zasiłku?",
@@ -14,21 +14,6 @@ const QUICK_QUESTIONS = [
   "Kto wypłaca zasiłek — pracodawca czy ZUS?",
   "Kiedy trzeba dołączyć odpis aktu urodzenia?",
 ];
-
-const LINK_BADGES: Record<string, string> = {
-  "https://www.zus.pl": "zus.pl · Zakład Ubezpieczeń Społecznych",
-  "https://www.gov.pl/web/rodzina/urlop-rodzicielski": "gov.pl · MRPiPS",
-  "https://www.pip.gov.pl/dla-pracodawcow/porady-prawne/rodzicielstwo": "pip.gov.pl · Państwowa Inspekcja Pracy",
-  "https://www.gov.pl/web/cyfryzacja/rejestr-stanu-cywilnego": "gov.pl · Urząd Stanu Cywilnego",
-};
-
-function getHostBadge(url: string) {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return url;
-  }
-}
 
 export function HelpChat() {
   const [question, setQuestion] = useState("");
@@ -137,42 +122,30 @@ export function HelpLinks() {
   }, []);
 
   return (
-    <section className="panel home-links" aria-labelledby="home-links-title">
-      <h2 className="home-help-title" id="home-links-title">Przydatne linki</h2>
+    <section className="home-links" aria-labelledby="home-links-title">
+      <h3 className="home-help-title" id="home-links-title">Przydatne linki</h3>
       <div className="home-links-group">
-        <h3>Oficjalne źródła</h3>
-        <p className="muted">
-          Bezpośrednie odnośniki do serwisów instytucji publicznych oraz oficjalnych wytycznych dla rodziców.
-        </p>
-        <ul className="official-links-grid">
+        <h4>Oficjalne źródła</h4>
+        <ul className="simple-links-list">
           {links.map((l) => (
             <li key={l.url}>
-              <a className="official-link-card" href={l.url} target="_blank" rel="noreferrer">
-                <span className="official-link-badge">{LINK_BADGES[l.url] ?? getHostBadge(l.url)}</span>
-                <strong className="official-link-title">
-                  <span>{l.title}</span>
-                  <span aria-hidden="true" className="official-link-arrow">↗</span>
-                </strong>
+              <a className="simple-green-link" href={l.url} target="_blank" rel="noreferrer">
+                {l.title} <span aria-hidden="true">↗</span>
               </a>
             </li>
           ))}
         </ul>
       </div>
       <div className="home-links-group">
-        <h3>Wsparcie w trudnych sytuacjach</h3>
+        <h4>Wsparcie w trudnych sytuacjach</h4>
         <p className="muted">
-          Organizacje charytatywne, sprawdzone na ich stronach i w KRS. Pomagają m.in. po stracie dziecka, przy
-          wcześniaku i ciężkiej chorobie.
+          Organizacje charytatywne pomagające m.in. po stracie dziecka, przy wcześniaku i ciężkiej chorobie.
         </p>
-        <ul className="official-links-grid">
+        <ul className="simple-links-list">
           {charities.map((c) => (
             <li key={c.url}>
-              <a className="official-link-card" href={c.url} target="_blank" rel="noreferrer">
-                <span className="official-link-badge">{c.helps_with.join(" · ")}</span>
-                <strong className="official-link-title">
-                  <span>{c.name}</span>
-                  <span aria-hidden="true" className="official-link-arrow">↗</span>
-                </strong>
+              <a className="simple-green-link" href={c.url} target="_blank" rel="noreferrer">
+                {c.name} <span aria-hidden="true">↗</span>
               </a>
             </li>
           ))}

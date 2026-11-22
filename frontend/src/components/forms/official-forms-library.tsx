@@ -8,8 +8,8 @@ export function OfficialFormsLibrary() {
   const [doc, setDoc] = useState<GuideDoc>();
 
   return (
-    <section className="panel home-forms-panel" aria-labelledby="home-forms-title">
-      <h2 className="home-help-title" id="home-forms-title">Oficjalne formularze ZUS</h2>
+    <section className="home-forms-panel" aria-labelledby="home-forms-title">
+      <h3 className="home-help-title" id="home-forms-title">Oficjalne formularze ZUS</h3>
       <p className="muted">Podgląd aktualnych wzorów ZUS z zaznaczonymi polami do wypełnienia.</p>
       <div className="forms-compact-grid">
         {officialForms.map((form) => (

@@ -1,6 +1,13 @@
-import { redirect } from "next/navigation";
+import { PageHeader } from "@/components/page-header";
+import { HelpChat } from "@/components/help/home-help";
 
-// Help (assistant chat and links) now lives at the bottom of the home page; keep old links working.
-export default function Help() {
-  redirect("/#pomoc");
+export default function HelpPage() {
+  return (
+    <main className="page">
+      <PageHeader eyebrow="Pomoc prawna" title="Asystent" accent="AI.">
+        Zadaj pytanie o urlopy rodzicielskie, zasiłki, formularze ZUS lub składki.
+      </PageHeader>
+      <HelpChat />
+    </main>
+  );
 }
