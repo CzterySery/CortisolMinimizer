@@ -49,8 +49,8 @@ export default function Me() {
 
   return (
     <main className="page">
-      <PageHeader eyebrow="Moje dane" title="Moje" accent="dane i dokumenty.">
-        {account ? `${account.persona.name} · ${account.persona.description}` : "Sprawdź najważniejsze dane i przygotuj dokumenty dla swojego planu."}
+      <PageHeader title="Moje dane">
+        {account ? `${account.persona.name} · ${account.persona.description}` : "Podgląd danych ubezpieczenia, historii e-ZLA oraz lista dokumentów do złożenia."}
       </PageHeader>
       {loading && !account && !plan ? <p className="muted" role="status">Wczytuję dane i statusy dokumentów…</p> : <>
         {expired && <p className="notice" role="status">Sesja wygasła. Zaloguj się ponownie, aby pobrać złożone dokumenty z konta.</p>}

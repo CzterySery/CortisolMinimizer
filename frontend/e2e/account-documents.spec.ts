@@ -24,7 +24,7 @@ test("fresh deployment origin loads the account plan and persisted receipts with
     return r.fulfill({ json: { id: 9, recipient: "employer", status: "wysłano (symulacja)" } });
   });
   await page.goto("/me");
-  await expect(page.getByRole("heading", { name: "Moje dane i dokumenty.", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Moje dane", exact: true })).toBeVisible();
   await expect(page.getByRole("navigation").getByRole("link", { name: "Twoje dokumenty", exact: true })).toHaveCount(0);
   const items = page.locator("#dokumenty .docs > li");
   await expect(items.first()).toHaveClass("done");

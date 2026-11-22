@@ -16,8 +16,8 @@ export default async function SourcePage({ params }: { params: Promise<{ id: str
   const sections = [...text.matchAll(/<a id="([^"]+)"><\/a>([\s\S]*?)(?=<a id="|$)/g)];
   const extension = source.pdf_pages ? "pdf" : "docx";
   return <main className="page legal-page">
-    <PageHeader eyebrow="Biblioteka źródeł · materiały ZUS" title={source.title}>
-      Transkrypcja dostarczonego dokumentu. Numer strony odnosi się do pliku PDF; indeksy górne mogą być zapisane w jednym wierszu.
+    <PageHeader title={source.title}>
+      Pełna transkrypcja dokumentu z odniesieniem do numerów stron oryginalnego pliku PDF.
     </PageHeader>
     <div className="actions"><a className="button" href={`/legal/${source.id}.${extension}`} target="_blank" rel="noreferrer">Otwórz oryginalny dokument ↗</a><Link className="button" href="/">Wróć do talii</Link></div>
     {sections.map(([ , anchor, body]) => <section key={anchor} id={anchor} className="legal-section">

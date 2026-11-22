@@ -4,8 +4,8 @@ import { HelpChat } from "@/components/help/home-help";
 export default function HelpPage() {
   return (
     <main className="page">
-      <PageHeader eyebrow="Pomoc prawna" title="Asystent" accent="AI.">
-        Zadaj pytanie o urlopy rodzicielskie, zasiłki, formularze ZUS lub składki.
+      <PageHeader title="Asystent AI">
+        Wyszukiwarka odpowiedzi w przepisach ZUS i Kodeksu pracy z odnośnikami do dokumentów źródłowych.
       </PageHeader>
       <HelpChat />
     </main>

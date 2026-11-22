@@ -128,8 +128,8 @@ export default function Calculator() {
     : plan.family.birth_date || plan.family.due_date;
 
   return <main className="page calculator-page">
-    <PageHeader eyebrow="Kalkulator zasiłku" title="Policz swój plan." accent="Jedno pytanie naraz.">
-      Przejdziemy przez Waszą sytuację krok po kroku. Kwoty, plan opieki i dokumenty zobaczysz na końcu.
+    <PageHeader title="Kalkulator zasiłku">
+      Wyliczenie wysokości zasiłków, podziału urlopów między rodziców oraz listy wymaganych wniosków krok po kroku.
     </PageHeader>
     <nav aria-label="Kroki kalkulatora" className="calculator-steps"><ol>
       {steps.map((name, i) => <li key={name} aria-current={i === step ? "step" : undefined}>
