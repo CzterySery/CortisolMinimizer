@@ -12,7 +12,7 @@ export function gameProfiles(signals: CardSignals[]) {
   const best = Math.max(...Object.values(scores));
   return [
     { id: "time", title: "Kortyzol Minimizer", score: scores.time },
-    { id: "money", title: "Zasiłki Maxxxing", score: scores.money },
+    { id: "money", title: "Zasiłki Maxxing", score: scores.money },
     { id: "knowledge", title: "Balans Farming", score: scores.knowledge },
   ].filter((profile) => Math.abs(profile.score - best) < 0.000001);
 }

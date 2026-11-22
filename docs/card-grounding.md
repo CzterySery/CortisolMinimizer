@@ -35,7 +35,7 @@ Tryb nie zmienia prawa, stawek, dostępności kart ani kwot. Dostępny jest ten 
 | Tryb | Cel końcowy 0–100 | Sposób liczenia |
 | --- | --- | --- |
 | Kortyzol Minimizer | Przewidywalny plan | 40% pokrycia potrzeb opieki, 30% udziału miesięcy z budżetem co najmniej na poziomie celu, 30% terminowo skompletowanych wymaganych dokumentów |
-| Zasiłki Maxing | Wykorzystanie należnych świadczeń | Suma świadczeń po uwzględnieniu podstaw i podwyższeń, porównana z wykonalnym maksimum dla tego scenariusza, potrzeb i horyzontu; obok zawsze całkowity dochód rodziny |
+| Zasiłki Maxxing | Wykorzystanie należnych świadczeń | Suma świadczeń po uwzględnieniu podstaw i podwyższeń, porównana z wykonalnym maksimum dla tego scenariusza, potrzeb i horyzontu; obok zawsze całkowity dochód rodziny |
 | Aura Farming | Realizacja rodzinnego podziału opieki | 50% pokrycia uzgodnionych celów wspólnej opieki i 50% pokrycia celów samodzielnej opieki, według potrzeb scenariusza |
 
 Dla samotnego rodzica cele aury dotyczą samodzielnej opieki i zorganizowanego wsparcia; nie wymagają nieistniejącego partnera. Nie wymagamy równego podziału za wszelką cenę. Brak celów danej kategorii wyłącza ją z mianownika i przeskalowuje pozostałe wagi. Wynik pieniędzy porównujemy dla tej samej sytuacji i tych samych ograniczeń, nie między rodzinami. Maksimum nie może pochodzić z niewykonalnego układu. Jeśli brak dodatniego należnego świadczenia, cel ma status „nie dotyczy”, a nie karę za brak ubezpieczenia.

@@ -40,7 +40,7 @@ function decisionTreeProfiles(balance: { money: number; time: number }) {
   if (diff > 6) {
     return [{ id: "time", title: "Kortyzol Minimizer", subtitle: "Maksimum czasu z dzieckiem" }];
   }
-  return [{ id: "money", title: "Zasiłki Maxxxing", subtitle: "Maksimum wsparcia budżetu" }];
+  return [{ id: "money", title: "Zasiłki Maxxing", subtitle: "Maksimum wsparcia budżetu" }];
 }
 
 // Authoritative replay: send every selected decision; the server recomputes a single plan.
