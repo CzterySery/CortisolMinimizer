@@ -52,8 +52,6 @@ def statistics(plan: Plan, result, p: Params, choices: dict, knowledge: int) -> 
     baseline = sum(parent.base_monthly or Decimal(0)
                    for parent in (plan.family.mother, plan.family.father) if parent)
     lowest = min((row.total for row in result.months), default=Decimal(0))
-    money_ratio = min(Decimal(1), lowest / baseline) if baseline else Decimal(0)
-    time_ratio = covered / len(needs) if needs else Decimal(0)
     return [Statistic(id="money", label="Pieniądze", value=int(lowest), max=int(baseline), unit="zł"),
             Statistic(id="time", label="Czas", value=int(covered), max=len(needs), unit="dni"),
             Statistic(id="knowledge", label="Wiedza", value=min(100, 50 + knowledge), max=100, unit="pkt")]
@@ -64,7 +62,6 @@ def apply_card(plan: Plan, card: dict, p: Params, choices: dict, facts: dict, re
     plan = plan.model_copy(deep=True)
     reservations = dict(reservations)
     birth = plan.family.birth_date or plan.family.due_date
-    card_id = card["id"]
     def after(kind, who=None):
         return max((last_day(b) + timedelta(days=1) for b in plan.blocks
                     if b.kind == kind and (who is None or b.who == who)), default=birth)

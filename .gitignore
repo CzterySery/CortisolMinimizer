@@ -23,3 +23,6 @@ Documents/*[Ss]prawy*/
 # Playwright output
 frontend/test-results/
 frontend/playwright-report/
+
+# Scratch output (old e2e screenshots went here)
+tmp/

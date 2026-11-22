@@ -10,13 +10,16 @@ async function shot(page: Page, info: TestInfo, step: string) {
 
 test("game → calculator → applications → mObywatel → cases → help → admin", async ({ page }, info) => {
   await page.goto("/");
-  const play = page.getByRole("button", { name: /^Zagraj kartę:/ });
-  await expect(play.first()).toBeVisible();
+  // A card in hand is a focusable group played with Enter (the keyboard path; clicking its body also plays it).
+  const playable = page.getByRole("group", { name: /^Karta: .*aby zagrać\.$/ }).and(page.locator(":not(.is-unavailable)"));
+  await expect(playable.first()).toBeVisible();
   await shot(page, info, "01-board");
   for (let round = 1; round <= 5; round++) {
-    const enabled = play.and(page.locator(":enabled")).first();
-    await expect(enabled).toBeVisible();
-    await enabled.click();
+    const card = playable.first();
+    const id = await card.getAttribute("data-card-id");
+    await card.focus();
+    await page.keyboard.press("Enter");
+    await expect(page.locator(`.hand-card[data-card-id="${id}"]`)).toHaveCount(0);
     await expect(page.getByRole("status").filter({ hasText: "Przeliczam" })).toHaveCount(0);
   }
   await shot(page, info, "02-board-complete");
@@ -57,7 +60,8 @@ test("game → calculator → applications → mObywatel → cases → help → 
   await page.goto("/#pomoc");
   await page.getByLabel("Twoje pytanie").fill("Ile trwa urlop ojcowski?");
   await page.getByRole("button", { name: "Wyślij pytanie" }).click();
-  await expect(page.getByText(/Urlop ojcowski trwa 14 dni/)).toBeVisible();
+  // The wording comes from the local answer or, with a model key, from Gemini; both state the 14-day pool.
+  await expect(page.locator(".rag-answer")).toContainText(/14 dni/, { timeout: 20_000 });
   await shot(page, info, "08-help");
 
   await page.goto("/admin");

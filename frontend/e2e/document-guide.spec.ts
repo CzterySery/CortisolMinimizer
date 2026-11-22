@@ -6,27 +6,33 @@ async function noOverflow(page: Page) {
   expect(await dialog.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBeTruthy();
 }
 
+// The blank template library lives on the home page, next to the assistant.
 async function library(page: Page, code: string) {
-  await page.goto("/applications");
-  await page.getByText("Przejrzyj oficjalne formularze ZUS — demo pól", { exact: true }).click();
-  await page.locator(".form-template-library").getByRole("button").filter({ has: page.locator("strong", { hasText: new RegExp(`^${code}$`) }) }).click();
+  await page.goto("/");
+  await page.locator(".home-forms-panel").getByRole("button").filter({ has: page.locator("strong", { hasText: new RegExp(`^${code}$`) }) }).click();
   await expect(page.getByRole("dialog")).toBeVisible();
 }
 
-test("official ZAM fields and page images form an interactive, non-submitting demo", async ({ page }, info) => {
+// Fields are numbered markers on the page image; `index` is 0-based like the page selector.
+async function field(page: Page, index: number) {
+  await page.getByRole("dialog").getByRole("button", { name: new RegExp(`^Pole ${index + 1}:`) }).click();
+}
+
+test("official ZAM fields and page images form a read-only, non-submitting demo", async ({ page }, info) => {
   let sent = 0;
   page.on("request", (r) => { if (r.method() === "POST" && /applications|birth-certificate/.test(r.url())) sent++; });
   await library(page, "ZAM");
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByRole("link", { name: "Otwórz oryginalny PDF" })).toHaveAttribute("href", "/forms/zam/original.pdf");
   await expect(dialog.getByText("Wpisz swój numer PESEL", { exact: true })).toBeVisible();
-  await dialog.getByLabel("Wybierz pole na tej stronie").selectOption("3");
+  await field(page, 3);
   await expect(dialog.getByText("Wpisz swoje imię", { exact: true })).toBeVisible();
-  await dialog.getByLabel("Próbny wpis w tym polu").fill("PRZYKŁAD");
-  await expect(dialog.locator('[data-field="p1-3"] .pdf-example')).toHaveText("PRZYKŁAD");
-  await page.screenshot({ path: `../tmp/form-guide-${info.project.name}.png`, fullPage: true });
+  // The blank library template is read-only; trial entries belong to a plan's document (next test).
+  await expect(dialog.getByLabel("Próbny wpis w tym polu")).toHaveCount(0);
+  await expect(dialog.locator(".pdf-example")).toHaveCount(0);
+  await page.screenshot({ path: info.outputPath("form-guide.png"), fullPage: true });
   await dialog.getByLabel("Strona formularza").selectOption("4");
-  await dialog.getByLabel("Wybierz pole na tej stronie").selectOption("4");
+  await field(page, 4);
   await expect(dialog.locator(".field-official-instruction")).toContainText("z innego tytułu");
   await expect(dialog.locator(".field-official-instruction")).toContainText("ojcowskiego");
   await dialog.getByLabel("Strona formularza").selectOption("6");
@@ -50,10 +56,10 @@ test("known periods and leave type are filled immediately, editable and restorab
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByLabel("Próbny wpis w tym polu")).toHaveValue(""); // identity is not guessed
   await dialog.getByLabel("Strona formularza").selectOption("1");
-  await dialog.getByLabel("Wybierz pole na tej stronie").selectOption("2");
+  await field(page, 2);
   await expect(dialog.getByLabel("Próbne zaznaczenie X")).not.toBeChecked(); // not adoption
   await expect(dialog.locator('[data-field="p2-1"] .pdf-example')).toHaveText("X");
-  await dialog.getByLabel("Wybierz pole na tej stronie").selectOption("3");
+  await field(page, 3);
   await expect(dialog.getByLabel("Próbny wpis w tym polu")).toBeVisible();
   await expect(dialog.getByText("Uzupełniono automatycznie", { exact: true })).toBeVisible();
   await expect(dialog.locator('[data-field="p2-3"] .pdf-example')).toContainText("2027");
@@ -90,7 +96,7 @@ test("account identity and payer are filled only for the matching parent, librar
   await expect(dialog.locator('[data-field="p1-4"] .pdf-example')).toHaveText("Kowalczyk");
   await expect(dialog.locator('[data-field="p1-16"] .pdf-example')).toHaveText("Przykładowa firma");
   await expect(dialog.locator('[data-field="p1-0"] .pdf-example')).toHaveCount(0);
-  await page.screenshot({ path: `../tmp/form-prefilled-${info.project.name}.png`, fullPage: true });
+  await page.screenshot({ path: info.outputPath("form-prefilled.png"), fullPage: true });
   await dialog.getByLabel("Strona formularza").selectOption("4");
   await expect(dialog.locator(".pdf-example")).toHaveCount(0); // other parent and declarations
   await page.keyboard.press("Escape");
@@ -119,7 +125,7 @@ for (const code of ["Z-15", "ZAS-53", "ZNp-7", "Z-3", "Z-3a"]) test(`official ${
   if (code === "Z-15") {
     await expect(dialog.getByText(/Z-15 zastępuje Z-15A/)).toBeVisible();
     await dialog.getByLabel("Strona formularza").selectOption("1");
-    await dialog.getByLabel("Wybierz pole na tej stronie").selectOption("4");
+    await field(page, 4);
     await expect(dialog.locator(".field-official-instruction")).toHaveText("Wpisz nazwisko osoby, nad którą sprawujesz opiekę.");
   }
   if (code === "ZNp-7") {
