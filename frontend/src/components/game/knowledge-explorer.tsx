@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Card, Round } from "@/types/game";
 import { DecisionCard } from "./decision-card";
 import { getDecisionNodeForCard } from "@/lib/decision-tree";
-import { HelpChat, HelpLinks } from "@/components/help/home-help";
+import { HelpLinks } from "@/components/help/home-help";
 import { OfficialFormsLibrary } from "@/components/forms/official-forms-library";
 import { ScrollReveal } from "@/components/scroll-reveal";
 
@@ -81,43 +81,41 @@ export function KnowledgeExplorer({
     .filter((c): c is Card => Boolean(c));
 
   return (
-    <>
-      <ScrollReveal>
-        <section className="knowledge-explorer" aria-labelledby="knowledge-explorer-title">
-      <div className="knowledge-explorer-header">
-        <div>
-          <h2 id="knowledge-explorer-title" className="knowledge-explorer-title">
-            O czym chcesz się dowiedzieć?
-          </h2>
+    <ScrollReveal>
+      <section id="informacje" className="knowledge-explorer" aria-labelledby="knowledge-explorer-title">
+        <div className="knowledge-explorer-header">
+          <div>
+            <h2 id="knowledge-explorer-title" className="knowledge-explorer-title">
+              Przydatne Informacje
+            </h2>
+          </div>
         </div>
-      </div>
 
-      <div className="knowledge-topic-pills" role="tablist" aria-label="Tematy kart wiedzy">
-        {TOPICS.map((topic) => {
-          const isSelected = topic.id === activeTopicId;
-          return (
-            <button
-              key={topic.id}
-              type="button"
-              role="tab"
-              aria-selected={isSelected}
-              className={`knowledge-topic-pill ${isSelected ? "active" : ""}`}
-              onClick={() => setActiveTopicId(topic.id)}
-            >
-              <span>{topic.label}</span>
-              {topic.id === "recommended" && playedIds.length > 0 && (
-                <small className="topic-pill-badge">Wg Twojej ścieżki</small>
-              )}
-            </button>
-          );
-        })}
-      </div>
+        <div className="knowledge-topic-pills" role="tablist" aria-label="Tematy kart wiedzy">
+          {TOPICS.map((topic) => {
+            const isSelected = topic.id === activeTopicId;
+            return (
+              <button
+                key={topic.id}
+                type="button"
+                role="tab"
+                aria-selected={isSelected}
+                className={`knowledge-topic-pill ${isSelected ? "active" : ""}`}
+                onClick={() => setActiveTopicId(topic.id)}
+              >
+                <span>{topic.label}</span>
+                {topic.id === "recommended" && playedIds.length > 0 && (
+                  <small className="topic-pill-badge">Wg Twojej ścieżki</small>
+                )}
+              </button>
+            );
+          })}
+        </div>
 
-      {activeTopic.subtitle && <p className="knowledge-topic-subtitle">{activeTopic.subtitle}</p>}
+        {activeTopic.subtitle && <p className="knowledge-topic-subtitle">{activeTopic.subtitle}</p>}
 
-      <div className="knowledge-cards-grid">
-        {displayedCards.map((card, index) => {
-          return (
+        <div className="knowledge-cards-grid">
+          {displayedCards.map((card, index) => (
             <div
               key={card.id}
               className="knowledge-card-wrapper"
@@ -129,17 +127,15 @@ export function KnowledgeExplorer({
             >
               <DecisionCard card={card} index={index} category="Karta wiedzy ZUS" />
             </div>
-          );
-        })}
-      </div>
-      </section>
-      </ScrollReveal>
+          ))}
+        </div>
 
-      <section id="pomoc" className="knowledge-explorer-help" aria-label="Pomoc">
-        <ScrollReveal><HelpChat /></ScrollReveal>
-        <ScrollReveal><OfficialFormsLibrary /></ScrollReveal>
-        <ScrollReveal><HelpLinks /></ScrollReveal>
+        <hr className="knowledge-divider" />
+        <OfficialFormsLibrary />
+
+        <hr className="knowledge-divider" />
+        <HelpLinks />
       </section>
-    </>
+    </ScrollReveal>
   );
 }

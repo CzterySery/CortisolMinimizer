@@ -468,7 +468,8 @@ dialog::backdrop { background: #18312788; }
 .handoff-adjustments-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding-top: 8px; }
 
 /* ---- Knowledge Explorer ("O czym chcesz się dowiedzieć?") ---- */
-.knowledge-explorer { margin: 88px 0 16px; padding: 32px 28px; background: #fafbf8; border: 1px solid #e2e8dd; border-radius: 22px; }
+.knowledge-explorer { margin: 56px 0 36px; padding: 32px 28px; background: #fafbf8; border: 1px solid #e2e8dd; border-radius: 22px; }
+.knowledge-divider { border: 0; border-top: 1px solid #e2e8dd; margin: 28px 0 24px; }
 .knowledge-explorer-header { margin-bottom: 18px; }
 .knowledge-explorer-title { font-family: Georgia, serif; font-size: clamp(22px, 3vw, 30px); font-weight: 400; color: var(--ink); margin: 6px 0 8px; }
 .knowledge-explorer-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0; max-width: 720px; }
@@ -560,12 +561,14 @@ dialog::backdrop { background: #18312788; }
 .income-history-choice summary, .plan-grid > details > summary { cursor: pointer; }
 @media (max-width: 560px) { .situation-choices { grid-template-columns: minmax(0, 1fr); } .situation-choices .choice { min-height: 100px; } }
 
-/* Help panels below KnowledgeExplorer (#pomoc): assistant chat, official forms, links */
-.knowledge-explorer-help { scroll-margin-top: 24px; margin: 32px 0 32px; display: flex; flex-direction: column; gap: 28px; }
-.home-help-title { font-family: Georgia, serif; font-size: clamp(20px, 2.4vw, 26px); font-weight: 400; color: var(--ink); margin: 0 0 4px; }
-.home-links { display: flex; flex-direction: column; gap: 22px; }
-.home-links-group h3 { margin: 0 0 6px; font: 400 20px Georgia, serif; color: var(--ink); }
-.home-links-group .muted { margin: 0 0 12px; }
+/* Integrated links inside Przydatne Informacje + standalone Asystent AI (/help) */
+.home-help-title { font-family: Georgia, serif; font-size: clamp(20px, 2.4vw, 24px); font-weight: 400; color: var(--ink); margin: 0 0 6px; }
+.home-links { display: flex; flex-direction: column; gap: 18px; }
+.home-links-group h4 { margin: 0 0 8px; font: 400 17px Georgia, serif; color: var(--ink); }
+.home-links-group .muted { margin: 0 0 10px; font-size: 13px; }
+.simple-links-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 24px; }
+.simple-green-link { display: inline-flex; align-items: baseline; gap: 5px; color: var(--green); font-size: 14px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: #b7c8b0; transition: color 140ms, text-decoration-color 140ms; }
+.simple-green-link:hover { color: #2f523e; text-decoration-color: currentColor; }
 .rag-assistant { grid-column: 1 / -1; }
 .rag-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; }
 .rag-header > .eyebrow { margin: 0; }
@@ -610,4 +613,4 @@ dialog::backdrop { background: #18312788; }
 .official-link-title { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-family: Georgia, serif; font-weight: 400; font-size: 15px; color: var(--ink); line-height: 1.3; }
 .official-link-arrow { font-family: system-ui, sans-serif; font-size: 13px; color: var(--green); flex-shrink: 0; }
 .official-link-card small { font-size: 12px; line-height: 1.55; color: var(--muted-strong); }
-@media (max-width: 800px) { .charities-grid, .official-links-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 800px) { .charities-grid, .official-links-grid, .simple-links-list { grid-template-columns: minmax(0, 1fr); } }
