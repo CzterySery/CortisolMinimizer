@@ -33,7 +33,7 @@ test("game → calculator → applications → mObywatel → cases → help → 
   await expect(page.getByText("Kwoty zasiłków")).toBeVisible();
   await shot(page, info, "03-calculator");
   await page.getByRole("link", { name: "Przygotuj wnioski dla tego planu" }).click();
-  await expect(page.getByRole("heading", { name: /Twoje dokumenty/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Twoje dokumenty", exact: true })).toBeVisible();
   // fill and "send" one leave/benefit form; anonymous, so repeated runs don't use up anyone's list
   await page.locator(".docs").getByRole("button", { name: /Wypełnij i wyślij \(symulacja\)/ }).filter({ hasNotText: "Odpis" }).first().click();
   const form = page.locator(".application-editor");
@@ -45,9 +45,10 @@ test("game → calculator → applications → mObywatel → cases → help → 
   await page.goto("/login");
   await page.getByRole("button", { name: /Anna Kowalczyk/ }).click();
   await expect(page).toHaveURL(/\/me/);
+  await page.getByText("Zwolnienia lekarskie (e-ZLA) i podstawy składek", { exact: true }).click();
   await expect(page.getByText("ZY 1048576")).toBeVisible();
   await shot(page, info, "05-me");
-  await page.getByRole("button", { name: "Moje wnioski" }).click();
+  await page.getByRole("link", { name: "Przejdź do dokumentów" }).click();
   await expect(page.getByText("Dokumenty, które ZUS już ma, są odhaczone.")).toBeVisible();
   await expect(page.locator(".docs li.done").first()).toBeVisible(); // e-ZLA and Z-3 she already filed
   await shot(page, info, "06-applications-logged-in");

@@ -28,7 +28,7 @@ async function proxy(request: Request, { params }: { params: Promise<{ path: str
     // Only content-type is copied: fetch already decoded the body, so content-encoding/length would lie.
     return new Response(upstream.body, {
       status: upstream.status,
-      headers: { "content-type": upstream.headers.get("content-type") ?? "application/json" },
+      headers: { "content-type": upstream.headers.get("content-type") ?? "application/json", "cache-control": "private, no-store" },
     });
   } catch {
     return Response.json({ detail: "API nie odpowiada." }, { status: 502 });

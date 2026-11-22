@@ -75,6 +75,7 @@ test("known periods and leave type are filled immediately, editable and restorab
 test("account identity and payer are filled only for the matching parent, library stays blank", async ({ page }, info) => {
   await page.route("**/api/v1/zus/me", (route) => route.fulfill({ json: {
     persona: { id: "demo", name: "Anna Kowalczyk", who: "mother" }, applications: [],
+    ezla: [], debt: { as_of: "2027-03-01", debt: "0", blocks_benefits: false },
     insurance: [{ payer: "Przykładowa firma", start: "2020-01-01", end: null }],
   } }));
   await page.goto("/applications");

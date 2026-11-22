@@ -70,6 +70,7 @@ test("account reload matches exact periods and does not use an undated legacy re
   await page.route("**/api/v1/calc/plan", (r) => r.fulfill({ json: { ...result, documents: [doc, second] } }));
   await page.route("**/api/v1/zus/me", (r) => r.fulfill({ json: {
     persona: { id: "demo", name: "Anna Przykładowa", who: "mother" }, insurance: [],
+    ezla: [], debt: { as_of: "2027-03-01", debt: "0", blocks_benefits: false },
     applications: [{ ...doc, payload: {} }, { form: doc.form, who: doc.who, recipient: doc.recipient, payload: {} }],
   } }));
   await page.goto("/applications");

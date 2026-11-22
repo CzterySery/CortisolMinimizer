@@ -247,7 +247,7 @@ export default function Calculator() {
                   </div>
                 }
               />
-              <div className="actions"><Link href="/applications" className="button button-primary" onClick={() => myPlan.put(plan)}>Przygotuj wnioski dla tego planu</Link></div>
+              <div className="actions"><Link href="/me#dokumenty" className="button button-primary" onClick={() => myPlan.put(plan)}>Przygotuj wnioski dla tego planu</Link></div>
             </>}
           </>}
           <div className="calculator-navigation">

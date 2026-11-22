@@ -18,7 +18,7 @@ export const adminToken = slot("otwartekarty.admin");
 export const savedGame = slot("otwartekarty.game.v1");
 export const applicationReceipts = slot("otwartekarty.receipts.v1");
 
-// The plan the user built in the calculator, read by /applications (their own case, never a game result).
+// The plan the user built in the calculator, read by /me (their own case, never a game result).
 export const myPlan = {
   put: (plan: unknown) => write("otwartekarty.myplan", JSON.stringify(plan)),
   get: (): unknown => {

@@ -25,7 +25,8 @@ test("unfiled checklist item expands its own form and a failed send can be retri
       : route.fulfill({ json: { id: 42, status: "Wysłano (symulacja)", recipient: "employer" } });
   });
   await page.goto("/applications");
-  await expect(page.getByRole("navigation").getByRole("link", { name: "Twoje dokumenty" })).toBeVisible();
+  await expect(page).toHaveURL(/\/me#dokumenty$/);
+  await expect(page.getByRole("navigation").getByRole("link", { name: "Moje dane" })).toBeVisible();
   await expect(page.locator(".application-editor")).toHaveCount(0);
   const items = page.locator(".docs > li");
   await items.nth(0).getByRole("button").click();

@@ -104,6 +104,10 @@ POSTGRES_PASSWORD=... ADMIN_TOKEN=... SESSION_SECRET=... \
 
 Bez tych trzech zmiennych polecenie się nie uruchomi.
 
+Konto i dokumenty są razem pod `/me`; dawny `/applications` przekierowuje do sekcji dokumentów. Konto pobiera historię z PostgreSQL także bez planu zapisanego w przeglądarce. Zalogowane wysyłki wracają z konta, a anonimowe potwierdzenia pozostają w `sessionStorage` danej domeny i karty przeglądarki — nie przenoszą się z localhosta na publiczne demo.
+
+Przy wdrożeniu (także na Railway) backend potrzebuje trwałego `DATABASE_URL` oraz stałego `SESSION_SECRET`, wspólnego dla wszystkich procesów i replik. Bez klucza sesji backend losuje go przy starcie, więc restart albo inny proces odrzuca wcześniejsze logowanie (`401`); UI prosi wtedy o ponowne zalogowanie. Frontend potrzebuje `API_URL` wskazującego ten backend. Błędy odczytu konta są widoczne i można ponowić pobieranie; brak odczytu nie powoduje cichej wysyłki anonimowej. Plik z samymi `GEMINI_API_KEY`/`GEMINI_MODEL` konfiguruje AI, nie sesje ani bazę.
+
 ## Sprawdzanie
 
 ```sh
