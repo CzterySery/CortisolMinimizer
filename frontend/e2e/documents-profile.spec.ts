@@ -26,6 +26,7 @@ test("unfiled checklist item expands its own form and a failed send can be retri
   });
   await page.goto("/applications");
   await expect(page).toHaveURL(/\/me#dokumenty$/);
+  const menu = page.getByRole("button", { name: "Menu" }); if (await menu.isVisible()) await menu.click();
   await expect(page.getByRole("navigation").getByRole("link", { name: "Moje dane" })).toBeVisible();
   await expect(page.locator(".application-editor")).toHaveCount(0);
   const items = page.locator(".docs > li");

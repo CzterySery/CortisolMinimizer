@@ -122,6 +122,20 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px soli
 .site-nav a { font-size: 12px; font-weight: 500; color: var(--muted-strong); text-decoration: none; padding: 10px 15px; border: 1px solid transparent; border-radius: 12px; background: #f1f4ed; white-space: nowrap; transition: background 160ms, color 160ms, box-shadow 160ms; }
 .site-nav a:hover { color: #385845; border-color: #d5dfcf; background: #e7eedf; box-shadow: 0 3px 10px #3858450d; }
 .site-nav a:focus-visible { outline: 2px solid #527561; outline-offset: 3px; }
+.menu-toggle { display: none; width: 44px; height: 44px; align-items: center; justify-content: center; padding: 0; border: 1px solid transparent; border-radius: 12px; background: #f1f4ed; cursor: pointer; }
+.menu-toggle:hover { border-color: #d5dfcf; background: #e7eedf; }
+.menu-toggle:focus-visible { outline: 2px solid #527561; outline-offset: 3px; }
+.menu-toggle span, .menu-toggle span::before, .menu-toggle span::after { display: block; width: 18px; height: 2px; border-radius: 1px; background: var(--muted-strong); transition: transform 160ms, background 160ms; }
+.menu-toggle span { position: relative; }
+.menu-toggle span::before, .menu-toggle span::after { content: ""; position: absolute; left: 0; }
+.menu-toggle span::before { top: -6px; }
+.menu-toggle span::after { top: 6px; }
+.menu-toggle[aria-expanded="true"] span { background: transparent; }
+.menu-toggle[aria-expanded="true"] span::before { transform: translateY(6px) rotate(45deg); }
+.menu-toggle[aria-expanded="true"] span::after { transform: translateY(-6px) rotate(-45deg); }
+@media (prefers-reduced-motion: reduce) { .menu-toggle span, .menu-toggle span::before, .menu-toggle span::after { transition: none; } }
+/* Brand + five links need ~834px in one row (28px shell padding); collapse with some slack. */
+@media (max-width: 900px) { .site-header { flex-wrap: wrap; } .menu-toggle { display: inline-flex; } .site-nav { display: none; flex-direction: column; width: 100%; } .site-nav[data-open="true"] { display: flex; } .site-nav a { padding: 13px 15px; } }
 .story .preview-badge { display: inline-flex; margin-bottom: 14px; }
 .button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 18px; border: 1px solid #dde5d7; border-radius: 12px; background: #f7f9f3; color: #3f5a3a; font: inherit; font-size: 13px; font-weight: 500; text-decoration: none; cursor: pointer; transition: background 160ms, border-color 160ms, box-shadow 160ms; }
 .button:hover { background: #edf3e6; }
@@ -233,7 +247,7 @@ cite { font-style: normal; color: var(--muted-strong); font-size: 11px; }
 
 @media (max-width: 1000px) { .calculator-layout { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 800px) { .preview-board > .statistics { gap: 12px; margin-top: 18px; } .preview-board .stat { align-items: flex-start; flex-direction: column; } .preview-board .stat-symbol { width: 28px; height: 28px; } }
-@media (max-width: 800px) { .site-header { flex-wrap: wrap; padding: 16px 0; } .site-nav { justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 4px; } .plan-grid, .form-grid { grid-template-columns: minmax(0, 1fr); } .block-row { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 800px) { .site-header { flex-wrap: wrap; padding: 16px 0; } .plan-grid, .form-grid { grid-template-columns: minmax(0, 1fr); } .block-row { grid-template-columns: 1fr 1fr; } }
 
 /* Authored deck preview and evidence. The server calculator remains authoritative. */
 .chapter-brand { flex-shrink: 0; white-space: nowrap; text-decoration: none; font: 400 clamp(18px, 4.3vw, 32px)/1.08 Georgia, 'Times New Roman', serif; letter-spacing: -1px; padding: 14px 0; }

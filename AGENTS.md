@@ -36,6 +36,7 @@ Jurors **will upload sample ZUS PDFs and check the computed amounts**. The brief
 - Cards only add blocks or set flags. Recomputing after each play updates the whole table, and nothing gets double-counted.
 
 ## Status (2026-11-21)
+- Mobile hamburger menu (2026-11-22): under 900px `SiteHeader` shows a ☰ button (`aria-expanded`, `aria-controls="site-nav"`) that opens the nav as a vertical list below the brand; a link tap or Escape closes it. Desktop nav unchanged. Mobile e2e specs open the menu before nav links.
 - README architecture simplification (2026-11-22): replaced detailed routing/model/storage internals and the file tree with three component summaries, a short API/AI explanation, linked main directories and the API documentation URL. Installation and project description preserved; documentation-only change.
 - Submission description in README (2026-11-22): added a concise Polish, nontechnical project title/description before the architecture, covering the mObywatel demo account → calculator → applications, direct calculator → applications, and game → calculator → applications paths, plus PDF case checking, legal help and explicit simulated-service/AI scope. Checked formal description/disclosure requirements against brief pp. 14–16. Technical setup sections retained; documentation-only change.
 - Z-3a second-parent demo identity (2026-11-22): the Magda simulation now exposes a separate fictional partner identity and contract-payer insurance period via `ZusAccount.related_parents`; generated frontend contract types include it. Document prefills resolve the account owner or a specifically keyed related parent, so the mother's data is never copied onto the father's form. The preview no longer shows the payer/profile demo notices above the form. Frontend TypeScript check passes.
@@ -372,7 +373,7 @@ The teammate's stateless replay engine (see `docs/game-engine.md` for card-by-ca
 - **Accessibility target: WCAG 2.1 AA** (Polish public-sector requirement):
   - the board already has a keyboard/touch path ("Połóż na stole"), an `aria-live` announcement and `prefers-reduced-motion`
   - **Contrast:** shared tokens and non-board screens pass AA since step 8 (`--muted` #666e6a). **Known gap:** board-only hardcoded greys (e.g. `.slot-mark` #c6cfc2, `.round-number`, `.slot-caption`, `.card-footer`, `.story h1 > span`, `.stat-symbol`) are below AA; new screens use `--muted-strong`.
-- **Responsive:** the board CSS has breakpoints at 1100/800/560px (cards stack vertically on phones). The header nav becomes a horizontal scroll row under 800px. Tables and charts scroll inside their own container.
+- **Responsive:** the board CSS has breakpoints at 1100/800/560px (cards stack vertically on phones). Under 900px the header nav collapses behind a hamburger button (brand + five links need ~834px in one row; between 800 and 900px they previously wrapped) (`.menu-toggle` in `site-header.tsx`, a client component; links and Escape close it), and mobile e2e must open it before using nav links. Tables and charts scroll inside their own container.
 - **Identity:** the team's light green "family table" look. No casino imagery, no copying Balatro's look, no ZUS logo (the footer says it isn't a ZUS service).
 
 ### Routes
