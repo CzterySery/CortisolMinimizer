@@ -2,6 +2,8 @@
 
 **LIVE DEMO:** [Otwarte Karty](https://charming-delight-production-38ec5aa2.up.railway.app/)
 
+![OtwarteKarty — animacja rodziny na kolejnych etapach rodzicielstwa](docs/readme_screenshots/otwartekarty-animacja.gif)
+
 ## Opis projektu
 
 **OtwarteKarty – Przewodnik Przyszłego Rodzica** to aplikacja przygotowana na HackNation 2026 w odpowiedzi na wyzwanie ZUS. 
@@ -12,19 +14,48 @@ Pomaga ona rodzicom zrozumieć przysługujące świadczenia, podzielić opiekę 
 
 ## Jak można skorzystać z aplikacji?
 
+![Jak to działa — określenie sytuacji rodziny, wybór kart w pięciu rundach i dopasowanie planu w kalkulatorze oraz trzy profile wyniku gry](docs/readme_screenshots/ow-it-works.png)
+
 ### Ścieżka od danych do wniosków
 
 - **Od konta do nowych wniosków:** w „Moje dane” wybierasz logowanie przez mObywatela i jeden z trzech fikcyjnych profili. Aplikacja symuluje pobranie z ZUS informacji o ubezpieczeniu, składkach, zadłużeniu, zwolnieniach lekarskich i wcześniej złożonych wnioskach. Następnie w kalkulatorze przygotowujesz nowy plan rodziny i przechodzisz do dokumentów wynikających z tego planu.
 - **Od razu do kalkulatora:** wpisujesz sytuację rodziny, dochody i planowane okresy opieki. Sprawdzasz podział urlopów między rodziców, wysokość świadczeń oraz skutki łączenia pracy z urlopem rodzicielskim. Gotowy plan prowadzi do listy dokumentów w „Moje dane”, gdzie możesz podejrzeć formularze, uzupełnić dostępne pola i zasymulować wysłanie wniosku do właściwego odbiorcy.
 - **Od gry do własnego planu:** w pięciu rundach wybierasz karty przedstawiające sytuacje i decyzje rodziców. Poznajesz ich wpływ na budżet i czas opieki, korzystając ze strategii „Kortyzol Minimizer”, „Zasiłki Maxxing” lub „Balans Farming”. Wynik przenosisz do kalkulatora, dopasowujesz do swojej rodziny, a następnie przechodzisz do wniosków.
 
+### Rozgrywka karciana
+
+![Animacja rozgrywki — wybór kart i planowanie kolejnych etapów rodzicielstwa](docs/readme_screenshots/otwartekarty-rozgrywka.gif)
+
+### Informacje w kartach
+
+Karty zawierają wyjaśnienia zasad oraz podstawy prawne z cytatami i odnośnikami do pełnego kontekstu oraz odpowiednich stron oryginalnych dokumentów.
+
+![Informacje w kartach — zasady urlopu macierzyńskiego, cytaty z Kodeksu pracy i odnośniki do źródeł](docs/readme_screenshots/card-info.png)
+
+### Kalkulator zasiłku
+
+Wynik kalkulatora pokazuje kwoty świadczeń dla obojga rodziców, okresy opieki oraz pozostałe pule urlopów.
+
+![Kalkulator zasiłku](docs/readme_screenshots/calculator-intro.png)
+![Kalkulator zasiłku — kwoty świadczeń mamy i taty, kalendarz opieki oraz pozostałe dni urlopów](docs/readme_screenshots/calculator.png)
+
+### Wypełnianie wniosków
+
+Podgląd oryginalnego formularza ZUS pokazuje dostępne dane z konta i planu oraz instrukcję dla wybranego pola.
+
+![Demo formularza ZAS-53 z automatycznie uzupełnionymi fikcyjnymi danymi i instrukcją wypełnienia](docs/readme_screenshots/document-demo.png)
+
 ### Sprawdzenie sprawy ZUS
 
 W **Sprawdź sprawę** możesz wybrać przykładową sprawę ZUS, wgrać PDF lub wpisać dane ręcznie, aby sprawdzić uprawnienia i przysługujące zasiłki. Aplikacja przy pomocy AI odczytuje wgrany PDF i wypełnia formularz, który możesz poprawić.
 
+![Sprawdź sprawę — przykładowe sprawy ZUS, wgranie PDF-u i ręczne wpisywanie danych](docs/readme_screenshots/sprawdz-sprawe.png)
+
 ### Asystent AI
 
 Asystent AI pomaga odnaleźć informacje w przepisach, a przydatne materiały kierują do oficjalnych źródeł i organizacji wspierających rodziców.
+
+![Asystent AI — przykładowe pytania i formularz wyszukiwania odpowiedzi w źródłach prawnych](docs/readme_screenshots/asystent-ai-2.png)
 
 ## Zakres symulacji i AI
 
