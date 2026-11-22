@@ -25,8 +25,8 @@ export const STRATEGIES: StrategyInfo[] = [
   },
   {
     id: "aura",
-    name: "Aura Farming",
-    badge: "✨ Aura Farming",
+    name: "Balans Farming",
+    badge: "✨ Balans Farming",
     shortDesc: "Równowaga i partnerski podział opieki.",
   },
 ];
@@ -89,7 +89,7 @@ const ROUND_2_BY_SITUATION: Record<string, { question: string; subtitle: string;
         cardId: "2C",
         branchTag: "already_born",
         strategyId: "aura",
-        strategyBadge: "✨ Aura Farming",
+        strategyBadge: "✨ Balans Farming",
         badge: "Etap · Dziecko już na świecie",
         title: "Dziecko już się urodziło",
         description:
@@ -139,7 +139,7 @@ const ROUND_2_BY_SITUATION: Record<string, { question: string; subtitle: string;
         cardId: "2B",
         branchTag: "adoption_under_14",
         strategyId: "aura",
-        strategyBadge: "✨ Aura Farming",
+        strategyBadge: "✨ Balans Farming",
         badge: "Adopcja · Dziecko 7–14 lat",
         title: "Przyjęliśmy starsze dziecko (do 14. roku życia)",
         description:
@@ -178,7 +178,7 @@ const ROUND_2_BY_SITUATION: Record<string, { question: string; subtitle: string;
         cardId: "2B",
         branchTag: "foster_school_deferral",
         strategyId: "aura",
-        strategyBadge: "✨ Aura Farming",
+        strategyBadge: "✨ Balans Farming",
         badge: "Piecza · Odroczenie szkolne (do 10 lat)",
         title: "Dziecko z odroczeniem obowiązku szkolnego",
         description:
@@ -234,7 +234,7 @@ function getRound3Branch(situationKey: string, r2Id: string): { question: string
           cardId: "3C",
           branchTag: "foster_want_shared",
           strategyId: "aura",
-          strategyBadge: "✨ Aura Farming",
+          strategyBadge: "✨ Balans Farming",
           badge: "Piecza · Podział między opiekunów",
           title: "Przekazanie części urlopu drugiemu rodzicowi zastępczemu",
           description:
@@ -279,7 +279,7 @@ function getRound3Branch(situationKey: string, r2Id: string): { question: string
           cardId: "3C",
           branchTag: "adoption_want_shared",
           strategyId: "aura",
-          strategyBadge: "✨ Aura Farming",
+          strategyBadge: "✨ Balans Farming",
           badge: "Adopcja · Zmiana warty rodziców",
           title: "Podział urlopu na warunkach macierzyńskiego po 14 tyg.",
           description:
@@ -320,7 +320,7 @@ function getRound3Branch(situationKey: string, r2Id: string): { question: string
         cardId: "3C",
         branchTag: "want_shared",
         strategyId: "aura",
-        strategyBadge: "✨ Aura Farming",
+        strategyBadge: "✨ Balans Farming",
         badge: "Cel · Szybki powrót mamy i podział",
         title: "Zmiana warty po 14 tygodniach (Kariera + Czas taty)",
         description:
@@ -368,7 +368,7 @@ function getRound4Branch(situationKey: string, r2Id: string, r3Id: string): { qu
           cardId: "4D",
           branchTag: "foster_year_reserve",
           strategyId: "aura",
-          strategyBadge: "✨ Aura Farming",
+          strategyBadge: "✨ Balans Farming",
           badge: "Piecza · Rezerwa na adaptację",
           title: "Część rodzicielskiego teraz, rezerwa na szkołę/przedszkole",
           description:
@@ -410,7 +410,7 @@ function getRound4Branch(situationKey: string, r2Id: string, r3Id: string): { qu
           cardId: "4D",
           branchTag: "adoption_year_reserve",
           strategyId: "aura",
-          strategyBadge: "✨ Aura Farming",
+          strategyBadge: "✨ Balans Farming",
           badge: "Adopcja · Zapas na edukację",
           title: "Główny blok teraz, rezerwa na adaptację szkolną",
           description:
@@ -451,7 +451,7 @@ function getRound4Branch(situationKey: string, r2Id: string, r3Id: string): { qu
         cardId: "4D",
         branchTag: "year_balance_reserve",
         strategyId: "aura",
-        strategyBadge: "✨ Aura Farming",
+        strategyBadge: "✨ Balans Farming",
         badge: "Strategia · Elastyczny zapas na później",
         title: "Część rodzicielskiego teraz, rezerwa na żłobek",
         description:
@@ -506,7 +506,7 @@ function getRound5Branch(situationKey: string, r2Id: string, exhaustedParental: 
           cardId: "5F",
           branchTag: "later_shared_care",
           strategyId: "aura",
-          strategyBadge: "✨ Aura Farming",
+          strategyBadge: "✨ Balans Farming",
           badge: "Kolejne lata · Partnerski podział opieki",
           title: "Zasiłek opiekuńczy (60 dni 80%) na zmianę obojga rodziców",
           description:
@@ -547,7 +547,7 @@ function getRound5Branch(situationKey: string, r2Id: string, exhaustedParental: 
         cardId: "5F",
         branchTag: "later_shared_care",
         strategyId: "aura",
-        strategyBadge: "✨ Aura Farming",
+        strategyBadge: "✨ Balans Farming",
         badge: "Kolejne lata · Partnerska równowaga",
         title: "Rodzice na zmianę (opiekuńczy 60 dni + 2 dni z art. 188 KP)",
         description:

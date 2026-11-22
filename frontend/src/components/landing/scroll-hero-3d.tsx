@@ -124,7 +124,7 @@ export function LandingHero() {
     <section className="landing-hero" aria-label="Wprowadzenie do przewodnika rodzicielskiego OtwarteKarty">
       <div className="landing-hero-content">
         <h1 className="landing-title">
-          Witaj w <em>Otwarte Karty</em>.
+          Witaj w <em>Otwartych Kartach</em>.
         </h1>
         <p className="landing-subtitle">
           Przewodnik po urlopach i zasiłkach rodzicielskich ZUS. Ułóż plan dla Waszej rodziny

@@ -197,10 +197,6 @@ export function GameBoard(props: GameBoardProps) {
     setAnnouncement("Stół wyczyszczony. Wracasz do pierwszej rundy.");
   }
 
-  const note = complete
-    ? "Wszystkie decyzje są na stole. Zobacz, co oznaczają dla budżetu i opieki."
-    : "Kliknij kartę lub przeciągnij ją na stół.";
-
   return (
     <main className={`game-layout ${mode === "preview" ? "preview-board" : ""} ${tableInView ? "table-visible" : "table-pending"} ${canRevealHand ? "hand-visible" : "hand-pending"}`} ref={boardRef}>
       <div className="main-board">
@@ -251,7 +247,6 @@ export function GameBoard(props: GameBoardProps) {
             </button>}
           />
           </div>
-          {complete && <p className="preview-note">{note}</p>}
           <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">{announcement}</p>
         </section>
         {props.belowHand}

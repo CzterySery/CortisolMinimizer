@@ -32,8 +32,8 @@ test("game → calculator → applications → mObywatel → cases → help → 
   await page.getByRole("link", { name: "Przygotuj wnioski dla tego planu" }).click();
   await expect(page.getByRole("heading", { name: /Twoje dokumenty/ })).toBeVisible();
   // fill and "send" one leave/benefit form; anonymous, so repeated runs don't use up anyone's list
-  const form = page.locator("details.form-card").filter({ hasNotText: "Odpis" }).first();
-  await form.locator("summary").click();
+  await page.locator(".docs").getByRole("button", { name: /Wypełnij i wyślij \(symulacja\)/ }).filter({ hasNotText: "Odpis" }).first().click();
+  const form = page.locator(".application-editor");
   await form.getByLabel("Imię i nazwisko").fill("Jan Przykładowy");
   await form.getByRole("button", { name: /^Wyślij do:/ }).click();
   await expect(page.getByRole("status").filter({ hasText: "Wysłano (symulacja)" })).toBeVisible();
@@ -54,7 +54,7 @@ test("game → calculator → applications → mObywatel → cases → help → 
   await expect(page.getByText("Wynik kalkulatora jest zgodny.")).toBeVisible();
   await shot(page, info, "07-cases");
 
-  await page.goto("/help");
+  await page.goto("/#pomoc");
   await page.getByLabel("Twoje pytanie").fill("Ile trwa urlop ojcowski?");
   await page.getByRole("button", { name: "Wyślij pytanie" }).click();
   await expect(page.getByText(/Urlop ojcowski trwa 14 dni/)).toBeVisible();

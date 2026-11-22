@@ -3,19 +3,12 @@ import { CardGrounding } from "./card-grounding";
 import { CardArtwork } from "./card-artwork";
 
 export function DecisionCard({ card, index, category }: { card: Card; index: number; category: string }) {
-  const strategyBadge = card.tags?.[1]?.replace(/^[^\p{L}]+/u, "");
-  const strategyId = card.tags?.[3];
+  // Strategy labels ("Balans Farming" etc.) are no longer shown on cards; the profile appears only at the end.
   return (
-    <article className={`decision-card card-${index} ${strategyId ? `card-strategy-${strategyId}` : ""}`}>
+    <article className={`decision-card card-${index}`}>
       <div className="card-top">
         <span>{card.design ? `KARTA ${card.id}` : `DECYZJA ${String.fromCharCode(65 + index)}`}</span>
-        {strategyBadge ? (
-          <span className={`card-strategy-badge ${strategyId ? `badge-${strategyId}` : ""}`}>
-            {strategyBadge}
-          </span>
-        ) : (
-          <span aria-hidden="true">↗</span>
-        )}
+        <span aria-hidden="true">↗</span>
       </div>
       <CardArtwork id={card.id} />
       <div className="card-copy">

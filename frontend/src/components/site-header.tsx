@@ -4,8 +4,7 @@ const nav = [
   ["/", "Strona główna"],
   ["/calculator", "Kalkulator"],
   ["/cases", "Sprawdź sprawę"],
-  ["/applications", "Wnioski"],
-  ["/help", "Pomoc"],
+  ["/applications", "Twoje dokumenty"],
   ["/me", "Moje dane"],
 ] as const;
 

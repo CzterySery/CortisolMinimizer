@@ -140,3 +140,17 @@ test("decision tree produces 3 mutually exclusive choices per round and branches
   assert.equal(fosterPlan.rate_variant, "averaged");
   assert.equal(fosterPlan.averaged_request_on, "2027-03-01");
 });
+
+test("round 1 situation cards move the balance identically (not at all) and use situation-specific conditions", async () => {
+  const deck = JSON.parse(await readFile(new URL("../../shared/deck-design.json", import.meta.url), "utf8"));
+  const design = (id) => (Array.isArray(deck) ? deck : deck.cards).find((card) => card.id === id);
+  const pool = ["1A", "1B", "1C", "1D", "1E", "1F"].map((id) => ({ id, title: id, description: "", design: design(id) }));
+  const { cards } = getDecisionTreeRound(0, [], [{ cards: pool }]);
+  assert.deepEqual(cards.map((card) => card.tags[2]), ["birth", "adoption", "foster"]);
+  const balances = cards.map((card) => gameScores([getCardSignals(card)]));
+  for (const balance of balances) assert.deepEqual(balance, { money: 50, time: 50, knowledge: 50 });
+  const conditions = cards.map((card) => getCardSignals(card).conditions);
+  assert.equal(new Set(conditions).size, 3);
+  assert.ok(getCardSignals(cards[1]).ruleIds.includes("adoption"));
+  assert.ok(!getCardSignals(cards[1]).ruleIds.includes("prebirth"));
+});

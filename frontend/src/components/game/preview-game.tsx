@@ -35,12 +35,12 @@ function decoratePlayedCard(base: Card, roundIndex: number, playedIds: string[])
 function decisionTreeProfiles(balance: { money: number; time: number }) {
   const diff = balance.time - balance.money;
   if (Math.abs(diff) <= 6) {
-    return [{ id: "aura", title: "✨ Aura Farming (Świadomy Balans Czasu i Budżetu)" }];
+    return [{ id: "aura", title: "Balans Farming", subtitle: "Świadomy Balans Czasu i Budżetu" }];
   }
   if (diff > 6) {
-    return [{ id: "time", title: "🧘 Kortyzol Minimizer (Maksimum czasu z dzieckiem)" }];
+    return [{ id: "time", title: "Kortyzol Minimizer", subtitle: "Maksimum czasu z dzieckiem" }];
   }
-  return [{ id: "money", title: "💰 Zasiłki Maxing (Maksimum wsparcia budżetu)" }];
+  return [{ id: "money", title: "Zasiłki Maxing", subtitle: "Maksimum wsparcia budżetu" }];
 }
 
 // Authoritative replay: send every selected decision; the server recomputes a single plan.
@@ -178,7 +178,7 @@ export function PreviewGame({ preview }: { preview: GamePreview }) {
       finishedHand={simulation && <section className="game-result" aria-labelledby="game-result-title" role="status">
           <p className="eyebrow">Twój profil z drzewa decyzji · Koniec gry</p>
           <h2 id="game-result-title">{finalProfiles.map((profile) => profile.title).join(" + ")}</h2>
-          <p>Wasza ścieżka: {played.map((c) => c.title).join(" → ")}.</p>
+          <p className="muted">{finalProfiles.map((profile) => profile.subtitle).join(" · ")}</p>
           <div className="actions">
           <button className="button button-primary" onClick={() => {
             planHandoff.put(buildCalculatorHandoffPlan(simulation.plan, playedIds));

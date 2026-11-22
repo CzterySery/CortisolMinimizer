@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { api, type S } from "@/lib/api";
 import { employmentLabel, whoLabel } from "@/lib/labels";
-import { myPlan, planHandoff } from "@/lib/session";
+import { myPlan, planHandoff, userToken } from "@/lib/session";
 import { BlocksEditor } from "@/components/forms/blocks-editor";
 import { FamilyForm, ParentFields } from "@/components/forms/family-form";
 import { LegalBasis } from "@/components/legal-basis";
@@ -32,22 +32,46 @@ export default function Calculator() {
   const [result, setResult] = useState<S["PlanResult"]>();
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
-  const [handoff, setHandoff] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
   const request = useRef<AbortController | null>(null);
+  const handoff = useRef<{ plan?: Plan } | null>(null);
 
   useEffect(() => {
-    const saved = planHandoff.take() as Plan | undefined;
-    if (!saved) return;
-    /* eslint-disable react-hooks/set-state-in-effect -- one-time client-only handoff */
-    setPlan(saved); setHandoff(true); setSituation(saved.family.adoption?.kind ?? "birth");
-    setBirthStatus(saved.family.birth_date ? "born" : "expected"); setWithFather(!!saved.family.father);
-    setConfirmed({ mother: true, father: !!saved.family.father });
-    setIncome(Object.fromEntries((["mother", "father"] as const).flatMap((who) => {
-      const parent = saved.family[who];
-      return parent ? [[who, parent.base_monthly != null ? "base" : parent.gross_monthly_estimate != null ? "estimate" : parent.salary_history?.length ? "history" : "unknown"]] : [];
-    })));
-    /* eslint-enable react-hooks/set-state-in-effect */
+    if (!handoff.current) handoff.current = { plan: planHandoff.take() as Plan | undefined };
+    const ctrl = new AbortController();
+    request.current = ctrl;
+    const populate = (saved: Plan) => {
+      setPlan(saved); setSituation(saved.family.adoption?.kind ?? "birth");
+      setBirthStatus(saved.family.birth_date ? "born" : "expected"); setWithFather(!!saved.family.father);
+      setConfirmed({ mother: true, father: !!saved.family.father });
+      setIncome(Object.fromEntries((["mother", "father"] as const).flatMap((who) => {
+        const parent = saved.family[who];
+        return parent ? [[who, parent.base_monthly != null ? "base" : parent.gross_monthly_estimate != null ? "estimate" : parent.salary_history?.length ? "history" : "unknown"]] : [];
+      })));
+    };
+    const load = async () => {
+      await Promise.resolve();
+      if (ctrl.signal.aborted) return;
+      if (handoff.current?.plan) { populate(handoff.current.plan); return; }
+      const token = userToken.get();
+      if (!token) return;
+      setBusy(true);
+      try {
+        const account = await api.GET("/api/v1/zus/me", { headers: { Authorization: `Bearer ${token}` }, signal: ctrl.signal });
+        if (ctrl.signal.aborted) return;
+        if (account.response.status === 401) { userToken.set(); return; }
+        if (!account.data) throw new Error("Nie udało się pobrać danych profilu. Możesz uzupełnić je ręcznie.");
+        populate(account.data.plan); setStep(7);
+        const response = await api.POST("/api/v1/calc/plan", { body: account.data.plan, signal: ctrl.signal });
+        if (ctrl.signal.aborted) return;
+        if (!response.data) throw new Error("Nie udało się obliczyć planu z profilu. Spróbuj ponownie lub popraw dane we wcześniejszych krokach.");
+        setResult(response.data);
+      } catch (e) {
+        if (!ctrl.signal.aborted) setError(e instanceof Error ? e.message : "Nie udało się pobrać planu z profilu.");
+      } finally { if (!ctrl.signal.aborted) setBusy(false); }
+    };
+    void load();
+    return () => ctrl.abort();
   }, []);
   useEffect(() => { heading.current?.focus(); }, [step]);
   useEffect(() => () => request.current?.abort(), []);
@@ -81,7 +105,7 @@ export default function Calculator() {
       finally { if (!ctrl.signal.aborted) setBusy(false); }
       return;
     }
-    if (step === 6) {
+    if (step === 6 || step === 7) {
       const ctrl = new AbortController(); request.current = ctrl; setBusy(true);
       try {
         const response = await api.POST("/api/v1/calc/plan", { body: plan, signal: ctrl.signal });
@@ -93,18 +117,6 @@ export default function Calculator() {
       return;
     }
     setStep(step + 1);
-  };
-  const computeHandoffDirect = async () => {
-    if (busy) return;
-    setError(undefined);
-    const ctrl = new AbortController(); request.current = ctrl; setBusy(true);
-    try {
-      const response = await api.POST("/api/v1/calc/plan", { body: plan, signal: ctrl.signal });
-      if (ctrl.signal.aborted) return;
-      if (!response.data) throw new Error(typeof response.error?.detail === "string" ? response.error.detail : "Sprawdź daty i dane w poprzednich krokach.");
-      setResult(response.data); setStep(7);
-    } catch (e) { if (!ctrl.signal.aborted) setError(e instanceof Error ? e.message : "Nie udało się obliczyć planu."); }
-    finally { if (!ctrl.signal.aborted) setBusy(false); }
   };
   const unknownBases = (["mother", "father"] as const).filter((who) => {
     const p = plan.family[who];
@@ -126,89 +138,12 @@ export default function Calculator() {
       </li>)}
     </ol></nav>
     <section className="calculator-step" aria-labelledby="calculator-question">
-      {handoff && step < 7 && (
-        <div className="handoff-adjustments-box" aria-label="Ostatnie szlify przeniesionego scenariusza z gry">
-          <div className="handoff-adjustments-header">
-            <span className="eyebrow">Przeniesiono z gry OtwarteKarty · Ostatnie szlify</span>
-            <h3>Dopasuj swój scenariusz przed szczegółowym wyliczeniem</h3>
-            <p className="notice">
-              Wczytaliśmy Twoje wybory z drzewa decyzyjnego ({situation === "birth" ? "Urodzenie dziecka" : situation === "adoption" ? "Adopcja" : "Rodzina zastępcza"}, {plan.blocks?.length ?? 0} okresów urlopowych). Możesz od razu skorygować poniższe kwoty i zatwierdzić wyliczenie albo przejść przez kreator krok po kroku.
-            </p>
-          </div>
-          <div className="handoff-adjustments-grid">
-            <label className="field">
-              Podstawa zasiłku mamy z gry (zł/mies.)
-              <input
-                type="number"
-                min={0}
-                step="100"
-                value={plan.family.mother.base_monthly ?? ""}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setIncome({ ...income, mother: val ? "base" : "unknown" });
-                  family({ ...plan.family, mother: { ...plan.family.mother, base_monthly: val || null } });
-                }}
-              />
-            </label>
-            {withFather && plan.family.father && (
-              <label className="field">
-                Podstawa zasiłku drugiego rodzica z gry (zł/mies.)
-                <input
-                  type="number"
-                  min={0}
-                  step="100"
-                  value={plan.family.father.base_monthly ?? ""}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setIncome({ ...income, father: val ? "base" : "unknown" });
-                    family({ ...plan.family, father: { ...plan.family.father!, base_monthly: val || null } });
-                  }}
-                />
-              </label>
-            )}
-            <label className="field">
-              Wybrany wariant wypłaty zasiłku z gry
-              <select
-                value={plan.rate_variant ?? "standard"}
-                onChange={(e) => {
-                  const variant = e.target.value as "standard" | "averaged";
-                  const defaultDate = plan.family.birth_date || plan.family.due_date || plan.family.adoption?.accepted_on || "2027-03-01";
-                  update({
-                    ...plan,
-                    rate_variant: variant,
-                    averaged_request_on: variant === "averaged" ? (plan.averaged_request_on || defaultDate) : null,
-                  });
-                }}
-              >
-                <option value="standard">100% na start, 70% na rodzicielskim (standardowy)</option>
-                <option value="averaged">Stałe 81,5% przez cały rok (wniosek w 21 dni)</option>
-              </select>
-            </label>
-          </div>
-          <div className="handoff-adjustments-actions">
-            <button
-              type="button"
-              className="button button-primary"
-              disabled={busy}
-              onClick={() => void computeHandoffDirect()}
-            >
-              {busy ? "Obliczam…" : "Zatwierdź poprawki i oblicz wynik"}
-            </button>
-            <button
-              type="button"
-              className="button"
-              onClick={() => setStep(5)}
-            >
-              Edytuj ułożone okresy urlopowe ({plan.blocks?.length ?? 0})
-            </button>
-          </div>
-        </div>
-      )}
       <p className="eyebrow">Krok {step + 1} z {steps.length}</p>
       <h2 id="calculator-question" ref={heading} tabIndex={-1}>{titles[step]}</h2>
       <form key={step} onSubmit={(e) => { e.preventDefault(); void next(); }}>
         <div className="stack">
-          {step === 0 && <>
+          {busy && <p role="status">{step === 7 ? "Obliczam wynik na podstawie danych profilu…" : "Przygotowuję dane…"}</p>}
+          {step === 0 && !busy && <>
             <LegalBasis rules={situation === "birth" ? ["maternity-pool"] : situation ? ["adoption"] : ["maternity-pool", "adoption"]} />
             <fieldset className="choice-options"><legend>Sytuacja rodziny</legend><div className="choice-grid situation-choices">
               {([ ["birth", "Urodzenie dziecka", "Czekacie na narodziny lub dziecko jest już z Wami."],
@@ -287,8 +222,10 @@ export default function Calculator() {
             <LegalBasis rules={["standard-rates", "averaged", "exclusive-rate", "top-up"]} />
           </>}
           {error && <p className="notice error" role="alert">{error}</p>}
+          {step === 7 && !busy && !result && <button type="submit" className="button button-primary">Spróbuj obliczyć ponownie</button>}
           {step === 7 && result && <>
             <p>{situation === "birth" ? "Urodzenie dziecka" : situation === "adoption" ? "Adopcja" : "Piecza niezawodowa"} · {event} · {withFather ? "oboje rodzice" : "plan jednej osoby"}</p>
+            <p className="notice">To wyliczenie dla podanych danych — możesz cofnąć się do wcześniejszych kroków i uzupełnić lub poprawić dane.</p>
             {(["mother", "father"] as const).some((who) => {
               const parent = plan.family[who];
               return parent && ["employee", "contract"].includes(parent.employment) && !parent.payer_insured_count;
@@ -298,14 +235,20 @@ export default function Calculator() {
               <ul className="issues">{invalid.map((issue) => <li key={issue.code}>{issue.text}<LegalBasis rules={[issue.code.split(".")[0]]} /></li>)}</ul>
               <button type="button" className="button" onClick={() => back(5)}>Popraw plan urlopów</button>
             </section> : <>
-              <PlanTimeline result={result} unknownBases={[...unknownBases]} />
+              <PlanTimeline
+                result={result}
+                unknownBases={[...unknownBases]}
+                assumptions={
+                  <div className="calculator-assumptions">
+                    <h4>Zakres obliczeń i założenia</h4>
+                    <p>Zasiłki pokazujemy przed PIT. Jedna podstawa na rodzica i jedna wersja parametrów dotyczą całego planu. Szybki szacunek z jednej pensji nie zastępuje podstawy ustalonej przez płatnika.</p>
+                    <p>Hospitalizację wpisujesz jako kwalifikujące dni z zaświadczenia. Wyjątki dotyczące straty dziecka, szczególnego przejęcia urlopu, niektórych okresów po ustaniu ubezpieczenia i złożonych składników wynagrodzenia wymagają osobnej weryfikacji. To wyliczenie dla podanych danych, nie decyzja ZUS.</p>
+                    <a href="/sources/benefits-act#article-31" target="_blank" rel="noreferrer">Ustawa zasiłkowa — wysokość świadczeń ↗</a>
+                  </div>
+                }
+              />
               <div className="actions"><Link href="/applications" className="button button-primary" onClick={() => myPlan.put(plan)}>Przygotuj wnioski dla tego planu</Link></div>
             </>}
-            <details className="calculator-assumptions"><summary>Zakres obliczeń i założenia</summary>
-              <p>Zasiłki pokazujemy przed PIT. Jedna podstawa na rodzica i jedna wersja parametrów dotyczą całego planu. Szybki szacunek z jednej pensji nie zastępuje podstawy ustalonej przez płatnika.</p>
-              <p>Hospitalizację wpisujesz jako kwalifikujące dni z zaświadczenia. Wyjątki dotyczące straty dziecka, szczególnego przejęcia urlopu, niektórych okresów po ustaniu ubezpieczenia i złożonych składników wynagrodzenia wymagają osobnej weryfikacji. To wyliczenie dla podanych danych, nie decyzja ZUS.</p>
-              <a href="/sources/benefits-act#article-31" target="_blank" rel="noreferrer">Ustawa zasiłkowa — wysokość świadczeń ↗</a>
-            </details>
           </>}
           <div className="calculator-navigation">
             {step > 0 && <button type="button" className="button" onClick={() => back()}>Wstecz</button>}

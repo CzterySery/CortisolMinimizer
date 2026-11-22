@@ -10,8 +10,8 @@ const STEPS = [
   },
   {
     num: "02",
-    title: "Wybieraj karty według strategii",
-    desc: "W kolejnych rundach każda karta jest oznaczona jedną z 3 strategii poniżej — wybierasz jedną kartę na rundę, budując swój plan.",
+    title: "Wybieraj po jednej karcie na rundę",
+    desc: "W kolejnych rundach wybierasz jedną z trzech kart — każdy wybór przesuwa bilans pieniędzy i czasu, a po 5 rundach poznasz swój profil (jeden z 3 poniżej).",
   },
   {
     num: "03",
@@ -39,7 +39,7 @@ export function LandingFeatures() {
         </div>
 
         <div className="steps-strategies-divider">
-          <span className="eyebrow">3 strategie · od 2. rundy</span>
+          <span className="eyebrow">3 profile · wynik na koniec gry</span>
           <div className="strategies-upfront-grid">
             {STRATEGIES.map((s) => (
               <div key={s.id} className={`strategy-upfront-card strategy-upfront-${s.id}`}>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Card, Round } from "@/types/game";
 import { DecisionCard } from "./decision-card";
 import { getDecisionNodeForCard } from "@/lib/decision-tree";
+import { HelpChat, HelpLinks } from "@/components/help/home-help";
 
 interface TopicGroup {
   id: string;
@@ -126,6 +127,11 @@ export function KnowledgeExplorer({
             </div>
           );
         })}
+      </div>
+
+      <div id="pomoc" className="knowledge-explorer-help" aria-label="Pomoc">
+        <HelpChat />
+        <HelpLinks />
       </div>
     </section>
   );

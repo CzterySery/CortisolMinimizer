@@ -46,6 +46,7 @@ test("known periods and leave type are filled immediately, editable and restorab
   await page.reload();
   await expect(page.locator("details.form-card").filter({ hasText: /Z-3:/ })).toHaveCount(0);
   await page.locator(".docs").getByRole("button", { name: /^ZAM:/ }).click();
+  await page.locator(".application-editor").getByRole("button", { name: "Pokaż demo: co wpisać i gdzie" }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByLabel("Próbny wpis w tym polu")).toHaveValue(""); // identity is not guessed
   await dialog.getByLabel("Strona formularza").selectOption("1");
@@ -83,6 +84,7 @@ test("account identity and payer are filled only for the matching parent, librar
   await page.reload();
   await expect(page.getByText("Dokumenty, które ZUS już ma, są odhaczone.", { exact: false })).toBeVisible();
   await page.locator(".docs").getByRole("button", { name: /^ZAM: wniosek o zasiłek macierzyński/ }).click();
+  await page.locator(".application-editor").getByRole("button", { name: "Pokaż demo: co wpisać i gdzie" }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog.locator('[data-field="p1-3"] .pdf-example')).toHaveText("Anna");
   await expect(dialog.locator('[data-field="p1-4"] .pdf-example')).toHaveText("Kowalczyk");
@@ -93,6 +95,7 @@ test("account identity and payer are filled only for the matching parent, librar
   await expect(dialog.locator(".pdf-example")).toHaveCount(0); // other parent and declarations
   await page.keyboard.press("Escape");
   await page.locator(".docs").getByRole("button", { name: /^ZAM: wniosek o zasiłek za urlop ojcowski/ }).click();
+  await page.locator(".application-editor").getByRole("button", { name: "Pokaż demo: co wpisać i gdzie" }).click();
   await expect(dialog.locator(".pdf-example")).toHaveCount(0); // father's first page
   await dialog.getByLabel("Strona formularza").selectOption("1");
   await expect(dialog.locator('[data-field="p2-9"] .pdf-example')).toHaveText("X");
@@ -135,6 +138,7 @@ test("employer leave example is clearly distinct from an official ZUS PDF", asyn
   })));
   await page.reload();
   await page.locator(".docs").getByRole("button", { name: /^Wniosek o urlop macierzyński/ }).click();
+  await page.locator(".application-editor").getByRole("button", { name: "Pokaż demo: co wpisać i gdzie" }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByText(/nasz przykład pisma do pracodawcy/)).toBeVisible();
   await dialog.getByLabel("Fragment wniosku").selectOption("3");

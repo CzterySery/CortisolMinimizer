@@ -13,6 +13,6 @@ export function gameProfiles(signals: CardSignals[]) {
   return [
     { id: "time", title: "Kortyzol Minimizer", score: scores.time },
     { id: "money", title: "Zasiłki Maxing", score: scores.money },
-    { id: "knowledge", title: "Aura Farming", score: scores.knowledge },
+    { id: "knowledge", title: "Balans Farming", score: scores.knowledge },
   ].filter((profile) => Math.abs(profile.score - best) < 0.000001);
 }

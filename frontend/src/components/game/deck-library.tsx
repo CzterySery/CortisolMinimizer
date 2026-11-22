@@ -13,6 +13,7 @@ export function DeckLibrary({ open, onClose, rounds }: { open: boolean; onClose:
   }, [open]);
   const round = rounds.find((item) => item.id === stage)!;
   return <dialog className="deck-dialog" ref={dialog} onClose={onClose} aria-labelledby="deck-library-title"
+    onClick={(event) => { if (event.target === event.currentTarget) dialog.current?.close(); }}
     onCancel={(event) => { event.preventDefault(); dialog.current?.close(); }}>
     <header className="dialog-heading"><div><p className="eyebrow">Pełna talia · 30 kart</p><h2 id="deck-library-title">Poznaj swoje możliwości</h2></div>
       <button className="button" autoFocus onClick={() => dialog.current?.close()}>Zamknij talię</button></header>

@@ -11,7 +11,7 @@ const sourceTitles: Record<string, string> = Object.fromEntries(manifest.map((so
 
 const labels: Record<string, string> = {
   description: "Co oznacza ta decyzja?", conditions: "Kiedy możesz skorzystać?",
-  "stats.money": "Pieniądze", "stats.time": "Czas", "stats.knowledge": "Wiedza",
+  "stats.money": "Pieniądze", "stats.time": "Czas",
   "rates.sick_pregnancy": "Chorobowe w ciąży", "rates.maternity": "Macierzyński",
   "rates.parental": "Rodzicielski", "rates.averaged": "Wariant uśredniony",
   "rates.care": "Opiekuńczy", "rates.paternity": "Ojcowski", "rates.supplementary": "Uzupełniający",
@@ -64,13 +64,18 @@ export function CardGrounding({ card }: { card: Card }) {
   const design = card.design;
   if (!design) return null;
   const signals = getCardSignals(card);
-  const ruleIds = [...new Set([...design.claims.flatMap((claim) => claim.rule_ids), ...signals?.ruleIds ?? []])];
+  // Round-1 situation cards (birth/adoption/foster) only borrow a base card id; its claims would mislead.
+  const situation = signals?.conditions !== undefined;
+  const ruleIds = situation ? signals.ruleIds
+    : [...new Set([...design.claims.flatMap((claim) => claim.rule_ids), ...signals?.ruleIds ?? []])];
+  const parameterRefs = situation && card.id !== "1A" ? [] : design.parameter_refs;
   const rules = legal.rules.filter((rule) => ruleIds.includes(rule.id));
   function inspect() { if (!dialog.current?.open) dialog.current?.showModal(); }
   return <>
     <p className="grounded-description"><button className="grounded-text" onClick={inspect}
       title="Kliknij, aby otworzyć pełne wyjaśnienie i podstawę prawną ZUS">{design.description}<span aria-hidden="true"> ⓘ</span></button></p>
     <dialog ref={dialog} className="evidence-dialog" aria-labelledby={headingId}
+      onClick={(event) => { if (event.target === event.currentTarget) dialog.current?.close(); }}
       onCancel={(event) => { event.preventDefault(); dialog.current?.close(); }}>
       <header className="dialog-heading"><div><p className="eyebrow">Karta {card.id} · {card.title}</p>
         <h2 id={headingId}>Jak działa ta karta?</h2></div>
@@ -78,10 +83,9 @@ export function CardGrounding({ card }: { card: Card }) {
     <div className="card-effects" aria-label="Wpływ decyzji">
       <section><span aria-hidden="true">zł</span><h3>Pieniądze · {signals?.money.label}</h3><p>{signals?.moneyReason ?? design.stats.money.explanation}</p></section>
       <section><span aria-hidden="true">◷</span><h3>Czas · {signals?.time.label}</h3><p>{signals?.timeReason ?? design.stats.time.explanation}</p></section>
-      <section><span aria-hidden="true">i</span><h3>Wiedza · {signals?.knowledge.label}</h3><p>{signals?.knowledgeReason}</p></section>
     </div>
       <p className="evidence-explanation">{design.description}</p>
-      <p><strong>Warunki:</strong> {design.conditions}</p>
+      <p><strong>Warunki:</strong> {signals?.conditions ?? design.conditions}</p>
       <p className="muted">Paski są wizualną mechaniką gry. Źródła poniżej opisują zasady świadczeń i urlopów; nie określają siły pasków.</p>
       {signals && <section className="impact-context" aria-label="Założenia porównania">
         <p><strong>Porównujemy:</strong> {signals.comparison}</p>
@@ -99,8 +103,8 @@ export function CardGrounding({ card }: { card: Card }) {
         {rule.external_verification && <p className="muted"><a href={rule.external_verification.url} target="_blank" rel="noreferrer">Sprawdź pełny tekst ustawy: {rule.external_verification.locator} ↗</a></p>}
       </section>)}
         <p className="evidence-version">Materiał konkursowy ZUS. Cytat sprawdzony w dostarczonym pliku; zastosowanie przepisu zależy od daty i okoliczności sprawy.</p>
-        {design.parameter_refs.length > 0 && <section className="parameter-list"><h3>Wartości i limity powiązane z kartą</h3>
-          {design.parameter_refs.map((path) => <div key={path} className="parameter-item"><span>{labels[path] ?? "Parametr świadczenia"}</span><strong>{parameterValue(path)}</strong></div>)}
+        {parameterRefs.length > 0 && <section className="parameter-list"><h3>Wartości i limity powiązane z kartą</h3>
+          {parameterRefs.map((path) => <div key={path} className="parameter-item"><span>{labels[path] ?? "Parametr świadczenia"}</span><strong>{parameterValue(path)}</strong></div>)}
         </section>}
       {design.notes && <p className="muted">Ta ścieżka wymaga uzupełnienia parametrów przed uruchomieniem wyliczeń.</p>}
     </dialog>

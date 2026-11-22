@@ -10,7 +10,9 @@ import { LegalBasis } from "@/components/legal-basis";
 const severity = { error: "Błąd", warning: "Uwaga", info: "Info" } as const;
 
 // Shared view of a computed plan: calculator, case verdicts and the end-of-game summary all render this.
-export function PlanTimeline({ result, unknownBases = [] }: { result: S["PlanResult"]; unknownBases?: ("mother" | "father")[] }) {
+export function PlanTimeline({ result, unknownBases = [], assumptions }: {
+  result: S["PlanResult"]; unknownBases?: ("mother" | "father")[]; assumptions?: ReactNode;
+}) {
   return (
     <div className="plan-grid">
       <Panel title="Kwoty zasiłków">
@@ -37,6 +39,7 @@ export function PlanTimeline({ result, unknownBases = [] }: { result: S["PlanRes
         <ul className="explain">{result.explain.filter((e) => !unknownBases.some((who) => e.text.startsWith(`${whoLabel[who]}:`)) &&
           e.rule !== "założenie kalkulatora").map((e, i) => <li key={i}>{e.text} <cite>{e.rule}</cite></li>)}</ul>
         <LegalBasis rules={["base", "standard-rates", "floor"]} />
+        {assumptions}
       </details>
     </div>
   );

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { api, type S } from "@/lib/api";
 import { day, pln } from "@/lib/format";
 import { recipientLabel, whoLabel } from "@/lib/labels";
-import { myPlan, planHandoff, userToken } from "@/lib/session";
+import { myPlan, userToken } from "@/lib/session";
 import { ApiResult } from "@/components/api-result";
 import { PageHeader } from "@/components/page-header";
 
@@ -17,25 +17,35 @@ export default function Me() {
   const [account, setAccount] = useState<S["ZusAccount"]>();
   const [error, setError] = useState<unknown>();
   const [loggedIn, setLoggedIn] = useState(true);
+  const [expired, setExpired] = useState(false);
 
   useEffect(() => {
     const token = userToken.get();
     if (!token) { setLoggedIn(false); return; } // eslint-disable-line react-hooks/set-state-in-effect -- one-time read of client-only storage
     api.GET("/api/v1/zus/me", { headers: { Authorization: `Bearer ${token}` } })
-      .then(({ data, error }) => (error ? setError(error) : setAccount(data)));
+      .then(({ data, error, response }) => {
+        if (response.status === 401) {
+          // The simulated session is signed per backend process, so a restart invalidates it: log in again.
+          userToken.set(); setExpired(true); setLoggedIn(false);
+        } else if (error) setError(error);
+        else setAccount(data);
+      });
   }, []);
 
   if (!loggedIn) return (
     <main className="page">
       <PageHeader eyebrow="Moje dane" title="Co wie o Was" accent="ZUS?" />
-      <p className="muted">Zaloguj się, aby zobaczyć swoje dane z ZUS (symulacja).</p>
-      <div className="actions"><Link className="button button-primary" href="/login">Zaloguj się przez mObywatel</Link></div>
+      {expired && <p className="notice" role="status">Sesja wygasła. Zaloguj się ponownie.</p>}
+      <section className="panel">
+        <p className="muted">Nie jesteś zalogowany. Zaloguj się przez mObywatel, aby zobaczyć swoje dane z ZUS: ubezpieczenia, zwolnienia e-ZLA, zaświadczenie o niezaleganiu i złożone wnioski (symulacja).</p>
+        <div className="actions"><Link className="button button-primary" href="/login">Zaloguj się przez mObywatel</Link></div>
+      </section>
     </main>
   );
-  if (!account) return <main className="page"><ApiResult error={error} /></main>;
+  if (!account) return <main className="page">{error ? <ApiResult error={error} /> : <p className="muted" role="status">Wczytuję dane z ZUS…</p>}</main>;
 
   const open = (path: string) => {
-    if (path === "/calculator") planHandoff.put(account.plan); else myPlan.put(account.plan);
+    if (path === "/applications") myPlan.put(account.plan);
     router.push(path);
   };
   const logout = () => { userToken.set(); router.push("/login"); };

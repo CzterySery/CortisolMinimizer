@@ -14,6 +14,8 @@ export interface CardSignals {
   knowledgeReason: string;
   later: string;
   ruleIds: string[];
+  /** Overrides the base card's conditions/rules when the card is a round-1 situation carrier. */
+  conditions?: string;
 }
 
 // Illustrative game weights, never amounts, days or legal parameters.
@@ -33,8 +35,36 @@ function signal(emphasis: number, up: string, down: string): CardSignal {
     label: emphasis > 0 ? up : emphasis < 0 ? down : "Bez zmiany" };
 }
 
+// Round 1 of the decision tree reuses 1A/1B/1D only as carriers for the family situation (birth, adoption,
+// foster care). The situation sets which rules apply, not a money/time trade-off, so all three move the
+// balance identically (not at all) instead of inheriting the unrelated profiles of the base cards.
+function situationSignals(card: Card): CardSignals {
+  const neutral = signal(0, "", "");
+  const situation = card.tags?.[2];
+  const what = situation === "adoption" ? "przysposobienie dziecka"
+    : situation === "foster" ? "przyjęcie dziecka do niezawodowej rodziny zastępczej" : "urodzenie dziecka";
+  return {
+    money: neutral, time: neutral, knowledge: neutral,
+    comparison: `Wybór sytuacji rodziny (${what}) względem pozostałych dwóch sytuacji w pierwszej rundzie.`,
+    period: "cały plan — sytuacja ustala zasady dla kolejnych rund",
+    moneyReason: "Sama sytuacja rodziny nie oznacza wypłaty ani jej wysokości. Kwota zależy od podstawy wymiaru i wariantu wypłaty wybranego w kolejnych rundach, dlatego pasek pieniędzy się nie zmienia.",
+    timeReason: "Sytuacja nie dodaje ani nie zużywa dni urlopu. Wymiar urlopów i limity wieku dziecka wynikają z tej sytuacji, ale wykorzystanie czasu planujesz w kolejnych rundach, dlatego pasek czasu się nie zmienia.",
+    knowledgeReason: "",
+    later: "Kolejne pytania, limity wieku dziecka i wymagane dokumenty dopasujemy do wybranej sytuacji.",
+    ruleIds: situation === "birth" || !situation
+      ? ["maternity-pool", "parental-pool", "paternity", "insured-parent"]
+      : ["adoption", "maternity-pool", "parental-pool", "paternity", "insured-parent"],
+    conditions: situation === "adoption"
+      ? "Przyjęcie dziecka na wychowanie i złożenie wniosku o przysposobienie w sądzie opiekuńczym; urlop przysługuje do ukończenia przez dziecko 14 lat. Wymagany tytuł do ubezpieczenia chorobowego."
+      : situation === "foster"
+        ? "Niezawodowa rodzina zastępcza; dziecko do 7 lat, a przy odroczeniu obowiązku szkolnego do 10 lat. Wymagany tytuł do ubezpieczenia chorobowego."
+        : "Ścieżka urodzenia: spodziewany lub niedawny poród. Wymagany tytuł do ubezpieczenia chorobowego (umowa o pracę, zlecenie lub JDG z dobrowolnym chorobowym).",
+  };
+}
+
 export function getCardSignals(card?: Card): CardSignals | undefined {
   if (!card?.design) return undefined; // Old API IDs can have different meanings.
+  if (card.tags?.[3] === "sytuacja") return situationSignals(card);
   const impact = audit.cards.find((item) => item.id === card.id);
   if (!impact) return undefined;
   const profile = profiles[card.id];

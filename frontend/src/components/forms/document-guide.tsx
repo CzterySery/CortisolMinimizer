@@ -17,12 +17,13 @@ export function DocumentGuide({ doc, plan, name, account, onClose }: {
   const form = officialForm(doc);
   useEffect(() => { const element = dialog.current; element?.showModal(); return () => element?.close(); }, []);
   return <dialog ref={dialog} className="document-guide" aria-labelledby={title}
+    onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     onCancel={(e) => { e.preventDefault(); onClose(); }}>
     <header className="dialog-heading"><div><p className="eyebrow">Demo wypełnienia · {doc.rule === "Oficjalny wzór ZUS" ? "wzór bez danych osoby" : whoLabel[doc.who]}</p>
       <h2 id={title}>{form ? `${form.code} — gdzie wpisać dane?` : doc.form}</h2></div>
       <button type="button" className="button" autoFocus onClick={onClose}>Zamknij podgląd</button>
     </header>
-    <p className="muted">Podpowiedzi i próbne wpisy służą nauce. Nie zmieniają oryginalnego PDF-u ani nie są wysyłane do ZUS.</p>
+    {!form && <p className="muted">Podpowiedzi i próbne wpisy służą nauce. Nie zmieniają oryginalnego PDF-u ani nie są wysyłane do ZUS.</p>}
     {form ? <OfficialGuide form={form} doc={doc} plan={plan} name={name} account={account} /> : documentIssuer(doc) === "doctor" ?
       <section className="panel"><h3>Ten dokument wystawia lekarz</h3><p>e-ZLA trafia elektronicznie do ZUS i płatnika. Nie wypełniasz go samodzielnie. Sprawdź swoje dane oraz okres niezdolności; błąd zgłoś lekarzowi.</p><p>{doc.note}</p><LegalBasis rules={["sick-docs"]} /></section>
       : doc.recipient === "usc" ? <section className="panel"><h3>To wniosek do USC, nie formularz ZUS</h3>
@@ -56,16 +57,11 @@ function OfficialGuide({ form, doc, plan, name, account }: {
   const setExample = (value: string) => { if (selected) setEdits({ ...edits, [selected.id]: value }); };
 
   return <>
-    <div className="form-source"><span>Oryginalny formularz ZUS · wersja {day(form.version)} · sprawdzono {day(form.checked)}</span>
+    <div className="form-source">
       <div className="actions"><a href={form.pdf} target="_blank" rel="noreferrer">Otwórz oryginalny PDF ↗</a>
         <a href={form.sourcePage} target="_blank" rel="noreferrer">Strona formularza w ZUS ↗</a></div>
     </div>
-    {doc.rule !== "Oficjalny wzór ZUS" && <p className="notice" role="status">
-      <strong>Automatycznie uzupełnione pola: {Object.keys(filled).length}.</strong> Dane z planu i konta są już widoczne w formularzu. Sprawdź je i popraw w podglądzie. Nieznane dane i oświadczenia pozostają puste.
-      {name && name.trim().split(/\s+/).length !== 2 && <> Imię i nazwisko „{name}” rozdziel ręcznie na właściwe pola.</>}
-    </p>}
     {form.id === "z15" && <p className="notice">Od 24.10.2026 formularz Z-15 zastępuje Z-15A i Z-15B. Poniżej pokazujemy aktualny Z-15, również gdy pozycja planu ma starszą nazwę.</p>}
-    {form.issuer === "employer" && <p className="notice"><strong>Wypełnia płatnik składek — pracodawca lub zleceniodawca.</strong> Możesz sprawdzić, jakich danych potrzebuje, ale nie podpisujesz tego zaświadczenia za płatnika.</p>}
     {form.id === "znp7" && <p className="notice">Część I (strony 1–2) wypełnia osoba ubiegająca się o świadczenie. Część II (strony 3–4) wypełnia płatnik składek.</p>}
     <div className="form-page-controls">
       <button type="button" className="button" disabled={!pageIndex} onClick={() => changePage(pageIndex - 1)}>Poprzednia strona</button>
@@ -95,6 +91,11 @@ function OfficialGuide({ form, doc, plan, name, account }: {
         </div>
       </div>
       <aside className="form-field-help" id={fieldHelp}>
+        {doc.rule !== "Oficjalny wzór ZUS" && <p className="notice" role="status">
+          <strong>Automatycznie uzupełnione pola: {Object.keys(filled).length}.</strong> Dane z planu i konta są już widoczne w formularzu. Sprawdź je i popraw w podglądzie. Nieznane dane i oświadczenia pozostają puste.
+          {name && name.trim().split(/\s+/).length !== 2 && <> Imię i nazwisko „{name}” rozdziel ręcznie na właściwe pola.</>}
+        </p>}
+        {form.issuer === "employer" && <p className="notice"><strong>Wypełnia płatnik składek — pracodawca lub zleceniodawca.</strong> Możesz sprawdzić, jakich danych potrzebuje, ale nie podpisujesz tego zaświadczenia za płatnika.</p>}
         {selected ? <>
           <label className="field">Wybierz pole na tej stronie<select value={fieldIndex} onChange={(e) => selectField(Number(e.target.value), true)}>
             {page.fields.map((field, index) => <option key={field.id} value={index}>{index + 1}. {field.label.slice(0, 110)}</option>)}
@@ -107,7 +108,7 @@ function OfficialGuide({ form, doc, plan, name, account }: {
             {!employerPart && selected.id in edits && <button type="button" className="button" onClick={() => setEdits((previous) => {
               const next = { ...previous }; delete next[selected.id]; return next;
             })}>Przywróć dane źródłowe</button>}</div>}
-          {employerPart ? <p className="notice">To część dla płatnika. Dane i podpis uzupełnia pracodawca, zleceniodawca albo upoważniona osoba.</p> : <>
+          {employerPart ? (form.issuer !== "employer" && <p className="notice">To część dla płatnika. Dane i podpis uzupełnia pracodawca, zleceniodawca albo upoważniona osoba.</p>) : <>
             {selected.type === "CheckBox" ? <label className="field-check"><input type="checkbox" checked={valueOf(selected.id) === "X"}
               onChange={(e) => setExample(e.target.checked ? "X" : "")} />Próbne zaznaczenie X</label>
               : <label className="field">Próbny wpis w tym polu<input value={valueOf(selected.id)} maxLength={220}
