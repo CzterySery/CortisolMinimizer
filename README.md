@@ -1,56 +1,51 @@
 # OtwarteKarty
 
-Gra karciana i kalkulator zasiłków dla przyszłych rodziców (HackNation 2026, zadanie ZUS). Backend: **Python + FastAPI + PostgreSQL**. Frontend: **Next.js (App Router) + TypeScript**.
+**LIVE DEMO:** [Otwarte Karty](https://charming-delight-production-38ec5aa2.up.railway.app/)
+
+## Opis projektu
+
+**OtwarteKarty – Przewodnik Przyszłego Rodzica** to aplikacja przygotowana na HackNation 2026 w odpowiedzi na wyzwanie ZUS. 
+
+Pomaga ona rodzicom zrozumieć przysługujące świadczenia, podzielić opiekę nad dzieckiem i przejść od poznania możliwości do przygotowania wniosków. 
+
+Łączy edukacyjną grę karcianą z kalkulatorem, który pokazuje kwoty świadczeń, kalendarz urlopów oraz potrzebne dokumenty, terminy i miejsca ich złożenia. Uwzględnia również adopcję i niezawodową pieczę zastępczą. Działa na komputerze i telefonie.
+
+## Jak można skorzystać z aplikacji?
+
+### Ścieżka od danych do wniosków
+
+- **Od konta do nowych wniosków:** w „Moje dane” wybierasz logowanie przez mObywatela i jeden z trzech fikcyjnych profili. Aplikacja symuluje pobranie z ZUS informacji o ubezpieczeniu, składkach, zadłużeniu, zwolnieniach lekarskich i wcześniej złożonych wnioskach. Następnie w kalkulatorze przygotowujesz nowy plan rodziny i przechodzisz do dokumentów wynikających z tego planu.
+- **Od razu do kalkulatora:** wpisujesz sytuację rodziny, dochody i planowane okresy opieki. Sprawdzasz podział urlopów między rodziców, wysokość świadczeń oraz skutki łączenia pracy z urlopem rodzicielskim. Gotowy plan prowadzi do listy dokumentów w „Moje dane”, gdzie możesz podejrzeć formularze, uzupełnić dostępne pola i zasymulować wysłanie wniosku do właściwego odbiorcy.
+- **Od gry do własnego planu:** w pięciu rundach wybierasz karty przedstawiające sytuacje i decyzje rodziców. Poznajesz ich wpływ na budżet i czas opieki, korzystając ze strategii „Kortyzol Minimizer”, „Zasiłki Maxxing” lub „Aura Farming”. Wynik przenosisz do kalkulatora, dopasowujesz do swojej rodziny, a następnie przechodzisz do wniosków.
+
+### Sprawdzenie sprawy ZUS
+
+W **Sprawdź sprawę** możesz wybrać przykładową sprawę ZUS, wgrać PDF lub wpisać dane ręcznie, aby sprawdzić uprawnienia i przysługujące zasiłki. Aplikacja przy pomocy AI odczytuje wgrany PDF i wypełnia formularz, który możesz poprawić.
+
+### Asystent AI
+
+Asystent AI pomaga odnaleźć informacje w przepisach, a przydatne materiały kierują do oficjalnych źródeł i organizacji wspierających rodziców.
+
+## Zakres symulacji i AI
+
+**Zakres symulacji i AI:** logowanie mObywatel, pobieranie danych urzędowych i wysyłanie wniosków są symulowane. AI wspiera odczyt nieznanych skanów oraz, po skonfigurowaniu, formułowanie odpowiedzi asystenta na podstawie źródeł prawnych. Odczytane dane można poprawić; uprawnienia i kwoty wylicza kalkulator według zapisanych reguł.
 
 ## Architektura
 
-```text
-przeglądarka ──/api/v1/*──▶ Next.js (frontend/, port 3000) ──API_URL──▶ FastAPI (backend/, port 8000) ──▶ PostgreSQL
-                                                                              └──▶ model AI (odczyt skanów spraw, redakcja odpowiedzi asystenta)
-```
+Aplikacja składa się z trzech głównych części:
 
-- **Przeglądarka nie woła FastAPI bezpośrednio.** Strony wołają `/api/v1/...` na serwerze Next.js, a [proxy](frontend/src/app/api/v1/[...path]/route.ts) przekazuje żądanie pod `API_URL` (zmienna tylko serwerowa, czytana w czasie działania). Bez `API_URL` te żądania zwracają `503`.
-- **Kontrakt API** to modele Pydantic w [schemas.py](backend/app/schemas.py). Frontend generuje z nich typy (`npm run gen:api` → `frontend/src/lib/schema.d.ts`).
-- **Jeden deterministyczny kalkulator** (`backend/app/calc/`, czyste funkcje) liczy grę, kalkulator i ocenę spraw: plan rodziny = fakty + okresy (bloki), z których wynikają kwoty, kalendarz opieki, pule, dokumenty i ryzyka.
-- **Parametry prawne** (stawki, limity, terminy) są tylko w [params.json](backend/app/data/params.json) i [params-history.json](backend/app/data/params-history.json), wersjonowane w PostgreSQL i edytowalne w panelu administracyjnym.
-- **Trwałe dane** są tylko w [repositories.py](backend/app/repositories.py). Tabele `config`, `games`, `submissions` i `uploads` backend tworzy sam przy starcie; nie ma migracji.
-- **AI:** odczyt wgranych skanów spraw ([vision.py](backend/app/vision.py)) i redakcja odpowiedzi asystenta prawnego z wyszukanych fragmentów przepisów ([rag.py](backend/app/rag.py); bez klucza Gemini odpowiada lokalne wyszukiwanie, a odpowiedź modelu jest w interfejsie oznaczona). Model przepisuje fakty do formularza, który użytkownik sprawdza; prawo do zasiłku i kwoty liczy kalkulator. Dostawca jest wymienny ([llm.py](backend/app/llm.py), `LLM_PROVIDER`): Google Gemini albo dowolne API zgodne z OpenAI, także model lokalny lub open-weight (Ollama, vLLM, LM Studio) i europejski (Mistral). Nowy dostawca to jedna klasa. Bez skonfigurowanego dostawcy sprawę wpisuje się ręcznie.
+- **Frontend — Next.js + TypeScript:** interfejs gry, kalkulatora, konta i dokumentów, dostosowany do komputerów i telefonów.
+- **Backend — Python + FastAPI:** wspólny kalkulator dla gry i oceny spraw, reguły świadczeń oraz obsługa wniosków i symulacji usług urzędowych.
+- **Baza danych — PostgreSQL:** zapis planów, złożonych wniosków i wersji parametrów prawnych. Stawki, limity i terminy można zmieniać w panelu administracyjnym.
 
-```text
-backend/
-  app/
-    main.py           # aplikacja, CORS, routery pod /api/v1
-    schemas.py        # kontrakt API
-    repositories.py   # katalog kart (JSON) + PostgreSQL
-    params.py         # model parametrów prawnych
-    vision.py         # odczyt skanów spraw: polecenie, schemat, walidacja
-    llm.py            # wymienny dostawca modelu: Gemini albo API zgodne z OpenAI
-    rag.py            # asystent prawny: wyszukiwanie fragmentów przepisów + opcjonalna redakcja modelem
-    api/              # catalog, calc, game, cases, gov_mock, info, admin
-    calc/             # base, plan, rules, paperwork, family: kalkulator
-    game/             # engine: odtwarzanie zagranych kart w jeden plan
-    data/             # parametry, scenariusze gry, persony, sprawy przykładowe, fundacje
-  tests/
-frontend/
-  src/
-    app/              # strony: gra, kalkulator, sprawy, wnioski, pomoc, mObywatel, admin, źródła; proxy /api/v1
-    components/       # game/, plan/, forms/, landing/, nagłówek i stopka
-    hooks/            # use-plan
-    lib/              # klient API (typy z OpenAPI), formatowanie, etykiety, sesja, logika rozdania
-    types/            # aliasy typów gry
-shared/               # talia kart (deck-design.json, cards.json) i reguły prawne dla obu aplikacji
-scripts/              # budowa talii i reguł, ekstrakcja źródeł prawnych, formularze ZUS
-Documents/legal/      # transkrypcje dostarczonych źródeł prawnych
-docs/                 # zakres silnika gry, grounding kart, przegląd kalkulatora, formularze
-```
 
-Pełny opis API: http://localhost:8000/docs (wszystkie endpointy pod `/api/v1`).
+Główne katalogi: [frontend/](frontend/) — interfejs, [backend/](backend/) — obliczenia i API, [shared/](shared/) — karty i reguły, [Documents/legal/](Documents/legal/) — źródła prawne, [docs/](docs/) — dokumentacja.
+
+Dokumentacja API po uruchomieniu: http://localhost:8000/docs.
 
 ## Instalacja i uruchomienie
 
 Wymagane: Python 3.11+, Node.js 20.9+ z npm (22.6+ dla `npm run test:cards`), Docker.
-
-### Wszystko w kontenerach
 
 Z katalogu głównego:
 

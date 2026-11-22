@@ -52,7 +52,7 @@ export function GameBoard(props: GameBoardProps) {
   const stage = stages.find((item) => item.id === currentRound) ?? stages.at(-1);
   const stageId = stage?.id;
 
-  // Observe when the round-track slots and the hand enter the viewport
+  // Reveal the round slots only once the full row is visible; the hand gets its own viewport trigger.
   useEffect(() => {
     const board = boardRef.current;
     if (!board || typeof IntersectionObserver === "undefined") {
@@ -60,17 +60,17 @@ export function GameBoard(props: GameBoardProps) {
       setHandInView(true);
       return;
     }
-    const roundsEl = board.querySelector<HTMLElement>(".rounds-section");
+    const roundsEl = board.querySelector<HTMLElement>(".round-track");
     const handEl = board.querySelector<HTMLElement>(".hand-section");
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
-          if (entry.target === roundsEl) setTableInView(true);
+          if (entry.target === roundsEl && entry.intersectionRatio >= 0.95) setTableInView(true);
           if (entry.target === handEl) setHandInView(true);
         }
       },
-      { threshold: 0.15, rootMargin: "0px" },
+      { threshold: [0.15, 0.95], rootMargin: "0px" },
     );
     if (roundsEl) observer.observe(roundsEl);
     if (handEl) observer.observe(handEl);
@@ -80,8 +80,8 @@ export function GameBoard(props: GameBoardProps) {
     };
   }, []);
 
-  // Dynamically animate the 5 table card slots when the table scrolls into view,
-  // then unlock the card deal a moment later so slots appear first and cards reveal right after.
+  // Dynamically animate the 5 table card slots after the complete row is in view,
+  // then reveal the deck before dealing cards from it.
   useEffect(() => {
     if (!tableInView) return;
     const animations: Animation[] = [];
@@ -235,7 +235,7 @@ export function GameBoard(props: GameBoardProps) {
             </div>
           ))}</div>}
           <Statistics statistics={statistics} baseline={props.baseline} projected={projected} simulation={props.simulation} hideValues={mode === "preview"} startAtMidpoint={played.length === 0 && !projected}
-            deckSlot={onReset && <button type="button" className="deck-stack" ref={deckRef} onClick={resetBoard} disabled={props.busy} aria-label="Resetuj karty i zacznij od początku" title="Rozdaj od nowa">
+            deckSlot={onReset && <button type="button" className={`deck-stack ${slotsReady ? "is-visible" : "is-pending"}`} ref={deckRef} onClick={resetBoard} disabled={props.busy} tabIndex={slotsReady ? undefined : -1} aria-hidden={!slotsReady} aria-label="Resetuj karty i zacznij od początku" title="Rozdaj od nowa">
               <span aria-hidden="true" /><span aria-hidden="true" /><span aria-hidden="true"><b>↺</b></span>
             </button>}
           />

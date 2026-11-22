@@ -319,11 +319,13 @@ dialog::backdrop { background: #18312788; }
 .statistics-deck-slot .deck-stack { position: relative; inset: auto; width: 52px; height: 70px; }
 .deck-stack:focus-visible { outline: 2px solid #527561; outline-offset: 9px; border-radius: 6px; }
 .deck-stack:disabled { opacity: .5; cursor: wait; }
+.deck-stack.is-pending { opacity: 0; visibility: hidden; transform: translateY(10px) rotate(-7deg); }
+.deck-stack.is-visible { opacity: 1; visibility: visible; transition: opacity 260ms ease, transform 260ms ease; }
 .round-instruction { font-size: 11px; line-height: 1.5; color: var(--muted-strong); margin: 6px 0 0; text-align: center; }
 @media (max-width: 560px) { .round-instruction { font-size: 9px; } }
 .hand-card { cursor: pointer; }
 .hand-card.is-playing { z-index: 20; pointer-events: none; }
-@media (prefers-reduced-motion: reduce) { .deck-stack > span { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .deck-stack > span, .deck-stack.is-visible { transition: none; } }
 .legal-section { scroll-margin-top: 24px; }
 .legal-section pre { white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; font: 14px/1.85 Georgia, serif; }
 .legal-section:target { background: #edf3e8; outline: 1px solid #c1d0b4; border-radius: 8px; padding: 18px; }
@@ -404,7 +406,7 @@ dialog::backdrop { background: #18312788; }
 .landing-subtitle { font-size: clamp(15px, 1.8vw, 17px); color: var(--muted); line-height: 1.65; max-width: 920px; margin: 0 auto; }
 .landing-plan-line { display: block; }
 
-.landing-animation-band { position: relative; width: 100%; margin: 0 auto 30px; background: #f5f7f2; border: 0; border-radius: 18px; padding: 20px 18px 16px; box-shadow: none; overflow: hidden; }
+.landing-animation-band { position: relative; width: 100%; margin: 0 auto 30px; background: transparent; border: 0; border-radius: 0; padding: 0; box-shadow: none; overflow: visible; }
 .landing-animation-viewport { position: relative; width: 100%; aspect-ratio: 1480 / 640; max-height: 440px; display: flex; align-items: center; justify-content: center; }
 .landing-animation-svg { width: 100%; height: 100%; display: block; }
 .replay-button-subtle { position: absolute; right: 12px; bottom: 8px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 13px; border: 0; border-radius: 20px; background: rgba(255, 255, 255, 0.78); font-size: 11px; color: var(--muted); cursor: pointer; transition: background 160ms, color 160ms; }

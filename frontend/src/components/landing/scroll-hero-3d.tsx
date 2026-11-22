@@ -16,7 +16,7 @@ function smoothstep(edge0: number, edge1: number, x: number): number {
 }
 
 const INK = "#1c1d1f";
-const WHITE = "#ffffff";
+const SKIN = "#e9b99b";
 const CREAM = "#f3eae0";
 const ACCENT = "#527561";
 const ACCENT_BLUE = "#3b7a9c";
@@ -134,7 +134,7 @@ export function LandingHero() {
         </p>
       </div>
 
-      {/* Subtle borderless contrasting area for the animation */}
+      {/* Transparent animation area */}
       <div className="landing-animation-band">
         <div className="landing-animation-viewport">
           <svg
@@ -148,7 +148,7 @@ export function LandingHero() {
               <style>{`
                 .ink { stroke: ${INK}; stroke-width: 2.2px; stroke-linecap: round; stroke-linejoin: round; }
                 .ink-thin { stroke: ${INK}; stroke-width: 1.6px; stroke-linecap: round; stroke-linejoin: round; }
-                .fill-white { fill: ${WHITE}; }
+                .fill-skin { fill: ${SKIN}; }
                 .fill-cream { fill: ${CREAM}; }
                 .fill-dark { fill: ${INK}; }
                 .fill-sage { fill: ${ACCENT}; }
@@ -199,7 +199,7 @@ export function LandingHero() {
 
                 <path
                   d="M 45 158 V 202 H 66 V 158 Z"
-                  className="fill-white ink"
+                  className="fill-skin ink"
                 />
 
                 <path
@@ -214,7 +214,7 @@ export function LandingHero() {
 
                 <path
                   d="M 35 122 C 35 98 50 85 70 85 C 90 85 99 101 97 127 C 95 153 83 171 65 171 C 48 171 35 155 35 122 Z"
-                  className="fill-white ink"
+                  className="fill-skin ink"
                 />
                 <path
                   d="M 35 125 C 32 101 46 80 72 80 C 91 80 103 92 101 107 C 91 100 78 98 62 102 C 50 105 43 114 41 125 Z"
@@ -229,7 +229,7 @@ export function LandingHero() {
 
                 <path
                   d="M 15 320 C 13 333 20 342 28 339 C 34 336 34 327 30 318 Z"
-                  className="fill-white ink"
+                  className="fill-skin ink"
                 />
                 <path
                   d="M 20 212 C 6 242 5 280 14 323 L 31 320 C 25 284 26 250 36 226 Z"
@@ -246,7 +246,7 @@ export function LandingHero() {
               <g transform="translate(128, 12)">
                 <path
                   d="M 48 376 L 56 480 L 66 544 H 86 L 80 480 L 66 376 Z"
-                  className="fill-white ink"
+                  className="fill-skin ink"
                 />
                 <path
                   d="M 65 544 L 62 564 H 114 C 114 552 102 546 86 544 Z"
@@ -256,7 +256,7 @@ export function LandingHero() {
 
                 <path
                   d="M 18 376 L 19 482 L 25 544 H 46 L 44 482 L 38 376 Z"
-                  className="fill-white ink"
+                  className="fill-skin ink"
                 />
                 <path
                   d="M 25 544 L 22 564 H 76 C 76 552 64 546 46 544 Z"
@@ -271,7 +271,7 @@ export function LandingHero() {
 
                 <path
                   d="M 41 164 V 206 H 60 V 164 Z"
-                  className="fill-white ink"
+                  className="fill-skin ink"
                 />
 
                 <path
@@ -292,20 +292,26 @@ export function LandingHero() {
                   className="ink"
                 />
 
-                <circle cx="25" cy="77" r="18" className="fill-white ink" />
+                <circle cx="25" cy="77" r="18" className="fill-dark ink" />
                 <path
                   d="M 27 93 C 31 87 40 85 46 90 C 42 96 33 98 27 93 Z"
                   className="fill-dark ink"
                 />
 
+                {/* Swept-back hair cap joins the bun and sits behind the face */}
+                <path
+                  d="M 25 137 C 20 111 30 88 49 80 C 70 71 94 86 98 110 L 90 126 C 87 105 77 94 62 93 C 44 93 33 108 30 132 Z"
+                  className="fill-dark ink"
+                />
+
                 <path
                   d="M 28 130 C 28 104 44 91 64 91 C 84 91 92 108 90 134 C 88 158 76 177 58 177 C 40 177 28 160 28 130 Z"
-                  className="fill-white ink"
+                  className="fill-skin ink"
                 />
+                {/* Soft side-swept fringe follows the forehead instead of crossing the face */}
                 <path
-                  d="M 31 144 C 37 124 44 110 56 105 C 67 101 79 104 89 111"
-                  fill="none"
-                  className="ink"
+                  d="M 28 136 C 31 117 39 101 53 95 C 68 89 84 97 91 111 C 80 104 69 103 58 107 C 46 112 39 126 34 141 C 32 146 30 149 28 151 Z"
+                  className="fill-dark ink"
                 />
                 <path d="M 60 124 Q 66 121 71 124" fill="none" className="ink" />
                 <path d="M 78 125 Q 83 123 87 126" fill="none" className="ink" />
@@ -316,7 +322,7 @@ export function LandingHero() {
 
                 <path
                   d={`M ${wristX - 2} ${wristY - 5} C ${wristX + 14} ${wristY - 7} ${wristX + 24} ${wristY + 2} ${wristX + 18} ${wristY + 11} C ${wristX + 10} ${wristY + 14} ${wristX - 3} ${wristY + 10} ${wristX - 2} ${wristY - 5} Z`}
-                  className="fill-white ink"
+                  className="fill-skin ink"
                 />
                 <path
                   d={`M 18 224 C 10 256 16 290 ${wristX - 4} ${wristY + 8} L ${wristX + 4} ${wristY - 6} C 36 280 32 254 36 234 Z`}
@@ -345,7 +351,7 @@ export function LandingHero() {
                 {/* 1. Baby Head drawn FIRST so its lower part is naturally tucked behind the straight edge of the koszyk */}
                 {babyInCarrierAlpha > 0.01 && (
                   <g opacity={babyInCarrierAlpha}>
-                    <circle cx="148" cy="480" r="22" className="fill-white ink" />
+                    <circle cx="148" cy="480" r="22" className="fill-skin ink" />
                     {/* Delicate hair curl on top of peeking head */}
                     <path d="M 143 458 C 147 451 155 453 153 459" fill="none" className="ink" />
                     {/* Peaceful eyes visible just above the straight basket edge */}
@@ -396,7 +402,7 @@ export function LandingHero() {
                 <g transform={`translate(${-crawlPhase * 6 - 5}, ${-Math.max(0, -crawlPhase) * 2.5 - 1})`}>
                   <path
                     d="M 30 534 L 29 564 L 13 566 C 11 561 7 559 4 562 C 2 565 2 576 9 576 L 36 576 C 43 576 46 571 45 565 L 44 534 Z"
-                    className="fill-white ink"
+                    className="fill-skin ink"
                   />
                 </g>
 
@@ -404,7 +410,7 @@ export function LandingHero() {
                 <g transform={`translate(${crawlPhase * 5 + 6}, ${-Math.max(0, crawlPhase) * 2.5})`}>
                   <path
                     d="M 78 532 Q 75 552 80 569 L 80 576 H 96 C 100 576 100 569 94 568 L 91 568 Q 89 550 92 532 Z"
-                    className="fill-white ink"
+                    className="fill-skin ink"
                   />
                 </g>
 
@@ -412,7 +418,7 @@ export function LandingHero() {
                 <g transform={`translate(${crawlPhase * 6}, ${-Math.max(0, crawlPhase) * 2.5})`}>
                   <path
                     d="M 30 534 L 29 564 L 13 566 C 11 561 7 559 4 562 C 2 565 2 576 9 576 L 36 576 C 43 576 46 571 45 565 L 44 534 Z"
-                    className="fill-white ink"
+                    className="fill-skin ink"
                   />
                 </g>
 
@@ -420,7 +426,7 @@ export function LandingHero() {
                 <g transform={`translate(${-crawlPhase * 5}, ${-Math.max(0, -crawlPhase) * 2.5})`}>
                   <path
                     d="M 78 532 Q 75 552 80 569 L 80 576 H 96 C 100 576 100 569 94 568 L 91 568 Q 89 550 92 532 Z"
-                    className="fill-white ink"
+                    className="fill-skin ink"
                   />
                 </g>
 
@@ -431,7 +437,7 @@ export function LandingHero() {
                 />
 
                 {/* Cute Baby Head looking forward-right */}
-                <circle cx="110" cy="494" r="22" className="fill-white ink" />
+                <circle cx="110" cy="494" r="22" className="fill-skin ink" />
                 <path d="M 105 472 C 110 465 118 467 116 473" fill="none" className="ink" />
                 <circle cx="113" cy="492" r="1.9" className="fill-dark" />
                 <circle cx="123" cy="493" r="1.9" className="fill-dark" />
@@ -450,7 +456,7 @@ export function LandingHero() {
                 <g transform={`rotate(${stride * 13}, 58, 316)`}>
                   <path
                     d="M 68 386 C 72 397 79 403 85 399 C 89 396 87 387 80 380 Z"
-                    className="fill-white ink"
+                    className="fill-skin ink"
                   />
                   <path
                     d="M 54 312 C 66 336 74 362 82 384 L 68 390 C 60 368 52 344 44 322 Z"
@@ -484,7 +490,7 @@ export function LandingHero() {
 
                 <path
                   d="M 43 276 V 306 H 59 V 276 Z"
-                  className="fill-white ink"
+                  className="fill-skin ink"
                 />
 
                 <path
@@ -499,7 +505,7 @@ export function LandingHero() {
 
                 <path
                   d="M 26 244 C 26 216 40 202 56 202 C 74 202 86 216 84 244 C 82 270 70 286 54 286 C 38 286 26 270 26 244 Z"
-                  className="fill-white ink"
+                  className="fill-skin ink"
                 />
                 <path
                   d="M 26 250 C 21 226 32 198 56 196 C 76 195 90 206 88 222 C 79 215 66 214 52 218 C 39 222 33 234 30 250 Z"
@@ -515,7 +521,7 @@ export function LandingHero() {
                 <g transform={`rotate(${-stride * 13}, 32, 316)`}>
                   <path
                     d="M 21 392 C 19 403 24 411 31 409 C 37 407 37 398 34 390 Z"
-                    className="fill-white ink"
+                    className="fill-skin ink"
                   />
                   <path
                     d="M 24 314 C 16 340 16 368 20 394 L 35 392 C 31 368 32 342 38 322 Z"
