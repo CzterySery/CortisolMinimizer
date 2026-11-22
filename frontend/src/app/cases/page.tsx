@@ -69,12 +69,15 @@ export default function Cases() {
             </button>
           ))}
         </section>
-        <div className="actions">
-          <label className="dropzone">
-            <span>Wgraj PDF sprawy</span>
-            <input type="file" accept="application/pdf" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
-          </label>
-          <button className="button button-dashed" onClick={() => { setManual(blank); setUploaded(undefined); setSample(undefined); setVerdict(undefined); setMessage(undefined); }}>Wpisz dane ręcznie</button>
+        <div className="case-input-options">
+          <p className="eyebrow">Wgraj albo wpisz</p>
+          <div className="actions">
+            <label className="dropzone">
+              <span>Wgraj PDF sprawy</span>
+              <input type="file" accept="application/pdf" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
+            </label>
+            <button className="button button-dashed" onClick={() => { setManual(blank); setUploaded(undefined); setSample(undefined); setVerdict(undefined); setMessage(undefined); }}>Wpisz dane ręcznie</button>
+          </div>
         </div>
         {message && <p className="notice" role="status">{message}</p>}
         {manual && (() => {
