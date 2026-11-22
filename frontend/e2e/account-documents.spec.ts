@@ -24,7 +24,7 @@ test("fresh deployment origin loads the account plan and persisted receipts with
     return r.fulfill({ json: { id: 9, recipient: "employer", status: "wysłano (symulacja)" } });
   });
   await page.goto("/me");
-  await expect(page.getByRole("heading", { name: /Anna Kowalczyk/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Moje dane i dokumenty.", exact: true })).toBeVisible();
   await expect(page.getByRole("navigation").getByRole("link", { name: "Twoje dokumenty", exact: true })).toHaveCount(0);
   const items = page.locator("#dokumenty .docs > li");
   await expect(items.first()).toHaveClass("done");
@@ -72,8 +72,8 @@ test("expired deployment sessions are explained and never silently send anonymou
   await expect(page.getByRole("status")).toContainText("Sesja wygasła");
   await expect.poll(() => page.evaluate(() => sessionStorage.getItem("otwartekarty.user"))).toBeNull();
   await expect(page.getByRole("button", { name: /Wypełnij i wyślij/ })).toHaveCount(0);
-  await page.getByRole("button", { name: "Kontynuuj bez logowania" }).click();
-  await expect(page.getByRole("button", { name: /Wypełnij i wyślij/ }).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "Kontynuuj bez logowania" })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Zaloguj się przez mObywatel", exact: true })).toBeVisible();
 });
 
 test("filed history stays visible even if recalculating the current document list fails", async ({ page }) => {

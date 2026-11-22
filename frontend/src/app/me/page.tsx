@@ -50,8 +50,8 @@ export default function Me() {
 
   return (
     <main className="page">
-      <PageHeader eyebrow="Moje dane · dokumenty i symulacja eZUS" title={account?.persona.name ?? "Moje dane."} accent="Twoje dokumenty.">
-        {account?.persona.description ?? "Sprawdź najważniejsze dane i przygotuj dokumenty dla swojego planu."}
+      <PageHeader eyebrow="Moje dane" title="Moje" accent="dane i dokumenty.">
+        {account ? `${account.persona.name} · ${account.persona.description}` : "Sprawdź najważniejsze dane i przygotuj dokumenty dla swojego planu."}
       </PageHeader>
       {loading && !account && !plan ? <p className="muted" role="status">Wczytuję dane i statusy dokumentów…</p> : <>
         {expired && <p className="notice" role="status">Sesja wygasła. Zaloguj się ponownie, aby pobrać złożone dokumenty z konta.</p>}
@@ -76,17 +76,14 @@ export default function Me() {
               <p>Złożone dokumenty na koncie: <strong>{account.applications.length}</strong></p>
             </section>
           </div>
-          <details className="panel"><summary>Zwolnienia lekarskie (e-ZLA) i podstawy składek</summary>
+          <section className="panel"><h2 className="eyebrow">Zwolnienia lekarskie (e-ZLA) i podstawy składek</h2>
             {account.ezla.length ? <ul>{account.ezla.map((z) => <li key={z.number}><strong>{z.number}</strong> · {day(z.start)} – {day(z.end)}
               {z.code_b && " · kod B (ciąża)"}</li>)}</ul> : <p>Brak zwolnień.</p>}
             {account.insurance.map((insurance) => <p key={`${insurance.title}|${insurance.start}`}>{insurance.payer}: podstawa składek {pln(insurance.contribution_base)}</p>)}
-          </details>
-          {savedPlan && <p className="muted">Lista dokumentów dotyczy Twojego planu z kalkulatora. <button type="button" className="button"
-            onClick={() => { myPlan.put(undefined); setSavedPlan(undefined); }}>Użyj planu z konta ZUS</button></p>}
+          </section>
         </> : <section className="panel">
           <p>Zaloguj się przez mObywatel, aby pobrać dane z ZUS i złożone dokumenty (symulacja). Wnioski przygotowane bez logowania są pamiętane w sesji tej przeglądarki.</p>
           <Link className="button button-primary" href="/login">Zaloguj się przez mObywatel</Link>
-          {expired && <button type="button" className="button" onClick={() => setExpired(false)}>Kontynuuj bez logowania</button>}
         </section>}
         <DocumentsSection plan={plan} account={account} token={token} allowSending={!expired && (!token || !!account)}
           onSubmitted={() => { if (token) setReload((n) => n + 1); }} />

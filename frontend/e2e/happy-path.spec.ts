@@ -45,7 +45,7 @@ test("game → calculator → applications → mObywatel → cases → help → 
   await page.goto("/login");
   await page.getByRole("button", { name: /Anna Kowalczyk/ }).click();
   await expect(page).toHaveURL(/\/me/);
-  await page.getByText("Zwolnienia lekarskie (e-ZLA) i podstawy składek", { exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Zwolnienia lekarskie (e-ZLA) i podstawy składek", exact: true })).toBeVisible();
   await expect(page.getByText("ZY 1048576")).toBeVisible();
   await shot(page, info, "05-me");
   await page.getByRole("link", { name: "Przejdź do dokumentów" }).click();
