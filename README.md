@@ -2,8 +2,6 @@
 
 Gra karciana i kalkulator zasiłków dla przyszłych rodziców (HackNation 2026, zadanie ZUS). Backend: **Python + FastAPI + PostgreSQL**. Frontend: **Next.js (App Router) + TypeScript**.
 
-Plan projektu, konwencje i stan prac: [AGENTS.md](AGENTS.md).
-
 ## Architektura
 
 ```text
@@ -27,6 +25,7 @@ backend/
     params.py         # model parametrów prawnych
     vision.py         # odczyt skanów spraw: polecenie, schemat, walidacja
     llm.py            # wymienny dostawca modelu: Gemini albo API zgodne z OpenAI
+    rag.py            # asystent prawny: wyszukiwanie fragmentów przepisów + opcjonalna redakcja modelem
     api/              # catalog, calc, game, cases, gov_mock, info, admin
     calc/             # base, plan, rules, paperwork, family: kalkulator
     game/             # engine: odtwarzanie zagranych kart w jeden plan
@@ -45,7 +44,7 @@ Documents/legal/      # transkrypcje dostarczonych źródeł prawnych
 docs/                 # zakres silnika gry, grounding kart, przegląd kalkulatora, formularze
 ```
 
-Pełny opis API: http://127.0.0.1:8000/docs (wszystkie endpointy pod `/api/v1`).
+Pełny opis API: http://localhost:8000/docs (wszystkie endpointy pod `/api/v1`).
 
 ## Instalacja i uruchomienie
 
@@ -84,7 +83,7 @@ Frontend, w drugim terminalu:
 
 ```sh
 cd frontend
-cp -n .env.example .env    # odkomentuj API_URL=http://127.0.0.1:8000
+cp -n .env.example .env    # odkomentuj API_URL=http://localhost:8000
 npm install
 npm run dev
 ```
@@ -104,9 +103,13 @@ POSTGRES_PASSWORD=... ADMIN_TOKEN=... SESSION_SECRET=... \
 
 Bez tych trzech zmiennych polecenie się nie uruchomi.
 
-Konto i dokumenty są razem pod `/me`; dawny `/applications` przekierowuje do sekcji dokumentów. Konto pobiera historię z PostgreSQL także bez planu zapisanego w przeglądarce. Zalogowane wysyłki wracają z konta, a anonimowe potwierdzenia pozostają w `sessionStorage` danej domeny i karty przeglądarki — nie przenoszą się z localhosta na publiczne demo.
+#### Uwagi do wdrożenia
 
-Przy wdrożeniu (także na Railway) backend potrzebuje trwałego `DATABASE_URL` oraz stałego `SESSION_SECRET`, wspólnego dla wszystkich procesów i replik. Bez klucza sesji backend losuje go przy starcie, więc restart albo inny proces odrzuca wcześniejsze logowanie (`401`); UI prosi wtedy o ponowne zalogowanie. Frontend potrzebuje `API_URL` wskazującego ten backend. Błędy odczytu konta są widoczne i można ponowić pobieranie; brak odczytu nie powoduje cichej wysyłki anonimowej. Plik z samymi `GEMINI_API_KEY`/`GEMINI_MODEL` konfiguruje AI, nie sesje ani bazę.
+- Backend potrzebuje trwałego `DATABASE_URL` oraz stałego `SESSION_SECRET`, wspólnego dla wszystkich procesów i replik. Bez klucza sesji backend losuje go przy starcie, więc restart albo inny proces odrzuca wcześniejsze logowanie (`401`); interfejs prosi wtedy o ponowne zalogowanie.
+- Frontend potrzebuje `API_URL` wskazującego ten backend.
+- Konto i dokumenty są razem pod `/me` (dawny `/applications` przekierowuje do sekcji dokumentów). Konto pobiera historię z PostgreSQL także bez planu zapisanego w przeglądarce, a błędy odczytu można ponowić; brak odczytu nie powoduje cichej wysyłki anonimowej.
+- Anonimowe potwierdzenia wysyłki zostają w `sessionStorage` danej domeny i karty, więc nie przenoszą się z localhosta na publiczne demo.
+- Plik `.env` z samymi `GEMINI_API_KEY`/`GEMINI_MODEL` konfiguruje AI, nie sesje ani bazę.
 
 ## Sprawdzanie
 
