@@ -49,6 +49,21 @@ def test_login_and_account(client):
     assert {a["form"] for a in me["applications"]} >= {"e-ZLA (zwolnienie lekarskie)"}
 
 
+@pytest.mark.parametrize("persona,pesel,city", [("anna", "00000000001", "Warszawa"),
+                                               ("magda", "00000000002", "Kraków"),
+                                               ("ola", "00000000003", "Gdańsk")])
+def test_fictional_personal_data_is_available_on_the_matching_account(client, persona, pesel, city):
+    account = client.get("/api/v1/zus/me", headers=login(client, persona)).json()
+    assert account["personal_data"]["pesel"] == pesel
+    assert account["personal_data"]["city"] == city
+    assert account["personal_data"]["birth_date"] and account["personal_data"]["street"]
+    payer = account["insurance"][0]["payer_data"]
+    assert payer["nip"] == "000000000" + pesel[-1]
+    assert payer["name"] and payer["regon"] and payer["street"] and payer["house_number"]
+    assert payer["postal_code"] and payer["city"] and payer["phone"]
+    assert all("personal_data" not in p for p in client.get("/api/v1/auth/personas").json())
+
+
 def test_account_needs_a_valid_token(client):
     assert client.get("/api/v1/zus/me").status_code == 401
     forged = login(client, "anna")["Authorization"].replace("anna", "magda")

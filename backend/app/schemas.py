@@ -347,6 +347,17 @@ class Persona(Model):
     who: Who  # whose mObywatel identity it is
 
 
+class DemoPersonalData(Model):
+    """Fictional profile data, separate from the legal calculator's family facts."""
+    pesel: str | None = Field(None, pattern=r"^\d{11}$")
+    birth_date: date
+    street: str
+    house_number: str
+    apartment_number: str = ""
+    postal_code: str
+    city: str
+
+
 class LoginRequest(Model):
     persona_id: str
 
@@ -363,6 +374,20 @@ class InsurancePeriod(Model):
     end: date | None
     sickness_insurance: bool
     contribution_base: Decimal
+    payer_data: "DemoPayerData | None" = None
+
+
+class DemoPayerData(Model):
+    """Complete fictional payer identity for form previews, attached to its insurance period."""
+    name: str
+    nip: str
+    regon: str
+    street: str
+    house_number: str
+    apartment_number: str = ""
+    postal_code: str
+    city: str
+    phone: str = ""
 
 
 class EZla(Model):
@@ -397,6 +422,7 @@ class ZusAccount(Model):
     debt: DebtCertificate
     applications: list[FiledApplication]  # already filed, including those sent from this app
     plan: Plan  # ZUS records plus the person's own entries (partner, planned leave), ready for the calculator
+    personal_data: DemoPersonalData | None = None
 
 
 class PueMessage(Model):

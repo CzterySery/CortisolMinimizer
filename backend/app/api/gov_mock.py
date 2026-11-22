@@ -17,6 +17,7 @@ from app.schemas import (
     ApplicationOut,
     BirthCertificateRequest,
     DebtCertificate,
+    DemoPersonalData,
     EZla,
     FiledApplication,
     InsurancePeriod,
@@ -39,6 +40,7 @@ class PersonaRecord(Persona):
     ezla: list[EZla]
     applications: list[FiledApplication]
     plan: Plan
+    personal_data: DemoPersonalData | None = None
 
 
 # shortcut: simulated login; the token is the persona id signed with a per-process (or SESSION_SECRET) key,
@@ -99,7 +101,7 @@ def account(persona: Me) -> ZusAccount:
         # same condition as rules.py debt.blocks-benefits (art. 2a)
         debt=DebtCertificate(as_of=as_of, debt=money(debt), blocks_benefits=parent.employment == "self_employed"
                              and debt > p.debt_threshold_pct_min_wage * p.min_wage),
-        applications=filed + persona.applications, plan=persona.plan)
+        applications=filed + persona.applications, plan=persona.plan, personal_data=persona.personal_data)
 
 
 def _filed(row: dict) -> FiledApplication:

@@ -157,7 +157,7 @@ export default function Calculator() {
                   }}><strong>{label}</strong><span>{description}</span></button>)}
             </div></fieldset>
             <aside className="calculator-login"><p>Masz dane na koncie ZUS? Możesz zacząć od ich pobrania w symulacji.</p>
-              <Link className="button" href="/login">Zaloguj się przez mObywatel</Link>
+              <Link className="button" href="/me#logowanie">Zaloguj się przez mObywatel</Link>
             </aside>
           </>}
           {step === 1 && <>

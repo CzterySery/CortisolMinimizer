@@ -43,6 +43,7 @@ test("game → calculator → applications → mObywatel → cases → help → 
   await shot(page, info, "04-applications");
 
   await page.goto("/login");
+  await page.getByRole("button", { name: "Zaloguj się przez mObywatel", exact: true }).click();
   await page.getByRole("button", { name: /Anna Kowalczyk/ }).click();
   await expect(page).toHaveURL(/\/me/);
   await expect(page.getByRole("heading", { name: "Zwolnienia lekarskie (e-ZLA) i podstawy składek", exact: true })).toBeVisible();

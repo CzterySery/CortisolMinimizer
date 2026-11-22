@@ -145,7 +145,7 @@ test("salary history validates every line and part-time consumes the proportiona
 
 test("one gross salary is clearly estimated and mObywatel is discoverable", async ({ page }) => {
   await page.goto("/calculator");
-  await expect(page.getByRole("link", { name: "Zaloguj się przez mObywatel", exact: true })).toHaveAttribute("href", "/login");
+  await expect(page.getByRole("link", { name: "Zaloguj się przez mObywatel", exact: true })).toHaveAttribute("href", "/me#logowanie");
   await selectSituation(page, "birth"); await next(page);
   await page.getByLabel("Czekamy na narodziny").check();
   await page.getByLabel("Przewidywana data porodu").fill("2027-03-01"); await next(page);
@@ -162,8 +162,8 @@ test("one gross salary is clearly estimated and mObywatel is discoverable", asyn
   await expect(page.getByRole("heading", { name: "Budżet", exact: true })).toHaveCount(0);
   await expect(page.getByText("Skąd te kwoty? · Szczegóły obliczeń", { exact: true })).toBeVisible();
   await page.getByRole("navigation", { name: "Główna nawigacja" }).getByRole("link", { name: "Moje dane", exact: true }).click();
-  await page.getByRole("link", { name: "Zaloguj się przez mObywatel", exact: true }).click();
-  await expect(page).toHaveURL(/\/login$/);
+  await page.getByRole("button", { name: "Zaloguj się przez mObywatel", exact: true }).click();
+  await expect(page).toHaveURL(/\/me$/);
   await page.getByRole("button", { name: /Anna Kowalczyk/ }).click();
   await expect(page).toHaveURL(/\/me$/);
 });

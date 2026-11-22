@@ -2,16 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { api, type S } from "@/lib/api";
 import { day, pln } from "@/lib/format";
 import { myPlan, userToken } from "@/lib/session";
 import { ApiResult } from "@/components/api-result";
 import { PageHeader } from "@/components/page-header";
 import { DocumentsSection } from "@/components/plan/documents-section";
+import { MobywatelLogin } from "@/components/forms/mobywatel-login";
 
 export default function Me() {
-  const router = useRouter();
   const [account, setAccount] = useState<S["ZusAccount"]>();
   const [savedPlan, setSavedPlan] = useState<S["Plan-Input"]>();
   const [token, setToken] = useState<string>();
@@ -46,7 +45,7 @@ export default function Me() {
   }, [reload]);
 
   const plan = savedPlan ?? account?.plan;
-  const logout = () => { userToken.set(); router.push("/login"); };
+  const logout = () => { userToken.set(); setToken(undefined); setAccount(undefined); setExpired(false); setReload((n) => n + 1); };
 
   return (
     <main className="page">
@@ -81,10 +80,7 @@ export default function Me() {
               {z.code_b && " · kod B (ciąża)"}</li>)}</ul> : <p>Brak zwolnień.</p>}
             {account.insurance.map((insurance) => <p key={`${insurance.title}|${insurance.start}`}>{insurance.payer}: podstawa składek {pln(insurance.contribution_base)}</p>)}
           </section>
-        </> : <section className="panel">
-          <p>Zaloguj się przez mObywatel, aby pobrać dane z ZUS i złożone dokumenty (symulacja). Wnioski przygotowane bez logowania są pamiętane w sesji tej przeglądarki.</p>
-          <Link className="button button-primary" href="/login">Zaloguj się przez mObywatel</Link>
-        </section>}
+        </> : <MobywatelLogin onLogin={() => { setToken(userToken.get()); setExpired(false); setReload((n) => n + 1); }} />}
         <DocumentsSection plan={plan} account={account} token={token} allowSending={!expired && (!token || !!account)}
           onSubmitted={() => { if (token) setReload((n) => n + 1); }} />
       </>}

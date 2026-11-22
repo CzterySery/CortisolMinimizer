@@ -73,7 +73,7 @@ test("expired deployment sessions are explained and never silently send anonymou
   await expect.poll(() => page.evaluate(() => sessionStorage.getItem("otwartekarty.user"))).toBeNull();
   await expect(page.getByRole("button", { name: /Wypełnij i wyślij/ })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Kontynuuj bez logowania" })).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Zaloguj się przez mObywatel", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Zaloguj się przez mObywatel", exact: true })).toBeVisible();
 });
 
 test("filed history stays visible even if recalculating the current document list fails", async ({ page }) => {

@@ -956,6 +956,62 @@ export interface components {
             /** Blocks Benefits */
             blocks_benefits: boolean;
         };
+        /**
+         * DemoPayerData
+         * @description Complete fictional payer identity for form previews, attached to its insurance period.
+         */
+        DemoPayerData: {
+            /** Name */
+            name: string;
+            /** Nip */
+            nip: string;
+            /** Regon */
+            regon: string;
+            /** Street */
+            street: string;
+            /** House Number */
+            house_number: string;
+            /**
+             * Apartment Number
+             * @default
+             */
+            apartment_number: string;
+            /** Postal Code */
+            postal_code: string;
+            /** City */
+            city: string;
+            /**
+             * Phone
+             * @default
+             */
+            phone: string;
+        };
+        /**
+         * DemoPersonalData
+         * @description Fictional profile data, separate from the legal calculator's family facts.
+         */
+        DemoPersonalData: {
+            /** Pesel */
+            pesel: string | null;
+            /**
+             * Birth Date
+             * Format: date
+             */
+            birth_date: string;
+            /** Street */
+            street: string;
+            /** House Number */
+            house_number: string;
+            /**
+             * Apartment Number
+             * @default
+             */
+            apartment_number: string;
+            /** Postal Code */
+            postal_code: string;
+            /** City */
+            city: string;
+        };
         /** Document */
         Document: {
             /** Form */
@@ -1221,6 +1277,7 @@ export interface components {
             sickness_insurance: boolean;
             /** Contribution Base */
             contribution_base: string;
+            payer_data: components["schemas"]["DemoPayerData"] | null;
         };
         /** Issue */
         Issue: {
@@ -2064,6 +2121,7 @@ export interface components {
             /** Applications */
             applications: components["schemas"]["FiledApplication"][];
             plan: components["schemas"]["Plan-Output"];
+            personal_data: components["schemas"]["DemoPersonalData"] | null;
         };
     };
     responses: never;

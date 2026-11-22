@@ -83,7 +83,7 @@ export function DocumentsSection({ plan, account, token, allowSending = true, on
       {error ? <ApiResult error={error} /> : null}
       {sent && <p className="notice" role="status">{sent}</p>}
       {(plan || shown.length > 0) && <><p className="muted">Kliknij niewysłany wniosek, aby uzupełnić dane i wysłać go w symulacji. Wysłane dokumenty i zaświadczenia możesz podejrzeć.</p>
-        <DocsChecklist documents={shown}
+        <DocsChecklist documents={shown} compact
           actionLabel={(doc) => canSend(doc) ? selected === documentKey(doc) ? "Zwiń formularz" : "Wypełnij i wyślij (symulacja)" : "Zobacz dokument ↗"}
           onInspect={(doc) => {
             if (canSend(doc)) setSelected((current) => current === documentKey(doc) ? undefined : documentKey(doc));

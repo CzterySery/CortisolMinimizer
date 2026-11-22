@@ -2,12 +2,21 @@
  {
   "id": "anna",
   "name": "Anna Kowalczyk",
+  "personal_data": {
+   "pesel": "00000000001", "birth_date": "1995-06-14", "street": "Przykładowa", "house_number": "10",
+   "apartment_number": "4", "postal_code": "00-001", "city": "Warszawa"
+  },
   "who": "mother",
   "description": "Umowa o pracę w małej firmie, więc zasiłki wypłaca ZUS. W ciąży na zwolnieniu z kodem B, poród w styczniu 2027. Część dokumentów już złożona.",
   "insurance": [
    {
     "title": "umowa o pracę na czas nieokreślony",
     "payer": "Pracownia „Przykład” sp. z o.o. (12 ubezpieczonych)",
+    "payer_data": {
+     "name": "Pracownia „Przykład” sp. z o.o.", "nip": "0000000001", "regon": "000000001",
+     "street": "Demonstracyjna", "house_number": "12", "apartment_number": "5",
+     "postal_code": "00-001", "city": "Warszawa", "phone": "000000101"
+    },
     "start": "2023-03-01",
     "end": null,
     "sickness_insurance": true,
@@ -157,12 +166,21 @@
  {
   "id": "magda",
   "name": "Magdalena Wiśniewska",
+  "personal_data": {
+   "pesel": "00000000002", "birth_date": "1992-02-09", "street": "Demonstracyjna", "house_number": "20",
+   "apartment_number": "7", "postal_code": "30-001", "city": "Kraków"
+  },
   "who": "mother",
   "description": "Własna działalność z dobrowolnym chorobowym, bez zaległości w składkach i podstawa podniesiona w ciąży. Partner na zleceniu z dobrowolnym chorobowym.",
   "insurance": [
    {
     "title": "pozarolnicza działalność gospodarcza",
     "payer": "płatnik własnych składek",
+    "payer_data": {
+     "name": "Magdalena Wiśniewska — Studio Przykład", "nip": "0000000002", "regon": "000000002",
+     "street": "Demonstracyjna", "house_number": "20", "apartment_number": "7",
+     "postal_code": "30-001", "city": "Kraków", "phone": "000000102"
+    },
     "start": "2025-02-01",
     "end": null,
     "sickness_insurance": true,
@@ -296,12 +314,21 @@
  {
   "id": "ola",
   "name": "Aleksandra Zielińska",
+  "personal_data": {
+   "pesel": "00000000003", "birth_date": "1999-04-21", "street": "Testowa", "house_number": "30",
+   "apartment_number": "2", "postal_code": "80-001", "city": "Gdańsk"
+  },
   "who": "mother",
   "description": "Umowa na czas określony kończy się w styczniu, przed porodem w kwietniu 2027. Samodzielna mama. Zasiłek po ustaniu ubezpieczenia.",
   "insurance": [
    {
     "title": "umowa o pracę na czas określony",
     "payer": "Sklep „Przykład” S.A. (40 ubezpieczonych)",
+    "payer_data": {
+     "name": "Sklep „Przykład” S.A.", "nip": "0000000003", "regon": "000000003",
+     "street": "Przykładowa", "house_number": "40", "apartment_number": "1",
+     "postal_code": "80-001", "city": "Gdańsk", "phone": "000000103"
+    },
     "start": "2025-08-01",
     "end": "2027-01-31",
     "sickness_insurance": true,

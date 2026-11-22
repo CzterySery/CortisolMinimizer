@@ -5,7 +5,7 @@ import Image from "next/image";
 import type { S } from "@/lib/api";
 import { day } from "@/lib/format";
 import { whoLabel, recipientLabel } from "@/lib/labels";
-import { documentIssuer, officialForm, prefilledFields, knownPayer, leaveRule, type GuideDoc, type OfficialForm } from "@/lib/document-guides";
+import { documentIssuer, officialForm, prefilledFields, knownPayer, knownPayerDetails, leaveRule, type GuideDoc, type OfficialForm } from "@/lib/document-guides";
 import { LegalBasis } from "@/components/legal-basis";
 import "./document-guide.css";
 
@@ -49,6 +49,7 @@ function OfficialGuide({ form, doc, plan, name, account, fieldEdits, onFieldsCha
     if (onFieldsChange) onFieldsChange(updated); else setLocalEdits(updated);
   };
   const filled = prefilledFields(form, doc, plan, name, account);
+  const payer = knownPayerDetails(doc, account);
   // Derive untouched values from new account data without overwriting corrections (including clearing).
   const valueOf = (id: string) => edits[id] ?? filled[id]?.value ?? "";
   const fieldHelp = useId();
@@ -65,6 +66,15 @@ function OfficialGuide({ form, doc, plan, name, account, fieldEdits, onFieldsCha
   const setExample = (value: string) => { if (selected) setEdits({ ...edits, [selected.id]: value }); };
 
   return <>
+    {payer && doc.rule !== "Oficjalny wzór ZUS" && <p className="notice">
+      Płatnik demonstracyjny: <strong>{payer.name}</strong> · NIP {payer.nip} · REGON {payer.regon}.<br />
+      ul. {payer.street} {payer.house_number}{payer.apartment_number && `/${payer.apartment_number}`}, {payer.postal_code} {payer.city}
+      {payer.phone && <> · tel. {payer.phone}</>}. Dane płatnika są fikcyjne.
+    </p>}
+    {account?.personal_data && account.persona.who === doc.who && doc.rule !== "Oficjalny wzór ZUS" &&
+      <p className="notice">Profil demonstracyjny: {account.persona.name}, ur. {day(account.personal_data.birth_date)}.
+        Dane osobowe i numery PESEL są fikcyjne. Datę urodzenia wpisujemy tylko tam, gdzie wymaga jej wzór;
+        gdy pole jest zastępstwem PESEL-u, pozostaje puste przy podanym numerze.</p>}
     <div className="form-source">
       <div className="actions"><a href={form.pdf} target="_blank" rel="noreferrer">Otwórz oryginalny PDF ↗</a>
         <a href={form.sourcePage} target="_blank" rel="noreferrer">Strona formularza w ZUS ↗</a></div>
