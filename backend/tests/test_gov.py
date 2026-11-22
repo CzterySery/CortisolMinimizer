@@ -158,6 +158,35 @@ def test_rag_indexes_all_loaded_documents_and_cites_sources(monkeypatch):
     assert "15 tygodni" in gem.answer and "/sources/labour-code#article-1802" in gem.links
 
 
+def test_gemini_help_request_and_parsing(monkeypatch):
+    """Thinking output must have room (it shares maxOutputTokens), thought parts are skipped, the key stays out
+    of the URL, and an empty or malformed reply falls back instead of raising."""
+    import io
+    import json
+    import urllib.request
+
+    from app import rag
+    sent, replies = [], []
+
+    def fake_urlopen(req, timeout=None):
+        sent.append(req)
+        return io.BytesIO(json.dumps(replies.pop(0)).encode())
+
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+    reply = lambda *parts, reason="STOP": {"candidates": [{"finishReason": reason,
+                                                            "content": {"parts": list(parts)}}]}
+    answer_json = json.dumps({"answer": "14 dni.", "source_urls": ["/sources/labour-code#article-1823"]})
+    replies += [reply({"text": "plan", "thought": True}, {"text": answer_json}),
+                reply({"text": ""}, reason="MAX_TOKENS"),
+                reply({"text": "[1, 2]"})]
+    call = lambda: rag._call_gemini("k", "Ile trwa ojcowski?", [], P)
+    assert call() == ("14 dni.", ["/sources/labour-code#article-1823"])
+    body = json.loads(sent[0].data)
+    assert body["generationConfig"]["maxOutputTokens"] >= 2048 and body["generationConfig"]["thinkingConfig"]
+    assert "key=" not in sent[0].full_url and sent[0].get_header("X-goog-api-key") == "k"
+    assert call() is None and call() is None
+
+
 def test_every_pue_answer_renders():
     import json
     for topic in json.loads((DATA / "pue.json").read_text(encoding="utf-8")):

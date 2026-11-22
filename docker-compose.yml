@@ -24,8 +24,8 @@ services:
       ADMIN_TOKEN: ${ADMIN_TOKEN:-dev}
       DATABASE_URL: postgresql://otwartekarty:${POSTGRES_PASSWORD:-otwartekarty}@db:5432/otwartekarty
       SESSION_SECRET: ${SESSION_SECRET:-}  # mObywatel mock tokens; empty = random per start
-      GEMINI_API_KEY: ${GEMINI_API_KEY:-}  # optional: enables Gemini LLM generation on top of legal RAG
-      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      # AI settings (GEMINI_API_KEY, GEMINI_MODEL, LLM_*) come only from backend/.env: an `${VAR:-}` entry here
+      # would override the file with an empty value.
     depends_on:
       db: { condition: service_healthy }
 

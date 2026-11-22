@@ -58,6 +58,7 @@ export function HelpChat() {
       <p className="muted">
         Zadaj pytanie o urlopy rodzicielskie, zasiłki, formularze (ZAM, Z-15, ZAS-53, ZNp-7, Z-3) lub składki.
         Asystent przeszukuje załadowane dokumenty ZUS i Kodeks pracy oraz zwraca krótką odpowiedź z linkami do źródeł.
+        Jeśli skonfigurowano model AI, to on formułuje odpowiedź z tych fragmentów; kwot i uprawnień nie liczy — robi to kalkulator.
       </p>
       <div className="rag-chips" aria-label="Przykładowe pytania">
         {QUICK_QUESTIONS.map((q) => (
@@ -98,7 +99,9 @@ export function HelpChat() {
       {reply.data && (
         <div className="notice rag-reply" role="status">
           <div className="rag-reply-meta">
-            <strong>Odpowiedź asystenta · Zweryfikowane źródła ZUS</strong>
+            <strong>{reply.data.mode === "gemini-rag"
+              ? "Odpowiedź sformułował model AI na podstawie źródeł poniżej — sprawdź ją w przepisach"
+              : "Odpowiedź asystenta · fragmenty źródeł ZUS"}</strong>
           </div>
           <p className="rag-answer">{reply.data.answer}</p>
           {reply.data.sources && reply.data.sources.length > 0 && (

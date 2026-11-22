@@ -63,7 +63,7 @@ export default function Cases() {
       </PageHeader>
       <div className="stack">
         <section className="choice-grid case-samples" aria-label="Przykładowe sprawy ZUS">
-          {samples.slice(0, 5).map((s) => (
+          {samples.map((s) => (
             <button key={s.id} className="choice" onClick={() => { setManual(undefined); setMessage(undefined); void evaluate(s.plan as S["Plan-Input"], s); }}>
               <strong>{s.title}</strong><span>{s.source}</span>
             </button>

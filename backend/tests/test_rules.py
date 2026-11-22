@@ -45,6 +45,8 @@ def test_legal_plan_has_no_issues():
 
 CASES = {
     "overlap": ([MATERNITY, blk("mother", "sick", at(10), 5)], {}, "plan.overlap"),
+    "parental during the other's maternity": ([MATERNITY, blk("father", "parental", at(50), 63)], {},
+                                              "simultaneous.during-maternity"),
     "paternity for mother": ([blk("mother", "paternity", BIRTH, 7)], {}, "paternity.father-only"),
     "job loss for father": ([blk("father", "job_loss_benefit", at(-30), 10)], {}, "job-loss-before.who"),
     "job loss after birth": ([blk("mother", "job_loss_benefit", at(-5), 10)], {}, "job-loss-before.after-birth"),

@@ -113,6 +113,14 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
             if b.start <= last_day(a):
                 add("plan.overlap", "error", f"Okresy nachodzą na siebie: {span(a)} oraz {span(b)}.",
                     "jeden rodzic, jedno świadczenie naraz")
+    # The other parent may take parental leave only alongside parental-period benefit, not basic maternity.
+    for a in plan.blocks:
+        for b in plan.blocks:
+            if (a.kind == "parental" and b.kind == "maternity" and a.who != b.who
+                    and a.start <= last_day(b) and b.start <= last_day(a)):
+                add("simultaneous.during-maternity", "error", f"{span(a)} nachodzi na urlop macierzyński: "
+                    f"{span(b)}. Drugi rodzic może korzystać z rodzicielskiego dopiero równolegle z okresem "
+                    "odpowiadającym urlopowi rodzicielskiemu.", "KP art. 182^1a § 6–7")
     for b in plan.blocks:
         if b.kind == "paternity" and b.who != "father":
             add("paternity.father-only", "error", "Urlop ojcowski przysługuje tylko ojcu dziecka.", "KP art. 182^3 § 1")

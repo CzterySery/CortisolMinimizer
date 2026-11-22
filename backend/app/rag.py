@@ -15,10 +15,10 @@ is absent or unreachable, falls back deterministically to local RAG synthesis.
 from __future__ import annotations
 
 import json
+import logging
 import math
 import os
 import re
-import urllib.error
 import urllib.request
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -29,6 +29,8 @@ from app.calc.base import percent
 from app.params import Params
 from app.repositories import DATA
 from app.schemas import PueReply, PueSource
+
+log = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parents[2]
 SHARED_DIR = ROOT / "shared"
@@ -581,7 +583,7 @@ def _call_gemini(
     p: Params,
     persona_context: str = "",
 ) -> tuple[str, list[str]] | None:
-    model = _read_env_value("GEMINI_MODEL") or "gemini-2.5-flash"
+    model = _read_env_value("GEMINI_MODEL") or "gemini-3.8-flash"  # same default as app/llm.py
     context_blocks = []
     for idx, c in enumerate(chunks, start=1):
         context_blocks.append(
@@ -616,7 +618,9 @@ def _call_gemini(
         "contents": [{"role": "user", "parts": [{"text": user_prompt}]}],
         "generationConfig": {
             "temperature": 0.15,
-            "maxOutputTokens": 450,
+            # thinking tokens count against this limit: with 450 and default thinking, answers came back empty
+            "maxOutputTokens": 2048,
+            "thinkingConfig": {"thinkingLevel": "LOW"},
             "responseMimeType": "application/json",
             "responseSchema": {
                 "type": "OBJECT",
@@ -629,24 +633,26 @@ def _call_gemini(
         },
     }
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "x-goog-api-key": api_key},  # key kept out of the URL
         method="POST",
     )
     try:
         with urllib.request.urlopen(req, timeout=12) as resp:
             body = json.loads(resp.read().decode("utf-8"))
-        text = body["candidates"][0]["content"]["parts"][0]["text"]
+        candidate = body["candidates"][0]
+        text = "".join(part.get("text", "") for part in candidate["content"]["parts"] if not part.get("thought"))
         parsed = json.loads(text)
         ans = str(parsed.get("answer", "")).strip()
         urls = [str(u).strip() for u in parsed.get("source_urls", []) if str(u).strip()]
         if ans:
             return ans, urls
-    except (urllib.error.URLError, TimeoutError, KeyError, IndexError, ValueError):
-        return None
+        log.warning("Gemini returned no answer (finishReason=%s)", candidate.get("finishReason"))
+    except Exception:  # network, HTTP, malformed or truncated output: fall back to the local answer
+        log.exception("Gemini help answer failed; using the local answer")
     return None
 
 

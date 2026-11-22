@@ -627,7 +627,6 @@ export function getDecisionNodeForCard(roundIndex: number, cardId: string, playe
   const r1Id = playedIds[0];
   const r2Id = playedIds[1] ?? "2A";
   const r3Id = playedIds[2] ?? "3B";
-  const r4Id = playedIds[3];
   const situationKey = r1Id === "1B" ? "adoption" : r1Id === "1D" ? "foster" : "birth";
 
   const allForRound =
@@ -717,6 +716,9 @@ export function buildCalculatorHandoffPlan(
   return {
     ...basePlan,
     family,
+    // The game replays the sample birth family's cards; their periods (e.g. pre-birth maternity) do not apply
+    // to adoption/foster care, so the calculator seeds legal first periods for that situation (/calc/start).
+    blocks: family.adoption ? [] : basePlan.blocks,
     rate_variant: rateVariant,
     averaged_request_on: averagedRequestOn,
   };

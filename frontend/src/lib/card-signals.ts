@@ -35,36 +35,56 @@ function signal(emphasis: number, up: string, down: string): CardSignal {
     label: emphasis > 0 ? up : emphasis < 0 ? down : "Bez zmiany" };
 }
 
-// Round 1 of the decision tree reuses 1A/1B/1D only as carriers for the family situation (birth, adoption,
-// foster care). The situation sets which rules apply, not a money/time trade-off, so all three move the
-// balance identically (not at all) instead of inheriting the unrelated profiles of the base cards.
+// Rounds 1–2 of the decision tree reuse deck cards (1A/1B/1D, 2A–2C) only as carriers for the family situation
+// and its stage. These set which rules apply, not a money/time trade-off, so they leave the balance unchanged
+// and show their own conditions and rules instead of the unrelated base card's (keyed by the tree's branch tag).
+const SITUATIONS: Record<string, { what: string; conditions: string; ruleIds: string[] }> = {
+  birth: { what: "urodzenie dziecka", ruleIds: ["maternity-pool", "parental-pool", "paternity", "insured-parent"],
+    conditions: "Ścieżka urodzenia: spodziewany lub niedawny poród. Wymagany tytuł do ubezpieczenia chorobowego (umowa o pracę, zlecenie lub JDG z dobrowolnym chorobowym)." },
+  adoption: { what: "przysposobienie dziecka", ruleIds: ["adoption", "maternity-pool", "parental-pool", "paternity", "insured-parent"],
+    conditions: "Przyjęcie dziecka na wychowanie i złożenie wniosku o przysposobienie w sądzie opiekuńczym; urlop przysługuje do ukończenia przez dziecko 14 lat. Wymagany tytuł do ubezpieczenia chorobowego." },
+  foster: { what: "przyjęcie dziecka do niezawodowej rodziny zastępczej", ruleIds: ["adoption", "maternity-pool", "parental-pool", "paternity", "insured-parent"],
+    conditions: "Niezawodowa rodzina zastępcza; dziecko do 7 lat, a przy odroczeniu obowiązku szkolnego do 10 lat. Wymagany tytuł do ubezpieczenia chorobowego." },
+  planning_pregnancy: { what: "planowanie ciąży", ruleIds: ["insured-parent", "sick-right", "prebirth"],
+    conditions: "Zasiłek macierzyński wymaga tytułu do ubezpieczenia chorobowego w dniu porodu. Zasiłek chorobowy w ciąży przysługuje dopiero po okresie wyczekiwania, dłuższym przy dobrowolnym ubezpieczeniu." },
+  about_to_birth: { what: "zbliżający się poród", ruleIds: ["prebirth", "maternity-pool", "birth-docs"],
+    conditions: "Pracownica może zacząć część urlopu macierzyńskiego przed przewidywaną datą porodu na podstawie zaświadczenia lekarskiego; pozostała część przypada po porodzie." },
+  already_born: { what: "dziecko już urodzone", ruleIds: ["maternity-pool", "averaged", "paternity", "parental-pool"],
+    conditions: "Po porodzie liczą się terminy: wniosek o wariant uśredniony, termin urlopu ojcowskiego i wnioski o urlop rodzicielski składane z wyprzedzeniem." },
+  adoption_under_7: { what: "przysposobienie młodszego dziecka", ruleIds: ["adoption", "maternity-pool", "parental-pool"],
+    conditions: "Przysposobienie dziecka przed ukończeniem 7 lat: urlop na warunkach macierzyńskiego i rodzicielski w pełnym wymiarze, licząc od przyjęcia dziecka." },
+  adoption_under_14: { what: "przysposobienie starszego dziecka", ruleIds: ["adoption", "maternity-pool", "parental-pool"],
+    conditions: "Przysposobienie dziecka w wieku od 7 do 14 lat: urlop na warunkach macierzyńskiego i rodzicielski w krótszym wymiarze, licząc od przyjęcia dziecka." },
+  adoption_pending: { what: "przygotowanie do przysposobienia", ruleIds: ["adoption", "paternity", "insured-parent"],
+    conditions: "Uprawnienia zaczynają się od przyjęcia dziecka na wychowanie i wystąpienia do sądu o przysposobienie; termin urlopu ojcowskiego liczy się od uprawomocnienia przysposobienia." },
+  foster_under_7: { what: "piecza nad dzieckiem do 7 lat", ruleIds: ["adoption", "maternity-pool", "parental-pool"],
+    conditions: "Niezawodowa rodzina zastępcza przyjmuje dziecko przed ukończeniem 7 lat; urlop na warunkach macierzyńskiego liczy się od przyjęcia dziecka." },
+  foster_school_deferral: { what: "piecza z odroczeniem obowiązku szkolnego", ruleIds: ["adoption", "maternity-pool", "parental-pool"],
+    conditions: "Przy odroczonym obowiązku szkolnym niezawodowa rodzina zastępcza może przyjąć dziecko do 10 lat; potrzebna decyzja o odroczeniu." },
+  foster_za_zyciem: { what: "piecza nad dzieckiem z zaświadczeniem „Za życiem”", ruleIds: ["adoption", "za-zyciem", "parental-pool"],
+    conditions: "Zaświadczenie „Za życiem” wydłuża wymiar urlopu rodzicielskiego, ale nie przydziela automatycznie wszystkich tygodni ani nie znosi części wyłącznych rodziców." },
+};
+
 function situationSignals(card: Card): CardSignals {
   const neutral = signal(0, "", "");
-  const situation = card.tags?.[2];
-  const what = situation === "adoption" ? "przysposobienie dziecka"
-    : situation === "foster" ? "przyjęcie dziecka do niezawodowej rodziny zastępczej" : "urodzenie dziecka";
+  const { what, conditions, ruleIds } = SITUATIONS[card.tags?.[2] ?? ""] ?? SITUATIONS.birth;
+  const stage = card.tags?.[3] !== "sytuacja";
   return {
     money: neutral, time: neutral, knowledge: neutral,
-    comparison: `Wybór sytuacji rodziny (${what}) względem pozostałych dwóch sytuacji w pierwszej rundzie.`,
+    comparison: stage ? `Etap sytuacji rodziny (${what}) względem pozostałych dwóch etapów w tej rundzie.`
+      : `Wybór sytuacji rodziny (${what}) względem pozostałych dwóch sytuacji w pierwszej rundzie.`,
     period: "cały plan — sytuacja ustala zasady dla kolejnych rund",
     moneyReason: "Sama sytuacja rodziny nie oznacza wypłaty ani jej wysokości. Kwota zależy od podstawy wymiaru i wariantu wypłaty wybranego w kolejnych rundach, dlatego pasek pieniędzy się nie zmienia.",
     timeReason: "Sytuacja nie dodaje ani nie zużywa dni urlopu. Wymiar urlopów i limity wieku dziecka wynikają z tej sytuacji, ale wykorzystanie czasu planujesz w kolejnych rundach, dlatego pasek czasu się nie zmienia.",
     knowledgeReason: "",
     later: "Kolejne pytania, limity wieku dziecka i wymagane dokumenty dopasujemy do wybranej sytuacji.",
-    ruleIds: situation === "birth" || !situation
-      ? ["maternity-pool", "parental-pool", "paternity", "insured-parent"]
-      : ["adoption", "maternity-pool", "parental-pool", "paternity", "insured-parent"],
-    conditions: situation === "adoption"
-      ? "Przyjęcie dziecka na wychowanie i złożenie wniosku o przysposobienie w sądzie opiekuńczym; urlop przysługuje do ukończenia przez dziecko 14 lat. Wymagany tytuł do ubezpieczenia chorobowego."
-      : situation === "foster"
-        ? "Niezawodowa rodzina zastępcza; dziecko do 7 lat, a przy odroczeniu obowiązku szkolnego do 10 lat. Wymagany tytuł do ubezpieczenia chorobowego."
-        : "Ścieżka urodzenia: spodziewany lub niedawny poród. Wymagany tytuł do ubezpieczenia chorobowego (umowa o pracę, zlecenie lub JDG z dobrowolnym chorobowym).",
+    ruleIds, conditions,
   };
 }
 
 export function getCardSignals(card?: Card): CardSignals | undefined {
   if (!card?.design) return undefined; // Old API IDs can have different meanings.
-  if (card.tags?.[3] === "sytuacja") return situationSignals(card);
+  if (card.tags?.[3] === "sytuacja" || (card.id.startsWith("2") && SITUATIONS[card.tags?.[2] ?? ""])) return situationSignals(card);
   const impact = audit.cards.find((item) => item.id === card.id);
   if (!impact) return undefined;
   const profile = profiles[card.id];
