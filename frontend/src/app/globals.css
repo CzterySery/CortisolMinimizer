@@ -589,11 +589,11 @@ dialog::backdrop { background: #18312788; }
 .rag-locator { color: var(--ink); font-weight: 500; }
 .rag-source-card small { font-size: 11px; line-height: 1.45; color: var(--muted-strong); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .charities-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 28px; }
-.official-links-grid { list-style: none; margin: 0 !important; padding: 0 !important; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.official-link-card { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid #e0e5dc; border-radius: 11px; background: #fafcf9; color: var(--ink); text-decoration: none; height: 100%; transition: border-color 150ms, background 150ms, box-shadow 150ms; }
+.official-links-grid { list-style: none; margin: 0 !important; padding: 0 !important; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.official-link-card { display: flex; flex-direction: column; gap: 5px; padding: 12px 14px; border: 1px solid #e0e5dc; border-radius: 11px; background: #fafcf9; color: var(--ink); text-decoration: none; height: 100%; transition: border-color 150ms, background 150ms, box-shadow 150ms; }
 .official-link-card:hover { border-color: #a6b99b; background: #f2f7ef; box-shadow: 0 8px 18px #263b2b0d; }
-.official-link-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase; color: var(--green); }
-.official-link-title { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-family: Georgia, serif; font-weight: 400; font-size: 17px; color: var(--ink); line-height: 1.3; }
+.official-link-badge { font-size: 9px; font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase; color: var(--green); }
+.official-link-title { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-family: Georgia, serif; font-weight: 400; font-size: 15px; color: var(--ink); line-height: 1.3; }
 .official-link-arrow { font-family: system-ui, sans-serif; font-size: 13px; color: var(--green); flex-shrink: 0; }
 .official-link-card small { font-size: 12px; line-height: 1.55; color: var(--muted-strong); }
 @media (max-width: 800px) { .charities-grid, .official-links-grid { grid-template-columns: minmax(0, 1fr); } }
