@@ -19,8 +19,8 @@ export const STRATEGIES: StrategyInfo[] = [
   },
   {
     id: "zasilki",
-    name: "Zasiłki Maxing",
-    badge: "💰 Zasiłki Maxing",
+    name: "Zasiłki Maxxxing",
+    badge: "💰 Zasiłki Maxxxing",
     shortDesc: "Więcej środków w rodzinnym budżecie.",
   },
   {
@@ -111,7 +111,7 @@ const ROUND_2_BY_SITUATION: Record<string, { question: string; subtitle: string;
         cardId: "2B",
         branchTag: "planning_pregnancy",
         strategyId: "zasilki",
-        strategyBadge: "💰 Zasiłki Maxing",
+        strategyBadge: "💰 Zasiłki Maxxxing",
         badge: "Etap · Planowanie lub początek ciąży",
         title: "Planujemy ciążę lub jesteśmy na początku",
         description:
@@ -150,7 +150,7 @@ const ROUND_2_BY_SITUATION: Record<string, { question: string; subtitle: string;
         cardId: "2C",
         branchTag: "adoption_pending",
         strategyId: "zasilki",
-        strategyBadge: "💰 Zasiłki Maxing",
+        strategyBadge: "💰 Zasiłki Maxxxing",
         badge: "Adopcja · Przed wnioskiem sądowym",
         title: "Przygotowujemy się do przyjęcia dziecka",
         description:
@@ -189,7 +189,7 @@ const ROUND_2_BY_SITUATION: Record<string, { question: string; subtitle: string;
         cardId: "2C",
         branchTag: "foster_za_zyciem",
         strategyId: "zasilki",
-        strategyBadge: "💰 Zasiłki Maxing",
+        strategyBadge: "💰 Zasiłki Maxxxing",
         badge: "Piecza · Dodatkowe wsparcie",
         title: "Dziecko w pieczy z zaświadczeniem „Za życiem”",
         description:
@@ -223,7 +223,7 @@ function getRound3Branch(situationKey: string, r2Id: string): { question: string
           cardId: "3A",
           branchTag: "foster_want_cash",
           strategyId: "zasilki",
-          strategyBadge: "💰 Zasiłki Maxing",
+          strategyBadge: "💰 Zasiłki Maxxxing",
           badge: "Piecza · 100% na start, 70% później",
           title: "100% zasiłku po przyjęciu dziecka, 70% na rodzicielskim",
           description:
@@ -268,7 +268,7 @@ function getRound3Branch(situationKey: string, r2Id: string): { question: string
           cardId: "3A",
           branchTag: "adoption_want_cash",
           strategyId: "zasilki",
-          strategyBadge: "💰 Zasiłki Maxing",
+          strategyBadge: "💰 Zasiłki Maxxxing",
           badge: "Adopcja · 100% na start, 70% później",
           title: "100% zasiłku w pierwszym okresie po przyjęciu dziecka",
           description:
@@ -309,7 +309,7 @@ function getRound3Branch(situationKey: string, r2Id: string): { question: string
         cardId: "3A",
         branchTag: "want_cash",
         strategyId: "zasilki",
-        strategyBadge: "💰 Zasiłki Maxing",
+        strategyBadge: "💰 Zasiłki Maxxxing",
         badge: "Cel · Maksimum gotówki na starcie",
         title: "100% zasiłku na początku, 70% później (Budżet)",
         description:
@@ -357,7 +357,7 @@ function getRound4Branch(situationKey: string, r2Id: string, r3Id: string): { qu
           cardId: "4C",
           branchTag: "foster_year_max_cash",
           strategyId: "zasilki",
-          strategyBadge: "💰 Zasiłki Maxing",
+          strategyBadge: "💰 Zasiłki Maxxxing",
           badge: "Piecza · Praca na część etatu + zasiłek",
           title: "Łączenie urlopu rodzicielskiego w pieczy z 1/2 etatu",
           description:
@@ -399,7 +399,7 @@ function getRound4Branch(situationKey: string, r2Id: string, r3Id: string): { qu
           cardId: "4C",
           branchTag: "adoption_year_max_cash",
           strategyId: "zasilki",
-          strategyBadge: "💰 Zasiłki Maxing",
+          strategyBadge: "💰 Zasiłki Maxxxing",
           badge: "Adopcja · Pensja + zasiłek",
           title: "Łączenie rodzicielskiego z pracą na część etatu",
           description:
@@ -440,7 +440,7 @@ function getRound4Branch(situationKey: string, r2Id: string, r3Id: string): { qu
         cardId: "4C",
         branchTag: "year_max_cash",
         strategyId: "zasilki",
-        strategyBadge: "💰 Zasiłki Maxing",
+        strategyBadge: "💰 Zasiłki Maxxxing",
         badge: "Strategia · Maksimum domowego budżetu",
         title: "Łączenie rodzicielskiego z pracą na część etatu",
         description:
@@ -495,7 +495,7 @@ function getRound5Branch(situationKey: string, r2Id: string, exhaustedParental: 
           cardId: "5C",
           branchTag: "later_part_time_adaptation",
           strategyId: "zasilki",
-          strategyBadge: "💰 Zasiłki Maxing",
+          strategyBadge: "💰 Zasiłki Maxxxing",
           badge: "Kolejne lata · Pensja + krótsze dni pracy",
           title: "Adaptacja połączona z pracą na 1/2 etatu",
           description:
@@ -536,7 +536,7 @@ function getRound5Branch(situationKey: string, r2Id: string, exhaustedParental: 
         cardId: "5E",
         branchTag: "later_father_care",
         strategyId: "zasilki",
-        strategyBadge: "💰 Zasiłki Maxing",
+        strategyBadge: "💰 Zasiłki Maxxxing",
         badge: "Kolejne lata · Ochrona powrotu do pracy",
         title: "Drugi rodzic przejmuje zwolnienia opiekuńcze (60 dni 80%)",
         description:

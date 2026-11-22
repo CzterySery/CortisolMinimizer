@@ -70,20 +70,13 @@ export function GameBoard(props: GameBoardProps) {
           if (entry.target === handEl) setHandInView(true);
         }
       },
-      { threshold: 0.05, rootMargin: "350px" },
+      { threshold: 0.15, rootMargin: "0px" },
     );
     if (roundsEl) observer.observe(roundsEl);
     if (handEl) observer.observe(handEl);
 
-    // Defensive fallback: guarantee reveal for tests and crawlers
-    const fallbackTimer = window.setTimeout(() => {
-      setTableInView(true);
-      setHandInView(true);
-    }, 1200);
-
     return () => {
       observer.disconnect();
-      window.clearTimeout(fallbackTimer);
     };
   }, []);
 
@@ -145,7 +138,7 @@ export function GameBoard(props: GameBoardProps) {
           { opacity: 1, offset: .28 },
           { transform: "translate(0, -6px) rotate(0deg) scale(1.02)", opacity: 1, offset: .82 },
           { transform: "translate(0, 0) rotate(0deg) scale(1)", opacity: 1 },
-        ], { duration: 580, delay: 160 + index * 115, fill: "backwards", easing: "cubic-bezier(.18,.75,.25,1)" }));
+        ], { duration: 580, delay: 320 + index * 125, fill: "backwards", easing: "cubic-bezier(.18,.75,.25,1)" }));
       });
     }
     return () => {

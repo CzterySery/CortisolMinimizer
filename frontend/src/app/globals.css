@@ -453,7 +453,7 @@ dialog::backdrop { background: #18312788; }
 .handoff-adjustments-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding-top: 8px; }
 
 /* ---- Knowledge Explorer ("O czym chcesz się dowiedzieć?") ---- */
-.knowledge-explorer { margin: 44px 0 16px; padding: 32px 28px; background: #fafbf8; border: 1px solid #e2e8dd; border-radius: 22px; }
+.knowledge-explorer { margin: 88px 0 16px; padding: 32px 28px; background: #fafbf8; border: 1px solid #e2e8dd; border-radius: 22px; }
 .knowledge-explorer-header { margin-bottom: 18px; }
 .knowledge-explorer-title { font-family: Georgia, serif; font-size: clamp(22px, 3vw, 30px); font-weight: 400; color: var(--ink); margin: 6px 0 8px; }
 .knowledge-explorer-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0; max-width: 720px; }

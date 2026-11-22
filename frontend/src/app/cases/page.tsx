@@ -77,17 +77,27 @@ export default function Cases() {
           <button className="button button-dashed" onClick={() => { setManual(blank); setUploaded(undefined); setSample(undefined); setVerdict(undefined); setMessage(undefined); }}>Wpisz dane ręcznie</button>
         </div>
         {message && <p className="notice" role="status">{message}</p>}
-        {manual && <div className="stack">
-          <FamilyForm value={manual.family} onChange={(family) => setManual({ ...manual, family })} />
-          <fieldset className="form-section">
-            <legend>Wysokość zasiłku</legend>
-            <label className="field-check"><input type="radio" name="case-rate" checked={manual.rate_variant !== "averaged"} onChange={() => setManual({ ...manual, rate_variant: "standard" })} /> 100% / 70%</label>
-            <label className="field-check"><input type="radio" name="case-rate" checked={manual.rate_variant === "averaged"} onChange={() => setManual({ ...manual, rate_variant: "averaged" })} /> 81,5%</label>
-          </fieldset>
-          <BlocksEditor value={manual.blocks ?? []} onChange={(blocks) => setManual({ ...manual, blocks })} />
-          {uploaded && <p className="muted">Po sprawdzeniu zapiszemy te dane (z Twoimi poprawkami) dla wgranego pliku: po ponownym wgraniu wrócą w tej postaci.</p>}
-          <div className="actions"><button className="button button-primary" onClick={() => evaluate(manual, undefined, uploaded)}>Sprawdź sprawę</button></div>
-        </div>}
+        {manual && (() => {
+          const formContent = (
+            <div className="stack" style={uploaded ? { marginTop: 16 } : undefined}>
+              <FamilyForm value={manual.family} onChange={(family) => setManual({ ...manual, family })} />
+              <fieldset className="form-section">
+                <legend>Wysokość zasiłku</legend>
+                <label className="field-check"><input type="radio" name="case-rate" checked={manual.rate_variant !== "averaged"} onChange={() => setManual({ ...manual, rate_variant: "standard" })} /> 100% / 70%</label>
+                <label className="field-check"><input type="radio" name="case-rate" checked={manual.rate_variant === "averaged"} onChange={() => setManual({ ...manual, rate_variant: "averaged" })} /> 81,5%</label>
+              </fieldset>
+              <BlocksEditor value={manual.blocks ?? []} onChange={(blocks) => setManual({ ...manual, blocks })} />
+              {uploaded && <p className="muted">Po sprawdzeniu zapiszemy te dane (z Twoimi poprawkami) dla wgranego pliku: po ponownym wgraniu wrócą w tej postaci.</p>}
+              <div className="actions"><button className="button button-primary" onClick={() => evaluate(manual, undefined, uploaded)}>Sprawdź sprawę</button></div>
+            </div>
+          );
+          return uploaded ? (
+            <details className="panel">
+              <summary>Edytuj odczytane dane sprawy</summary>
+              {formContent}
+            </details>
+          ) : formContent;
+        })()}
         {error ? <ApiResult error={error} /> : null}
         {verdict && <Verdict verdict={verdict} sample={sample} />}
       </div>
