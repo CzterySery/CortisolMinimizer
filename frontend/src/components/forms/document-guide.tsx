@@ -4,8 +4,8 @@ import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import type { S } from "@/lib/api";
 import { day } from "@/lib/format";
-import { whoLabel, recipientLabel } from "@/lib/labels";
-import { documentIssuer, officialForm, prefilledFields, knownPayer, leaveRule, type GuideDoc, type OfficialForm } from "@/lib/document-guides";
+import { whoLabel } from "@/lib/labels";
+import { documentIssuer, officialForm, prefilledFields, knownPayer, knownPayerDetails, parentProfile, leaveRule, type GuideDoc, type OfficialForm } from "@/lib/document-guides";
 import { LegalBasis } from "@/components/legal-basis";
 import "./document-guide.css";
 
@@ -35,7 +35,7 @@ export function DocumentGuide({ doc, plan, name, account, onClose, fieldEdits, o
       : doc.recipient === "usc" ? <section className="panel"><h3>To wniosek do USC, nie formularz ZUS</h3>
         <p>Przygotuj imię i nazwisko dziecka, datę i miejsce urodzenia, wybór odpisu skróconego lub zupełnego oraz sposób odbioru. Dane wpisujesz w usłudze USC.</p>
         <p>{doc.note}</p><a href="https://www.gov.pl/web/gov/uzyskaj-odpis-aktu-stanu-cywilnego-urodzenia-malzenstwa-zgonu" target="_blank" rel="noreferrer">Otwórz usługę odpisu aktu na gov.pl ↗</a></section>
-        : <LeaveGuide doc={doc} name={name} payer={knownPayer(doc, account)} />}
+        : <LeaveGuide doc={doc} name={name} account={account} />}
   </dialog>;
 }
 
@@ -103,6 +103,15 @@ function OfficialGuide({ form, doc, plan, name, account, fieldEdits, onFieldsCha
           <strong>Automatycznie uzupełnione pola: {Object.keys(filled).length}.</strong> Dane z planu i konta są już widoczne w formularzu. Sprawdź je i popraw w podglądzie. Nieznane dane i oświadczenia pozostają puste.
           {name && name.trim().split(/\s+/).length !== 2 && <> Imię i nazwisko „{name}” rozdziel ręcznie na właściwe pola.</>}
         </p>}
+        {account && doc.rule !== "Oficjalny wzór ZUS" && !parentProfile(doc, account)?.personalData && <p className="notice">
+          {parentProfile(doc, account)
+            ? "Konto nie udostępniło PESEL-u, daty urodzenia ani adresu. Zaloguj się ponownie lub uzupełnij brakujące dane ręcznie."
+            : "Konto nie zawiera danych osobowych tego rodzica. Uzupełnij jego dane ręcznie."}
+        </p>}
+        {selected?.name.endsWith(".Dataurodzenia[0]") && selected.label.startsWith("Jeśli")
+          && parentProfile(doc, account)?.personalData?.pesel && <p className="notice">
+            Data urodzenia pozostaje pusta zgodnie z instrukcją ZUS: w tym polu podaje się ją tylko przy braku numeru PESEL. PESEL jest już uzupełniony.
+          </p>}
         {form.issuer === "employer" && <p className="notice"><strong>Wypełnia płatnik składek — pracodawca lub zleceniodawca.</strong> Możesz sprawdzić, jakich danych potrzebuje, ale nie podpisujesz tego zaświadczenia za płatnika.</p>}
         {selected ? <>
           <p className="eyebrow">Pole {fieldIndex + 1} · strona {page.number} · {selected.type === "CheckBox" ? "zaznaczenie" : "wpis"}</p>
@@ -128,13 +137,25 @@ function OfficialGuide({ form, doc, plan, name, account, fieldEdits, onFieldsCha
   </>;
 }
 
-function LeaveGuide({ doc, name, payer }: { doc: GuideDoc; name?: string; payer?: string }) {
+function LeaveGuide({ doc, name, account }: { doc: GuideDoc; name?: string; account?: S["ZusAccount"] }) {
   const [selected, setSelected] = useState(0);
+  const profile = parentProfile(doc, account);
+  const personal = profile?.personalData;
+  const payer = knownPayer(doc, account);
+  const payerData = knownPayerDetails(doc, account);
+  const address = (data: Pick<S["DemoPersonalData"], "street" | "house_number" | "apartment_number" | "postal_code" | "city">) =>
+    `${data.street} ${data.house_number}${data.apartment_number ? `/${data.apartment_number}` : ""}\n${data.postal_code} ${data.city}`;
+  const insuredDetails = [name || profile?.name || "[Twoje imię i nazwisko]",
+    personal?.pesel ? `PESEL: ${personal.pesel}` : "",
+    personal?.birth_date ? `Data urodzenia: ${day(personal.birth_date)}` : "",
+    personal ? address(personal) : ""].filter(Boolean).join("\n");
+  const payerDetails = [payer || "[nazwa pracodawcy]", payerData?.nip ? `NIP: ${payerData.nip}` : "",
+    payerData ? address(payerData) : "[uzupełnij adres pracodawcy]"].filter(Boolean).join("\n");
   const period = doc.start && doc.end ? `${day(doc.start)} – ${day(doc.end)}` : "[podaj okres, którego dotyczy wniosek]";
   const areas = [
-    { title: "Twoje dane", value: name || "[Twoje imię i nazwisko]", help: "Wpisz imię i nazwisko pracownika składającego wniosek. Dane drugiego rodzica podajesz w odpowiednim oświadczeniu, jeśli są wymagane." },
+    { title: "Twoje dane", value: insuredDetails, help: "Dostępne dane pochodzą z profilu osoby składającej ten wniosek. Sprawdź je przed złożeniem pisma. Dane drugiego rodzica podajesz w odpowiednim oświadczeniu, jeśli są wymagane." },
     { title: "Miejsce i data", value: "[miejscowość, data złożenia]", help: "Wpisz miejscowość i rzeczywistą datę złożenia pisma. Nie jest to automatycznie data rozpoczęcia urlopu." },
-    { title: "Adresat", value: recipientLabel[doc.recipient] === "Pracodawca" ? (payer ? `${payer}\n[uzupełnij adres pracodawcy]` : "[nazwa i adres pracodawcy]") : "[właściwy adresat]", help: "Wpisz nazwę pracodawcy lub działu kadr, do którego kierujesz wniosek. Nazwa, jeśli ją znamy, pochodzi z okresu ubezpieczenia na koncie." },
+    { title: "Adresat", value: doc.recipient === "employer" ? payerDetails : "[właściwy adresat]", help: "Nazwa, NIP i adres pracodawcy, jeśli są dostępne, pochodzą z właściwego okresu ubezpieczenia tego rodzica na koncie." },
     { title: "Treść i okres", value: `${doc.form}\nOkres: ${period}`, help: "Wskaż rodzaj urlopu i dokładne daty. Okres pochodzi z planu; sprawdź go przed przepisaniem do podpisanego wniosku." },
     { title: "Oświadczenia i załączniki", value: doc.note || "[wymagane oświadczenia i załączniki]", help: "Uzupełnij wymagane oświadczenia zgodnie ze stanem faktycznym. Informacja poniżej wynika z Twojego planu. Nie składaj oświadczenia, jeśli nie potwierdzasz jego treści." },
     { title: "Podpis", value: "[Twój podpis]", help: "Podpisz dokument w wymagany sposób. Ten podgląd nie jest podpisem elektronicznym ani wysłaniem wniosku." },

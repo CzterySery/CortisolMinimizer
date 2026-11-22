@@ -53,7 +53,7 @@ export function suggestedField(form: OfficialForm, field: PdfField, doc: GuideDo
 
 export type FilledField = { value: string; source: string };
 
-function parentProfile(doc: GuideDoc, account?: S["ZusAccount"]) {
+export function parentProfile(doc: GuideDoc, account?: S["ZusAccount"]) {
   if (account?.persona.who === doc.who) return {
     name: account.persona.name, personalData: account.personal_data, insurance: account.insurance,
   };
@@ -121,6 +121,18 @@ export function prefilledFields(form: OfficialForm, doc: GuideDoc, plan?: S["Pla
     if (period) result[field.id] = { value: period, source: "Okres tego dokumentu w Twoim planie" };
     // Exact full native widget names and checked labels protect against other-parent/payer fields.
     const prefix = "topmostSubform[0].Page1[0].";
+    // Z-15 places the payer on page 2, below the care recipient's identity.
+    // Match exact payer widgets so the insured person's data never reaches that recipient.
+    const payerPage = form.id === "z15" ? 2 : form.id === "znp7" ? 3 : 1;
+    if (page.number === payerPage && field.type === "Text") {
+      const payerPrefix = `topmostSubform[0].Page${payerPage}[0].`;
+      const payerFields: Record<string, string> = { Nazwaplatnika: payer ?? "", NIP: payerData?.nip ?? "",
+        REGON: payerData?.nip ? "" : payerData?.regon ?? "" };
+      for (const [native, value] of Object.entries(payerFields)) {
+        if (value && field.name === payerPrefix + `${native}[0]` && /płatnika|REGON/.test(field.label))
+          result[field.id] = { value, source: "Dane płatnika przypisanego do tego okresu ubezpieczenia" };
+      }
+    }
     if (page.number === 1 && field.type === "Text") {
       if (parts?.length === 2 && ["Imie[0]", "Imię[0]"].some((n) => field.name === prefix + n)
         && /Wpisz (swoje imię|imię osoby ubezpieczonej)/.test(field.label))
@@ -128,13 +140,7 @@ export function prefilledFields(form: OfficialForm, doc: GuideDoc, plan?: S["Pla
       if (parts?.length === 2 && field.name === prefix + "Nazwisko[0]"
         && /Wpisz (swoje nazwisko|nazwisko osoby ubezpieczonej)/.test(field.label))
         result[field.id] = { value: parts[1], source: "Imię i nazwisko podane we wniosku lub na koncie — sprawdź podział" };
-      if (payer && field.name === prefix + "Nazwaplatnika[0]" && field.label.includes("płatnika składek"))
-        result[field.id] = { value: payer, source: "Płatnik przypisany do tego okresu ubezpieczenia" };
       if (payerData) {
-        if (field.name === prefix + "NIP[0]" && field.label.includes("NIP płatnika składek"))
-          result[field.id] = { value: payerData.nip, source: "Fikcyjny NIP płatnika demonstracyjnego" };
-        if (!payerData.nip && field.name === prefix + "REGON[0]" && field.label.includes("REGON"))
-          result[field.id] = { value: payerData.regon, source: "Fikcyjny REGON płatnika demonstracyjnego" };
         if (certificate && field.name === prefix + "Numertelefonu[0]" && payerData.phone)
           result[field.id] = { value: payerData.phone, source: "Telefon płatnika demonstracyjnego" };
         if (certificate && field.label.startsWith("Adres płatnika składek")) {
@@ -172,6 +178,10 @@ export function prefilledFields(form: OfficialForm, doc: GuideDoc, plan?: S["Pla
           result[field.id] = { value, source: "Dane płatnika demonstracyjnego — część II wypełniana przez płatnika" };
       }
     }
+    if (form.id === "znp7" && page.number === 3 && field.type === "Text" && ownName
+        && field.name === "topmostSubform[0].Page3[0].Tekst1[0]"
+        && field.label === "Wpisz imię i nazwisko ubezpieczonego")
+      result[field.id] = { value: ownName, source: "Dane osoby ubezpieczonej, której dotyczy dokument" };
     if (form.id === "zam" && checkbox && field.type === "CheckBox"
       && field.name === `topmostSubform[0].Page2[0].${checkbox}[0]` && field.label.startsWith("Zaznacz, jeśli wnioskujesz"))
       result[field.id] = { value: "X", source: "Rodzaj urlopu dla tego dokumentu w Twoim planie" };

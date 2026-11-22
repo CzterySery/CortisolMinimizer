@@ -105,6 +105,7 @@ Bez tych trzech zmiennych polecenie się nie uruchomi.
 - Konto i dokumenty są razem pod `/me` (dawny `/applications` przekierowuje do sekcji dokumentów). Konto pobiera historię z PostgreSQL także bez planu zapisanego w przeglądarce, a błędy odczytu można ponowić; brak odczytu nie powoduje cichej wysyłki anonimowej.
 - Anonimowe potwierdzenia wysyłki zostają w `sessionStorage` danej domeny i karty, więc nie przenoszą się z localhosta na publiczne demo.
 - Plik `.env` z samymi `GEMINI_API_KEY`/`GEMINI_MODEL` konfiguruje AI, nie sesje ani bazę.
+- Automatyczne wypełnienie formularzy wymaga aktualnego backendu: `/api/v1/zus/me` musi zwracać `personal_data`, `insurance[].payer_data` i, dla znanego drugiego rodzica, `related_parents`. Jeśli po logowaniu formularze mają tylko imię i nazwisko, sprawdź te pola w odpowiedzi API oraz `API_URL`; wdróż aktualny backend i frontend, następnie zaloguj się ponownie. Sama aktualizacja interfejsu nie doda brakujących danych konta. Biblioteka oficjalnych wzorów na stronie głównej pokazuje puste druki; dane konta widać w dokumentach konkretnego planu w „Moje dane”.
 
 ## Sprawdzanie
 
