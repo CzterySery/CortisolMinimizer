@@ -31,6 +31,7 @@ def two_page_pdf() -> bytes:
 
 
 def test_provider_selection(monkeypatch):
+    monkeypatch.setattr(llm.genai, "Client", lambda **_: object())  # selection needs no live SDK client
     assert llm.provider() is None  # nothing configured: manual entry
     monkeypatch.setenv("GEMINI_API_KEY", "k")
     llm.provider.cache_clear()

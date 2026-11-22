@@ -75,6 +75,40 @@ def evaluate(case: CaseInput,
     if upload:
         repositories.save_reading(upload, case.model_dump(mode="json"))
     errors = {i.code for i in result.issues if i.severity == "error"}
-    return CaseVerdict(insured=not any(code.startswith("insured-parent.") for code in errors),
-                       waiting_period_ok="sick-right.waiting-period" not in errors,
-                       debt_block="debt.blocks-benefits" in errors, entitled=not errors, result=result)
+    missing = []
+    unknown_bases = []
+    insurance_unknown = False
+    waiting_unknown = False
+    if not any(b.kind != "vacation" for b in case.plan.blocks):
+        missing.append("Dodaj okres świadczenia, którego dotyczy sprawa.")
+        insurance_unknown = True
+    for who in ("mother", "father"):
+        parent = getattr(case.plan.family, who)
+        blocks = [b for b in case.plan.blocks if b.who == who and b.kind != "vacation"]
+        if not parent or not blocks:
+            continue
+        label = "Mama" if who == "mother" else "Tata"
+        if parent.employment != "none" and not parent.insured_since and not parent.insurance_confirmed:
+            missing.append(f"{label}: podaj początek ubezpieczenia albo potwierdź je na podstawie dokumentów.")
+            insurance_unknown = True
+        if any(b.kind == "sick" for b in blocks) and not parent.insured_since:
+            missing.append(f"{label}: data początku ubezpieczenia jest potrzebna do okresu wyczekiwania.")
+            waiting_unknown = True
+        if (parent.employment != "none" and not parent.salary_history and parent.base_monthly is None
+                and parent.gross_monthly_estimate is None and any(b.base_monthly is None for b in blocks)):
+            unknown_bases.append(who)
+            missing.append(f"{label}: uzupełnij podstawę zasiłku lub historię wynagrodzeń.")
+    for issue in result.issues:
+        if issue.code == "insured-parent.ends-before-birth":
+            insurance_unknown = True
+            missing.append("Potwierdź przedłużenie umowy albo właściwy wyjątek po ustaniu ubezpieczenia.")
+        if issue.code in {"base.recalculation-needed", "base.components-review", "rehab.indexation-missing",
+                          "floor.tax-not-modelled", "base.jdg-short-period", "rehab.sick-not-exhausted"}:
+            missing.append(issue.text)
+    insurance_error = any(code.startswith("insured-parent.") for code in errors)
+    return CaseVerdict(insured=False if insurance_error else None if insurance_unknown else True,
+                       waiting_period_ok=False if "sick-right.waiting-period" in errors else
+                       None if waiting_unknown else True,
+                       debt_block="debt.blocks-benefits" in errors,
+                       entitled=False if errors else None if missing else True,
+                       missing_data=missing, unknown_bases=unknown_bases, result=result)

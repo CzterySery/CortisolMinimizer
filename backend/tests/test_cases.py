@@ -72,6 +72,20 @@ def test_samples_and_evaluate(client):
     assert not client.post("/api/v1/cases/evaluate", json={"plan": refused["plan"]}).json()["insured"]
 
 
+def test_incomplete_case_does_not_confirm_insurance_or_entitlement(client):
+    body = {"plan": {"family": {"mother": {"employment": "employee"}, "due_date": "2027-03-01"},
+                     "blocks": [{"who": "mother", "kind": "maternity", "start": "2027-03-01", "days": 140}]}}
+    verdict = client.post("/api/v1/cases/evaluate", json=body).json()
+    assert verdict["insured"] is None and verdict["entitled"] is None
+    assert verdict["unknown_bases"] == ["mother"] and verdict["missing_data"]
+    body["plan"]["family"]["mother"].update(insured_since="2025-01-01", base_monthly="6000")
+    complete = client.post("/api/v1/cases/evaluate", json=body).json()
+    assert complete["insured"] is True and complete["entitled"] is True
+    body["plan"]["family"]["mother"]["employment"] = "none"
+    refused = client.post("/api/v1/cases/evaluate", json=body).json()
+    assert refused["insured"] is False and refused["entitled"] is False
+
+
 def test_upload_is_recognized_by_hash_or_sent_to_manual_entry(client, monkeypatch):
     monkeypatch.setattr(llm, "provider", lambda: None)  # no model configured
     pdf = b"%PDF-1.4 sample bundle"

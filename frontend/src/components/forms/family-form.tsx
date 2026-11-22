@@ -48,7 +48,13 @@ export function FamilyForm({ value, onChange, section = "all", birthStatus }: {
           })} />
         </label>}
         {!value.adoption && birthStatus !== "expected" && <label className="field">Jeśli dziecko urodziło się martwe lub zmarło: data (przy martwym urodzeniu data porodu)
-          <input type="date" value={value.child_died_on ?? ""} onChange={(e) => set({ child_died_on: e.target.value || null })} />
+          <input type="date" value={value.child_died_on ?? ""} onChange={(e) => set({ child_died_on: e.target.value || null,
+            surviving_children: !e.target.value ? null : (value.children ?? 1) === 1 ? 0 : value.surviving_children,
+          })} />
+        </label>}
+        {!value.adoption && value.child_died_on && <label className="field">Liczba dzieci z tego porodu pozostałych przy życiu
+          <input required type="number" min={0} max={(value.children ?? 1) - 1} value={value.surviving_children ?? ""}
+            onChange={(e) => set({ surviving_children: Number(e.target.value) })} />
         </label>}
         <label className="field">{value.adoption ? "Liczba dzieci przyjętych jednocześnie" : "Liczba dzieci przy porodzie"}
           <input type="number" min={1} value={value.children ?? 1} onChange={(e) => {
@@ -113,6 +119,24 @@ export function FamilyForm({ value, onChange, section = "all", birthStatus }: {
         </label>
         </>}
       </div>
+      {section !== "child" && !value.adoption && <details className="form-card">
+        <summary>Szczególna sytuacja mamy — przejęcie macierzyńskiego przez tatę</summary>
+        <label className="field">Powód przejęcia<select value={value.maternity_takeover?.reason ?? ""} onChange={(e) => set({
+          maternity_takeover: e.target.value ? { reason: e.target.value as "death" | "hospital" | "abandonment" | "incapacity",
+            start: value.maternity_takeover?.start ?? "", end: null } : null,
+        })}><option value="">Nie dotyczy</option><option value="death">Śmierć mamy</option>
+          <option value="hospital">Pobyt mamy w szpitalu uniemożliwiający opiekę</option>
+          <option value="abandonment">Porzucenie dziecka</option><option value="incapacity">Orzeczenie o niezdolności do samodzielnej egzystencji</option>
+        </select></label>
+        {value.maternity_takeover && <>
+          <label className="field">Data zdarzenia / początek pobytu<input required type="date" value={value.maternity_takeover.start}
+            onChange={(e) => set({ maternity_takeover: { ...value.maternity_takeover!, start: e.target.value } })} /></label>
+          {value.maternity_takeover.reason === "hospital" && <label className="field">Koniec pobytu mamy w szpitalu
+            <input required type="date" value={value.maternity_takeover.end ?? ""} onChange={(e) => set({ maternity_takeover: {
+              ...value.maternity_takeover!, end: e.target.value || null } })} /></label>}
+          <p className="muted">Dodaj okres taty w planie urlopów. Hospitalizacja, porzucenie i orzeczenie u ubezpieczonej mamy wymagają co najmniej 8 tygodni wykorzystanych przez nią po porodzie. Przejęcie po śmierci nie wymaga tego minimum. Potrzebne są dokumenty potwierdzające zdarzenie.</p>
+        </>}
+      </details>}
       {section !== "child" && <details className="form-card">
         <summary>Hospitalizacja dziecka — uzupełniający urlop macierzyński</summary>
         <label className="field-check">
@@ -171,6 +195,9 @@ export function ParentFields({ label, value, onChange, onRemove, hideEmployment 
         <label className="field">Ubezpieczenie do (koniec umowy)
           <input type="date" value={value.insured_until ?? ""} onChange={(e) => onChange({ ...value, insured_until: e.target.value || null })} />
         </label>
+        <label className="field-check"><input type="checkbox" checked={!!value.insurance_confirmed}
+          onChange={(e) => onChange({ ...value, insurance_confirmed: e.target.checked })} />
+          Dokumenty potwierdzają ubezpieczenie chorobowe w okresie tej sprawy</label>
         {value.employment !== "self_employed" && <label className="field">Płatnik zgłasza do ubezpieczenia chorobowego (osób)
           <input type="number" min={0} value={value.payer_insured_count ?? 0} onChange={(e) => onChange({ ...value, payer_insured_count: Number(e.target.value) })} />
         </label>}

@@ -87,6 +87,39 @@ def test_filed_applications_come_back_on_the_account(client):
     assert client.sent[-1]["payload"]["persona"] is None
 
 
+def test_filed_application_preserves_the_exact_period_and_fields(client):
+    auth = login(client, "ola")
+    body = {"form": "ZAM", "who": "mother", "recipient": "zus", "start": "2027-04-02",
+            "end": "2027-08-19", "payload": {"imie_nazwisko": "Ala Przykładowa"},
+            "official_fields": {"p1-3": "Ala", "p2-1": "X", "p2-3": "2.04.2027 – 19.08.2027"}}
+    assert client.post("/api/v1/applications", json=body, headers=auth).status_code == 200
+    filed = client.get("/api/v1/zus/me", headers=auth).json()["applications"][0]
+    assert (filed["start"], filed["end"]) == (body["start"], body["end"])
+    assert filed["payload"]["imie_nazwisko"] == body["payload"]["imie_nazwisko"]
+    assert filed["payload"]["pdf:p1-3"] == "Ala"
+    body["official_fields"] = {"not-an-official-field": "bad"}
+    assert client.post("/api/v1/applications", json=body).status_code == 422
+    body["official_fields"] = {"p2-1": "Yes"}  # checkbox values are explicit
+    assert client.post("/api/v1/applications", json=body).status_code == 422
+    body["official_fields"] = {"p2-3": "01.01.2027 – 31.01.2027"}
+    assert client.post("/api/v1/applications", json=body).status_code == 422
+    body["official_fields"] = {}
+    body["end"] = "2027-01-01"
+    assert client.post("/api/v1/applications", json=body).status_code == 422
+
+
+def test_legacy_receipts_recover_only_explicit_complete_periods(client):
+    auth = login(client, "ola")
+    client.sent.append({"id": 1, "kind": "application", "created_at": datetime(2026, 11, 21), "status": "wysłano",
+                        "payload": {"form": "ZAM", "who": "mother", "recipient": "zus", "persona": "ola",
+                                    "payload": {"okres_od": "2027-04-02", "okres_do": "2027-08-19"}}})
+    filed = client.get("/api/v1/zus/me", headers=auth).json()["applications"][0]
+    assert (filed["start"], filed["end"]) == ("2027-04-02", "2027-08-19")
+    client.sent[0]["payload"]["payload"]["okres_do"] = "not-a-date"
+    incomplete = client.get("/api/v1/zus/me", headers=auth).json()["applications"][0]
+    assert incomplete["start"] is None and incomplete["end"] is None
+
+
 def test_pue_answers_from_params_and_logs_the_question(client):
     reply = client.post("/api/v1/pue/messages", json={"question": "Ile trwa urlop ojcowski?"}).json()
     assert "14 dni" in reply["answer"] and reply["links"]
@@ -135,13 +168,13 @@ def test_every_pue_answer_renders():
 def test_personas_match_the_calculator():
     """Each persona shows a brief case; what it already filed must be among its plan's documents."""
     expected = {"anna": set(),
-                "magda": {"base.raised-in-pregnancy"},
+                "magda": {"base.raised-in-pregnancy", "base.recalculation-needed"},
                 "ola": {"insured-parent.ends-before-birth"}}
     for pid, persona in _personas().items():
         result = compute_plan(persona.plan, P)
         assert {i.code for i in check(persona.plan, result, P)} == expected[pid]
-        have = {(d.form, d.who) for d in documents(persona.plan, P)}
-        assert all((a.form, a.who) in have for a in persona.applications), pid
+        have = {(d.form, d.who, d.recipient, d.start, d.end) for d in documents(persona.plan, P)}
+        assert all((a.form, a.who, a.recipient, a.start, a.end) in have for a in persona.applications), pid
 
 
 def test_charities_are_listed_with_krs(client):

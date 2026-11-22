@@ -30,6 +30,9 @@ documents state; never compute a benefit and never encode ZUS's decision as a fa
 - due_date / birth_date: the child's expected and actual birth dates; use the birth date for both when only it is
   known. children: children born in this birth. child_died_on: the date of a stillbirth (martwe urodzenie, karta
   martwego urodzenia, akt urodzenia z adnotacją) or of the child's death (akt zgonu); otherwise empty.
+  surviving_children: only the expressly documented count of surviving children from that birth; do not guess.
+  maternity_takeover: only an expressly documented maternal death, abandonment, incapacity ruling or hospital
+  stay preventing personal care, with its actual dates. Do not infer it from an ordinary paternal leave application.
 - blocks: every leave/benefit period the documents show as applied for, granted or already used, in order, for the
   parent who takes it: maternity (macierzyński), parental (rodzicielski; each separate part is its own block),
   paternity (ojcowski), supplementary (dodatkowy macierzyński), sick (chorobowy), rehab (świadczenie

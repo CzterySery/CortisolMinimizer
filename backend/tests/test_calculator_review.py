@@ -60,7 +60,8 @@ def test_start_has_no_report_and_uses_number_of_children(client):
     p.family.children = 2
     response = client.post("/api/v1/calc/start", json=p.model_dump(mode="json")).json()
     assert response["blocks"] == [{"who": "mother", "kind": "maternity", "start": "2027-03-01",
-                                    "days": 217, "work_fraction": "0"}]
+                                    "days": 217, "work_fraction": "0", "base_monthly": None,
+                                    "rehab_indexation_factor": None, "monthly_tax_advance": None}]
     assert "months" not in response and "bases" not in response
 
 

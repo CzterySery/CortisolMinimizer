@@ -106,27 +106,33 @@ export default function Cases() {
 }
 
 function Verdict({ verdict, sample }: { verdict: S["CaseVerdict"]; sample?: Sample }) {
-  const yes = (ok: boolean, good: string, bad: string) => <li className={ok ? "done" : "error"}>{ok ? good : bad}</li>;
+  const invalid = verdict.result.issues.some((issue) => issue.severity === "error");
+  const yes = (ok: boolean | null, good: string, bad: string, missing = "Do uzupełnienia — sprawdź dane poniżej") =>
+    <li className={ok === null ? "" : ok ? "done" : "error"}>{ok === null ? missing : ok ? good : bad}</li>;
   return (
     <section className="stack" aria-live="polite">
       <section className="panel">
         <h2 className="eyebrow">Wynik</h2>
         <ul className="docs">
-          {yes(verdict.insured, "Ubezpieczenie chorobowe: jest", "Ubezpieczenie chorobowe: brak")}
-          {yes(verdict.waiting_period_ok, "Okres wyczekiwania: spełniony", "Okres wyczekiwania: niespełniony")}
+          {yes(verdict.insured, "Ubezpieczenie chorobowe: jest", "Ubezpieczenie chorobowe: brak", "Ubezpieczenie chorobowe: do potwierdzenia")}
+          {yes(verdict.waiting_period_ok, "Okres wyczekiwania: spełniony", "Okres wyczekiwania: niespełniony", "Okres wyczekiwania: brak danych")}
           {yes(!verdict.debt_block, "Zadłużenie składkowe: nie blokuje", "Zadłużenie składkowe: blokuje zasiłki")}
-          {yes(verdict.entitled, "Prawo do zasiłku: tak", "Prawo do zasiłku: nie (szczegóły w „Ryzyka i uwagi”)")}
+          {yes(verdict.entitled, "Prawo do zasiłku: tak", "Prawo do zasiłku: nie (szczegóły w „Ryzyka i uwagi”)", "Prawo do zasiłku: do uzupełnienia")}
         </ul>
+        {(verdict.missing_data?.length ?? 0) > 0 && <div className="notice"><strong>Uzupełnij lub potwierdź dane</strong>
+          <ul>{verdict.missing_data.map((item) => <li key={item}>{item}</li>)}</ul>
+          <p>Kwoty dla znanych podstaw są symulacją, dopóki nie potwierdzisz wszystkich przesłanek.</p></div>}
+        {invalid && <p className="notice">Plan zawiera błędy prawne. Kwoty są ukryte do czasu ich poprawienia.</p>}
         {sample && <>
-          <p><strong>Decyzja ZUS:</strong> {sample.zus_outcome} {sample.zus_entitled === verdict.entitled ? "Wynik kalkulatora jest zgodny." : "Wynik kalkulatora jest inny."}</p>
-          {sample.granted.map((g) => (
+          <p><strong>Decyzja ZUS:</strong> {sample.zus_outcome} {verdict.entitled === null ? "Wynik wymaga uzupełnienia danych." : sample.zus_entitled === verdict.entitled ? "Wynik kalkulatora jest zgodny." : "Wynik kalkulatora jest inny."}</p>
+          {!invalid && sample.granted.map((g) => (
             <div key={g.who} className="table-scroll"><table className="data-table">
               <thead><tr><th>{whoLabel[g.who]}</th><th>ZUS</th><th>Kalkulator</th></tr></thead>
               <tbody>
-                {g.base && <tr><td>Podstawa wymiaru</td><td>{pln(g.base)}</td><td>{pln(verdict.result.bases[g.who] ?? 0)}</td></tr>}
+                {g.base && <tr><td>Podstawa wymiaru</td><td>{pln(g.base)}</td><td>{verdict.unknown_bases?.includes(g.who) ? "Brak danych" : pln(verdict.result.bases[g.who] ?? 0)}</td></tr>}
                 {Object.entries(g.months).map(([m, amount]) => <tr key={m}>
                   <td>Wypłata za {month(m)}</td><td>{pln(amount)}</td>
-                  <td>{pln(verdict.result.months.find((row) => row.month === m)?.benefit[g.who] ?? 0)}</td>
+                  <td>{verdict.unknown_bases?.includes(g.who) ? "Brak danych" : pln(verdict.result.months.find((row) => row.month === m)?.benefit[g.who] ?? 0)}</td>
                 </tr>)}
               </tbody>
             </table></div>
@@ -134,7 +140,7 @@ function Verdict({ verdict, sample }: { verdict: S["CaseVerdict"]; sample?: Samp
           {sample.note && <p className="muted">{sample.note}</p>}
         </>}
       </section>
-      <PlanTimeline result={verdict.result} />
+      <PlanTimeline result={verdict.result} unknownBases={verdict.unknown_bases ?? []} hideFinancials={invalid} />
     </section>
   );
 }

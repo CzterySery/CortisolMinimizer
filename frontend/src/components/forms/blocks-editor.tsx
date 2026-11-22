@@ -28,6 +28,23 @@ export function BlocksEditor({ value, onChange, whos = ["mother", "father"] }: {
           <input type="number" min={0} max={0.5} step={0.05} value={b.work_fraction ?? "0"} onChange={(e) => update(i, { work_fraction: e.target.value })} />
           <small>0 oznacza pełny urlop, 0,5 — pracę na pół etatu. Dni powyżej to cały okres kalendarzowy, także jego wydłużenie.</small>
         </label>}
+        {b.kind !== "vacation" && <details><summary>Dokładne dane płatnika dla tego okresu (opcjonalnie)</summary>
+          <label className="field">Potwierdzona podstawa dla tego okresu (zł/mies.)
+            <input type="number" min={0.01} step="0.01" value={b.base_monthly ?? ""}
+              onChange={(e) => update(i, { base_monthly: e.target.value || null })} />
+            <small>Pierwszeństwo przed ogólną podstawą rodzica, np. po przerwie lub przy złożonych składnikach Z-3.</small>
+          </label>
+          {b.kind === "rehab" && <label className="field">Wskaźnik waloryzacji rehabilitacyjnego
+            <input type="number" min={1} step="0.0001" value={b.rehab_indexation_factor ?? ""}
+              onChange={(e) => update(i, { rehab_indexation_factor: e.target.value || null })} />
+            <small>Wskaźnik ogłoszony dla kwartału rozpoczęcia świadczenia, np. 1,05; 1 oznacza brak podwyższenia.</small>
+          </label>}
+          {["maternity", "parental", "supplementary"].includes(b.kind) && <label className="field">Potwierdzona miesięczna zaliczka PIT od pełnego zasiłku (zł)
+            <input type="number" min={0} step="0.01" value={b.monthly_tax_advance ?? ""}
+              onChange={(e) => update(i, { monthly_tax_advance: e.target.value || null })} />
+            <small>Dla podwyższenia niskiego zasiłku; 0 tylko przy potwierdzonym braku zaliczki. Kalkulator nie wyznacza podatku.</small>
+          </label>}
+        </details>}
         <LegalBasis rules={[({ maternity: "maternity-pool", parental: "parental-pool", paternity: "paternity",
           supplementary: "supplementary", sick: "sick-right", care: "care-right", rehab: "rehab",
           job_loss_benefit: "job-loss-before", vacation: "" } as const)[b.kind], ...(b.kind === "parental" ? ["part-time"] : [])]} />

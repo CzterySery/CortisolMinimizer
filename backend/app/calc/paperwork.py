@@ -32,7 +32,7 @@ def documents(plan: Plan, p: Params) -> list[Document]:
             order: date | None = None, start: date | None = None, end: date | None = None) -> None:
         doc = Document(form=form, who=who, recipient=recipient, due_by=due, rule=rule, note=note.strip(),
                        start=start, end=end)
-        found.setdefault((form, who, recipient, due, note), (due or order or birth, doc))
+        found.setdefault((form, who, recipient, start, end, due, note), (due or order or birth, doc))
 
     for b in blocks:
         parent = parents[b.who]
@@ -43,7 +43,8 @@ def documents(plan: Plan, p: Params) -> list[Document]:
 
     applicant = f.adoption.applicant if f.adoption else "mother"
     mother = parents.get(applicant, parents["mother"])
-    if plan.rate_variant == "averaged" and mother.employment != "none":
+    if (plan.rate_variant == "averaged" and mother.employment != "none"
+            and not (f.child_died_on == birth and not f.surviving_children)):
         ended = mother.insured_until is not None and mother.insured_until < birth
         employee = mother.employment == "employee" and not ended
         add(applicant, "Wniosek o zasiłek macierzyński w wysokości 81,5%",
@@ -144,6 +145,25 @@ def _block(b: Block, parent: Parent, parents: dict[str, Parent], plan: Plan, p: 
             add(who, "Wniosek o urlop macierzyński", "employer", "KP art. 180 § 1; rozp. dok. § 13",
                 "Jeśli rodzicielski zaczyna się zaraz po nim, wystarczy jeden wniosek o oba urlopy.")
     elif kind == "maternity" and not adoption:  # the father takes over the rest of maternity leave (KP art. 180 § 4)
+        takeover = plan.family.maternity_takeover
+        if takeover:
+            evidence = {"death": "Dołącz akt zgonu mamy i potwierdzenie dotychczas wykorzystanego okresu.",
+                        "hospital": "Dołącz zaświadczenie o okresie pobytu mamy w szpitalu i niemożności opieki "
+                                    "oraz potwierdzenie przerwania przez nią pobierania świadczenia.",
+                        "incapacity": "Dołącz orzeczenie o niezdolności mamy do samodzielnej egzystencji "
+                                      "i dokument rezygnacji z dalszego świadczenia, gdy je pobierała.",
+                        "abandonment": "Dołącz oświadczenie o porzuceniu dziecka z datą zdarzenia "
+                                       "i potwierdzenie wykorzystanego okresu."}[takeover.reason]
+            add(who, "Wniosek o pozostałą część urlopu macierzyńskiego" if employee else
+                "ZAM: wniosek o zasiłek macierzyński", "employer" if employee else pays,
+                "KP art. 180 § 6–16; rozp. dok. § 21–24", evidence,
+                due=b.start - timedelta(days=p.deadlines.maternity_takeover_notice_days)
+                if takeover.reason == "incapacity" and employee else None)
+            if pays == "zus" and not jdg:
+                form = "Z-3" if employee else "Z-3a"
+                add(who, f"{form}: zaświadczenie płatnika składek do {BENEFIT[kind]}", "zus",
+                    "art. 61 ust. 3; rozp. dok. § 3", "Płatnik potwierdza podstawę i okres przejętego świadczenia.")
+            return
         if employee:
             add(who, "Wniosek o pozostałą część urlopu macierzyńskiego", "employer", "KP art. 180 § 9; rozp. wn. § 5",
                 "Dołącz odpis skrócony aktu urodzenia i oświadczenie mamy o rezygnacji z pozostałej części urlopu.",

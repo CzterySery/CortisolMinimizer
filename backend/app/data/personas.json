@@ -34,6 +34,8 @@
     "who": "mother",
     "recipient": "zus",
     "filed_on": "2026-10-06",
+    "start": "2026-10-06",
+    "end": "2026-11-04",
     "status": "przyjęte"
    },
    {
@@ -41,6 +43,8 @@
     "who": "mother",
     "recipient": "zus",
     "filed_on": "2026-11-10",
+    "start": "2026-11-05",
+    "end": "2026-12-06",
     "status": "przyjęte, zasiłek wypłacany"
    }
   ],
@@ -179,6 +183,8 @@
     "who": "mother",
     "recipient": "zus",
     "filed_on": "2026-09-14",
+    "start": "2026-09-14",
+    "end": "2026-09-20",
     "status": "przyjęte"
    },
    {
@@ -186,6 +192,8 @@
     "who": "mother",
     "recipient": "zus",
     "filed_on": "2026-09-22",
+    "start": "2026-09-14",
+    "end": "2026-09-20",
     "status": "przyjęte"
    }
   ],

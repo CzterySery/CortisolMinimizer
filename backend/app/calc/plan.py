@@ -143,7 +143,12 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
             father_exclusive.add((other, d))
             left -= ONE - b.work_fraction
 
-    averaged = plan.rate_variant == "averaged"
+    # A loss without surviving children has no parental period: maternity is paid at 100%.
+    stillbirth = family.child_died_on == birth and not family.surviving_children
+    averaged = plan.rate_variant == "averaged" and not stillbirth
+    if stillbirth and plan.rate_variant == "averaged":
+        explain.append(Explain(text="Przy martwym urodzeniu bez żyjącego rodzeństwa stosujemy 100% "
+                                    "podstawy macierzyńskiego zamiast wariantu 81,5%.", rule="art. 31 ust. 1; KP art. 180¹"))
     year_one_end = plus_years(birth, 1)
     # art. 31 ust. 3g/4: without a single averaged-rate parental day in year 1, parental drops to 70%
     # and the maternity period gets a one-off top-up to 100%
@@ -198,16 +203,30 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
                     continue
             rehab_day += b.kind == "rehab"
             r = rate(who, b, d, rehab_day)
-            daily = money(base[who] * r / 30)  # art. 36 ust. 3: one day = 1/30 of the monthly base
+            period_base = b.base_monthly if b.base_monthly is not None else base[who]
+            if b.kind == "rehab" and b.rehab_indexation_factor is not None:
+                period_base = money(period_base * b.rehab_indexation_factor)
+            daily = money(period_base * r / 30)  # art. 36 ust. 3: one day = 1/30 of the monthly base
             # art. 31 ust. 3a floor for insured parents; shortcut: not applied on part-time days (art. 31 ust. 4a)
-            if b.kind in MATERNITY_BENEFIT - {"paternity"} and base[who] > 0 and not b.work_fraction:
-                daily = max(daily, floor_day)
+            if b.kind in MATERNITY_BENEFIT - {"paternity"} and period_base > 0:
+                # With an advance supplied by the payer, compare net benefit before reducing for part-time work.
+                # Legacy full-leave estimates retain their old floor until the advance is supplied.
+                if b.monthly_tax_advance is not None:
+                    daily = max(daily, money((p.parental_benefit_floor + b.monthly_tax_advance) / 30))
+                elif not b.work_fraction:
+                    daily = max(daily, floor_day)
             amount[who][d] = money(daily * (ONE - b.work_fraction))
             seen.setdefault(id(b), (b, Counter()))[1][(r, amount[who][d])] += 1
         for key, (b, rates) in seen.items():
             block_benefit[key] = sum((a * n for (_, a), n in rates.items()), Decimal(0))
             paid = ", ".join(f"{percent(r)} podstawy: {n} dni × {pln(a)}" for (r, a), n in rates.items())
             part = f", praca {percent(b.work_fraction)} etatu" if b.work_fraction else ""
+            if b.base_monthly is not None:
+                explain.append(Explain(text=f"{WHO[who]}: potwierdzona podstawa dla okresu od {b.start}: "
+                                            f"{pln(b.base_monthly)}.", rule="art. 43; dane płatnika"))
+            if b.kind == "rehab" and b.rehab_indexation_factor is not None:
+                explain.append(Explain(text=f"Waloryzacja podstawy rehabilitacyjnego od {b.start}: "
+                                            f"wskaźnik {b.rehab_indexation_factor}.", rule="art. 19 ust. 2–3"))
             explain.append(Explain(text=f"{WHO[who]}: {KIND[b.kind]} {b.start.isoformat()} – {last_day(b).isoformat()}"
                                         f"{part}: {paid}.", rule=RULE[b.kind]))
         explain.extend(_sick_payer(who, parents[who], days[who], p))
@@ -221,10 +240,16 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
             "Wariant uśredniony bez ani jednego dnia rodzicielskiego w pierwszym roku dziecka: rodzicielski 70%.",
             rule="art. 31 ust. 3, 3f" if averaged_kept else "art. 31 ust. 3g"))
     top_up = Decimal(0)
-    if averaged and not averaged_kept and base.get(applicant, Decimal(0)) > 0:
+    if averaged and not averaged_kept:
         # Compare with what was actually computed, including the floor; never top up unpaid/invalid days.
-        standard_day = max(money(base[applicant] * p.rates.maternity / 30), floor_day)
-        top_up = money(sum((max(Decimal(0), standard_day - amount[applicant][d])
+        def standard_day(b: Block) -> Decimal:
+            period_base = b.base_monthly if b.base_monthly is not None else base[applicant]
+            if period_base <= 0:
+                return Decimal(0)
+            floor = money((p.parental_benefit_floor + (b.monthly_tax_advance or Decimal(0))) / 30)
+            return max(money(period_base * p.rates.maternity / 30), floor)
+
+        top_up = money(sum((max(Decimal(0), standard_day(b) - amount[applicant][d])
                             for d, b in days[applicant].items()
                             if b.kind == "maternity" and d in amount[applicant]), Decimal(0)))
         explain.append(Explain(text=f"Jednorazowe wyrównanie macierzyńskiego do 100% (na wniosek), po uwzględnieniu "
@@ -245,6 +270,9 @@ def compute_plan(plan: Plan, p: Params, *, horizon: tuple[date, date] | None = N
         for who in parents:
             present = Decimal(0)
             for day in range(1, n + 1):
+                if (who == "mother" and family.maternity_takeover and family.maternity_takeover.reason == "death"
+                        and date(y, m, day) > family.maternity_takeover.start):
+                    continue
                 b = days[who].get(date(y, m, day))
                 present += ONE if b is None or b.kind == "vacation" else b.work_fraction
             # shortcut: salary prorated by calendar days; payroll's 1/30-per-absence rule differs in partial months

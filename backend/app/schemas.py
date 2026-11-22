@@ -3,7 +3,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 
 
 class Model(BaseModel):
@@ -104,6 +104,7 @@ class Parent(Model):
     voluntary_sickness: bool = False
     insured_since: date | None = None
     insured_until: date | None = None  # last day of the insurance title: contract end, JDG closed (brief H.3)
+    insurance_confirmed: bool = False  # explicit confirmation from insurance records when dates are unavailable
     base_monthly: Decimal | None = None   # podstawa wymiaru; derived from salary_history when absent
     gross_monthly_estimate: Decimal | None = Field(None, gt=0)  # explicit quick employee estimate, not pay history
     salary_history: list[MonthPay] = []
@@ -123,6 +124,18 @@ class Hospitalization(Model):
 class AdoptedChild(Model):
     birth_date: date
     school_deferred: bool = False
+
+
+class MaternityTakeover(Model):
+    reason: Literal["death", "hospital", "abandonment", "incapacity"]
+    start: date  # death/abandonment date, hospital admission or incapacity onset
+    end: date | None = None  # inclusive hospital discharge; required for hospital takeover
+
+    @model_validator(mode="after")
+    def valid_period(self):
+        if self.reason == "hospital" and (self.end is None or self.end < self.start):
+            raise ValueError("Podaj prawidłową datę zakończenia hospitalizacji mamy.")
+        return self
 
 
 class Adoption(Model):
@@ -146,6 +159,8 @@ class Family(Model):
     due_date: date
     birth_date: date | None = None
     child_died_on: date | None = None  # stillbirth = the birth date; caps maternity (KP art. 180^1)
+    surviving_children: int | None = Field(None, ge=0)  # after the recorded death; None preserves old single-loss plans
+    maternity_takeover: MaternityTakeover | None = None
     children: int = Field(1, ge=1)
     za_zyciem: bool = False
     hospitalization: Hospitalization | None = None
@@ -158,6 +173,9 @@ class Block(Model):
     start: date
     days: int = Field(gt=0)
     work_fraction: Decimal = Field(Decimal(0), ge=0, lt=1)  # part-time parental leave
+    base_monthly: Decimal | None = Field(None, gt=0)  # verified base for this period, takes precedence over parent base
+    rehab_indexation_factor: Decimal | None = Field(None, ge=1)  # published factor for quarter of rehab start
+    monthly_tax_advance: Decimal | None = Field(None, ge=0)  # verified advance for the full monthly benefit
 
 
 class Plan(Model):
@@ -311,10 +329,12 @@ class ParseResult(Model):
 
 
 class CaseVerdict(Model):
-    insured: bool  # sickness insurance covers the case (no insured-parent error)
-    waiting_period_ok: bool
+    insured: bool | None  # None: missing dates or an unresolved insurance exception
+    waiting_period_ok: bool | None
     debt_block: bool
-    entitled: bool  # no legal error at all
+    entitled: bool | None  # None: incomplete facts; False only for a demonstrated legal error
+    missing_data: list[str] = []
+    unknown_bases: list[Who] = []
     result: PlanResult  # bases, benefit per period (calendar), months, issues, documents, explain
 
 
@@ -364,6 +384,10 @@ class FiledApplication(Model):
     recipient: Recipient
     filed_on: date
     status: str
+    start: date | None = None
+    end: date | None = None
+    document_id: str | None = None
+    payload: dict[str, str] = {}
 
 
 class ZusAccount(Model):
@@ -398,6 +422,24 @@ class ApplicationIn(Model):
     who: Who
     recipient: Recipient
     payload: dict[str, str] = {}  # the filled-in form fields
+    start: date | None = None
+    end: date | None = None
+    document_id: str | None = None
+    official_fields: dict[str, str] = {}  # native PDF field IDs -> reviewed values
+
+    @model_validator(mode="after")
+    def valid_period(self):
+        # Older clients stored period fields inside payload; keep accepting that wire format.
+        if self.start is None and self.payload.get("okres_od"):
+            self.start = date.fromisoformat(self.payload["okres_od"])
+        if self.end is None and self.payload.get("okres_do"):
+            self.end = date.fromisoformat(self.payload["okres_do"])
+        if (self.start is None) != (self.end is None) or (self.start and self.end < self.start):
+            raise ValueError("Podaj obie daty okresu we właściwej kolejności.")
+        for key, value in (("okres_od", self.start), ("okres_do", self.end)):
+            if value and key in self.payload and self.payload[key] != value.isoformat():
+                raise ValueError("Okres formularza nie zgadza się z okresem dokumentu.")
+        return self
 
 
 class ApplicationOut(Model):

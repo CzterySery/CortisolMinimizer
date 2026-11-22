@@ -5,6 +5,8 @@ import type { Card, Round } from "@/types/game";
 import { DecisionCard } from "./decision-card";
 import { getDecisionNodeForCard } from "@/lib/decision-tree";
 import { HelpChat, HelpLinks } from "@/components/help/home-help";
+import { OfficialFormsLibrary } from "@/components/forms/official-forms-library";
+import { ScrollReveal } from "@/components/scroll-reveal";
 
 interface TopicGroup {
   id: string;
@@ -17,7 +19,7 @@ const TOPICS: TopicGroup[] = [
   {
     id: "recommended",
     label: "Polecane dla Twojej ścieżki",
-    subtitle: "",
+    subtitle: "Karty dobrane do Twoich wyborów w grze lub kluczowe zasady urlopów i zasiłków ZUS na start.",
     cardIds: ["1C", "3F", "2E"],
   },
   {
@@ -79,7 +81,9 @@ export function KnowledgeExplorer({
     .filter((c): c is Card => Boolean(c));
 
   return (
-    <section className="knowledge-explorer" aria-labelledby="knowledge-explorer-title">
+    <>
+      <ScrollReveal>
+        <section className="knowledge-explorer" aria-labelledby="knowledge-explorer-title">
       <div className="knowledge-explorer-header">
         <div>
           <h2 id="knowledge-explorer-title" className="knowledge-explorer-title">
@@ -128,11 +132,14 @@ export function KnowledgeExplorer({
           );
         })}
       </div>
+      </section>
+      </ScrollReveal>
 
-      <div id="pomoc" className="knowledge-explorer-help" aria-label="Pomoc">
-        <HelpChat />
-        <HelpLinks />
-      </div>
-    </section>
+      <section id="pomoc" className="knowledge-explorer-help" aria-label="Pomoc">
+        <ScrollReveal><HelpChat /></ScrollReveal>
+        <ScrollReveal><OfficialFormsLibrary /></ScrollReveal>
+        <ScrollReveal><HelpLinks /></ScrollReveal>
+      </section>
+    </>
   );
 }

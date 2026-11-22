@@ -16,6 +16,7 @@ const slot = (key: string) => ({ get: () => read(key), set: (v?: string) => writ
 export const userToken = slot("otwartekarty.user");
 export const adminToken = slot("otwartekarty.admin");
 export const savedGame = slot("otwartekarty.game.v1");
+export const applicationReceipts = slot("otwartekarty.receipts.v1");
 
 // The plan the user built in the calculator, read by /applications (their own case, never a game result).
 export const myPlan = {

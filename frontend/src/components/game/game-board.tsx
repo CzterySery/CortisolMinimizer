@@ -138,7 +138,7 @@ export function GameBoard(props: GameBoardProps) {
           { opacity: 1, offset: .28 },
           { transform: "translate(0, -6px) rotate(0deg) scale(1.02)", opacity: 1, offset: .82 },
           { transform: "translate(0, 0) rotate(0deg) scale(1)", opacity: 1 },
-        ], { duration: 580, delay: 320 + index * 125, fill: "backwards", easing: "cubic-bezier(.18,.75,.25,1)" }));
+        ], { duration: 580, delay: 480 + index * 140, fill: "backwards", easing: "cubic-bezier(.18,.75,.25,1)" }));
       });
     }
     return () => {
@@ -201,7 +201,7 @@ export function GameBoard(props: GameBoardProps) {
         </section>
         <RoundTrack stages={stages} currentRound={currentRound} playedCards={played} draggedId={draggedId} onPlayCard={playCard} />
         <section className="hand-section" aria-labelledby="hand-title">
-          <div className="section-heading hand-heading">
+          <div className={`section-heading hand-heading${!complete && mode === "preview" ? " sr-only" : ""}`}>
             <h2 id="hand-title">{complete ? "Twój profil" : "Wybierz jedną kartę"}</h2>
             {mode === "game" && <span>{complete ? `${played.length} zagranych kart` : `${handSize} karty · przeciągnij jedną na podświetlone miejsce`}</span>}
           </div>

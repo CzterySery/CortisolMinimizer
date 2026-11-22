@@ -161,7 +161,8 @@ test("one gross salary is clearly estimated and mObywatel is discoverable", asyn
   await expect(page.getByText("Wynik orientacyjny.", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Budżet", exact: true })).toHaveCount(0);
   await expect(page.getByText("Skąd te kwoty? · Szczegóły obliczeń", { exact: true })).toBeVisible();
-  await page.getByRole("navigation", { name: "Główna nawigacja" }).getByRole("link", { name: "mObywatel", exact: true }).click();
+  await page.getByRole("navigation", { name: "Główna nawigacja" }).getByRole("link", { name: "Moje dane", exact: true }).click();
+  await page.getByRole("link", { name: "Zaloguj się przez mObywatel", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
   await page.getByRole("button", { name: /Anna Kowalczyk/ }).click();
   await expect(page).toHaveURL(/\/me$/);

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const nav = [
   ["/", "Strona główna"],
-  ["/calculator", "Kalkulator"],
+  ["/calculator", "Kalkulator zasiłku"],
   ["/cases", "Sprawdź sprawę"],
   ["/applications", "Twoje dokumenty"],
   ["/me", "Moje dane"],

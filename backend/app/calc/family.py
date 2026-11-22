@@ -11,8 +11,12 @@ def maternity_end_after_death(plan: Plan, p: Params) -> date | None:
     f = plan.family
     if f.child_died_on is None or f.adoption:
         return None
-    # shortcut: assumes no child of the birth survived; for twins with a survivor the pool follows the survivors
-    # (§ 1 zd. 2), add a survivors count when such a case appears
+    if f.surviving_children:
+        prebirth = sum(max(0, min(b.days, (event_date(plan) - b.start).days)) for b in plan.blocks
+                       if b.kind == "maternity" and b.who == "mother")
+        weeks = p.maternity.weeks_by_children[min(f.surviving_children, len(p.maternity.weeks_by_children)) - 1]
+        standard_end = event_date(plan) + timedelta(days=weeks * 7 - prebirth - 1)
+        return max(standard_end, f.child_died_on + timedelta(days=p.maternity.after_death_min_days))
     seven = f.child_died_on + timedelta(days=p.maternity.after_death_min_days)  # the day of death not counted
     eight = event_date(plan) + timedelta(weeks=p.maternity.stillbirth_weeks)
     return max(eight - timedelta(days=1), seven) if f.child_died_on < eight else seven

@@ -611,6 +611,19 @@ export interface components {
             payload?: {
                 [key: string]: string;
             };
+            /** Start */
+            start?: string | null;
+            /** End */
+            end?: string | null;
+            /** Document Id */
+            document_id?: string | null;
+            /**
+             * Official Fields
+             * @default {}
+             */
+            official_fields?: {
+                [key: string]: string;
+            };
         };
         /** ApplicationOut */
         ApplicationOut: {
@@ -700,6 +713,12 @@ export interface components {
              * @default 0
              */
             work_fraction?: number | string;
+            /** Base Monthly */
+            base_monthly?: number | string | null;
+            /** Rehab Indexation Factor */
+            rehab_indexation_factor?: number | string | null;
+            /** Monthly Tax Advance */
+            monthly_tax_advance?: number | string | null;
         };
         /** Block */
         "Block-Output": {
@@ -725,6 +744,12 @@ export interface components {
              * @default 0
              */
             work_fraction: string;
+            /** Base Monthly */
+            base_monthly: string | null;
+            /** Rehab Indexation Factor */
+            rehab_indexation_factor: string | null;
+            /** Monthly Tax Advance */
+            monthly_tax_advance: string | null;
         };
         /** Body_parse_api_v1_cases_parse_post */
         Body_parse_api_v1_cases_parse_post: {
@@ -833,13 +858,23 @@ export interface components {
         /** CaseVerdict */
         CaseVerdict: {
             /** Insured */
-            insured: boolean;
+            insured: boolean | null;
             /** Waiting Period Ok */
-            waiting_period_ok: boolean;
+            waiting_period_ok: boolean | null;
             /** Debt Block */
             debt_block: boolean;
             /** Entitled */
-            entitled: boolean;
+            entitled: boolean | null;
+            /**
+             * Missing Data
+             * @default []
+             */
+            missing_data: string[];
+            /**
+             * Unknown Bases
+             * @default []
+             */
+            unknown_bases: ("mother" | "father")[];
             result: components["schemas"]["PlanResult"];
         };
         /** Catalog */
@@ -1015,6 +1050,9 @@ export interface components {
             birth_date?: string | null;
             /** Child Died On */
             child_died_on?: string | null;
+            /** Surviving Children */
+            surviving_children?: number | null;
+            maternity_takeover?: components["schemas"]["MaternityTakeover-Input"] | null;
             /**
              * Children
              * @default 1
@@ -1041,6 +1079,9 @@ export interface components {
             birth_date: string | null;
             /** Child Died On */
             child_died_on: string | null;
+            /** Surviving Children */
+            surviving_children: number | null;
+            maternity_takeover: components["schemas"]["MaternityTakeover-Output"] | null;
             /**
              * Children
              * @default 1
@@ -1075,6 +1116,19 @@ export interface components {
             filed_on: string;
             /** Status */
             status: string;
+            /** Start */
+            start: string | null;
+            /** End */
+            end: string | null;
+            /** Document Id */
+            document_id: string | null;
+            /**
+             * Payload
+             * @default {}
+             */
+            payload: {
+                [key: string]: string;
+            };
         };
         /** Game */
         "Game-Input": {
@@ -1212,6 +1266,36 @@ export interface components {
             adoption_min_weeks: number;
             /** Pregnancy Weeks */
             pregnancy_weeks: number;
+        };
+        /** MaternityTakeover */
+        "MaternityTakeover-Input": {
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "death" | "hospital" | "abandonment" | "incapacity";
+            /**
+             * Start
+             * Format: date
+             */
+            start: string;
+            /** End */
+            end?: string | null;
+        };
+        /** MaternityTakeover */
+        "MaternityTakeover-Output": {
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "death" | "hospital" | "abandonment" | "incapacity";
+            /**
+             * Start
+             * Format: date
+             */
+            start: string;
+            /** End */
+            end: string | null;
         };
         /** MonthPay */
         "MonthPay-Input": {
@@ -1352,6 +1436,11 @@ export interface components {
             insured_since?: string | null;
             /** Insured Until */
             insured_until?: string | null;
+            /**
+             * Insurance Confirmed
+             * @default false
+             */
+            insurance_confirmed?: boolean;
             /** Base Monthly */
             base_monthly?: number | string | null;
             /** Gross Monthly Estimate */
@@ -1403,6 +1492,11 @@ export interface components {
             insured_since: string | null;
             /** Insured Until */
             insured_until: string | null;
+            /**
+             * Insurance Confirmed
+             * @default false
+             */
+            insurance_confirmed: boolean;
             /** Base Monthly */
             base_monthly: string | null;
             /** Gross Monthly Estimate */
@@ -1647,23 +1741,6 @@ export interface components {
             /** Question */
             question: string;
         };
-        /** PueSource */
-        PueSource: {
-            /** Title */
-            title: string;
-            /**
-             * Locator
-             * @default ""
-             */
-            locator: string;
-            /** Url */
-            url: string;
-            /**
-             * Snippet
-             * @default ""
-             */
-            snippet: string;
-        };
         /** PueReply */
         PueReply: {
             /** Answer */
@@ -1684,6 +1761,23 @@ export interface components {
              * @enum {string}
              */
             mode: "gemini-rag" | "local-rag" | "fallback";
+        };
+        /** PueSource */
+        PueSource: {
+            /** Title */
+            title: string;
+            /**
+             * Locator
+             * @default
+             */
+            locator: string;
+            /** Url */
+            url: string;
+            /**
+             * Snippet
+             * @default
+             */
+            snippet: string;
         };
         /** Rates */
         "Rates-Input": {

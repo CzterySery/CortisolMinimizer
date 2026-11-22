@@ -43,6 +43,7 @@ def plus_months(d: date, n: int) -> date:
 def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
     f = plan.family
     birth = event_date(plan)
+    takeover = f.maternity_takeover
     parents = {"mother": f.mother} | ({"father": f.father} if f.father else {})
     days = day_map(plan)
     issues: dict[str, Issue] = {}
@@ -126,7 +127,7 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
             rule_id, rule = AFTER_BIRTH[b.kind]
             add(f"{rule_id}.before-birth", "error", f"{span(b)}: ten okres może zacząć się dopiero po narodzinach "
                 "dziecka.", rule)
-        if b.kind in AFTER_BIRTH and f.child_died_on and last_day(b) > f.child_died_on:
+        if b.kind in AFTER_BIRTH and f.child_died_on and not f.surviving_children and last_day(b) > f.child_died_on:
             rule_id, rule = AFTER_BIRTH[b.kind]
             add(f"{rule_id}.after-child-death", "error", f"{span(b)}: ten okres służy opiece nad dzieckiem, więc nie "
                 "przysługuje po jego śmierci. Mamie zostaje urlop macierzyński (KP art. 180^1).", rule)
@@ -139,7 +140,8 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
             continue
         since, until = parent.insured_since, parent.insured_until
         if (parent.base_monthly is None and parent.gross_monthly_estimate is None
-                and not parent.salary_history and sickness_insured(parent)):
+                and not parent.salary_history and sickness_insured(parent)
+                and any(b.base_monthly is None for b in taken)):
             add("base.missing", "warning", f"{WHO[who]}: brak podstawy wymiaru i wynagrodzeń z Z-3, więc kwoty zasiłków "
                 "nie mogą być oszacowane. Uzupełnij dane; brak kwoty nie oznacza zerowego dochodu.", "art. 36")
         if parent.base_monthly is None and parent.gross_monthly_estimate is not None:
@@ -218,7 +220,23 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
             "dni (limit jest wspólny dla rodziców).", "art. 32 ust. 2")
 
     # --- maternity (KP art. 180) ---
+    if not f.adoption and f.surviving_children is not None and (not f.child_died_on or f.surviving_children >= f.children):
+        add("maternity-pool.survivors-invalid", "error", "Liczba dzieci pozostałych przy życiu wymaga daty zgonu "
+            "i musi być mniejsza od liczby dzieci przy porodzie.", "KP art. 180¹")
+    if not f.adoption and f.child_died_on and f.children > 1 and f.surviving_children is None:
+        add("maternity-pool.survivors-missing", "error", "Podaj liczbę dzieci z tego porodu pozostałych przy życiu; "
+            "bez niej nie ustalimy właściwego wymiaru macierzyńskiego.", "KP art. 180¹")
+    if f.child_died_on and f.child_died_on < birth:
+        add("maternity-pool.death-before-birth", "error", "Data zgonu nie może poprzedzać porodu.", "KP art. 180¹")
+    if takeover and (f.adoption or takeover.start < birth):
+        add("transfer.event-invalid", "error", "Szczególne przejęcie w tej ścieżce wymaga zdarzenia po porodzie.",
+            "KP art. 180 § 6–15")
+    if takeover and takeover.reason == "death" and any(b.who == "mother" and last_day(b) > takeover.start
+                                                       for b in plan.blocks):
+        add("transfer.mother-after-death", "error", "Okresy mamy nie mogą przypadać po jej śmierci.", "KP art. 180 § 12")
     mother_maternity = sorted(d for d, b in days["mother"].items() if b.kind == "maternity")
+    combined = sorted(set(mother_maternity) | {d for d, b in days["father"].items() if b.kind == "maternity"})
+    continuous = len(combined) == (combined[-1] - combined[0]).days + 1 if combined else True
     if not f.adoption and len([d for d in mother_maternity if d < birth]) > p.maternity.prebirth_max_weeks * 7:
         add("prebirth.too-early", "error", f"Przed porodem można wykorzystać najwyżej {p.maternity.prebirth_max_weeks} "
             "tygodni urlopu macierzyńskiego.", "KP art. 180 § 2")
@@ -226,18 +244,77 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
         if mother_maternity[0] > birth:
             add("maternity-pool.starts-after-birth", "error", "Urlop macierzyński zaczyna się najpóźniej w dniu porodu.",
                 "KP art. 183^1 § 2")
-        if len(mother_maternity) != (mother_maternity[-1] - mother_maternity[0]).days + 1:
+        hospital_pause = takeover and takeover.reason == "hospital"
+        if (len(mother_maternity) != (mother_maternity[-1] - mother_maternity[0]).days + 1
+                and not (hospital_pause and continuous)):
             add("maternity-pool.not-continuous", "error", "Urlop macierzyński mamy musi być ciągły.", "KP art. 180 § 3")
     father_maternity = sorted(d for d, b in days["father"].items() if b.kind == "maternity")
     if father_maternity and not f.adoption:
         after_birth = [d for d in mother_maternity if birth <= d < father_maternity[0]]
-        if len(after_birth) < p.maternity.mother_personal_weeks * 7:
+        minimum = p.maternity.mother_personal_weeks * 7
+        if takeover:
+            minimum = 0 if takeover.reason == "death" or not sickness_insured(f.mother) else (
+                p.maternity.mother_personal_weeks_incapacity * 7)
+            event_first = takeover.start if takeover.reason == "hospital" else takeover.start + timedelta(days=1)
+            if father_maternity[0] < event_first:
+                add("transfer.before-event", "error", "Przejęcie zaczyna się po zdarzeniu, a przy hospitalizacji "
+                    "najwcześniej w dniu przyjęcia do szpitala.", "KP art. 180 § 6–15")
+            if takeover.reason == "hospital" and any(d > takeover.end for d in father_maternity):
+                add("transfer.outside-hospital", "error", "Tata może przejąć ten okres wyłącznie na czas "
+                    "kwalifikującego pobytu mamy w szpitalu.", "KP art. 180 § 10–11")
+            if takeover.reason == "hospital" and any(father_maternity[0] <= d <= takeover.end for d in mother_maternity):
+                add("transfer.mother-in-hospital", "error", "Mama wraca do macierzyńskiego po zakończeniu "
+                    "pobytu uniemożliwiającego opiekę.", "KP art. 180 § 10–11")
+            if takeover.reason == "hospital" and not sickness_insured(f.mother):
+                add("transfer.hospital-uninsured", "error", "Ta ścieżka przerwania urlopu w szpitalu wymaga "
+                    "ubezpieczonej mamy.", "KP art. 180 § 10–11")
+            if any(d in days["mother"] and days["mother"][d].kind == "maternity" for d in father_maternity):
+                add("transfer.overlap", "error", "Mama i tata nie mogą pobierać macierzyńskiego za ten sam dzień.",
+                    "KP art. 180 § 14")
+            if takeover.reason != "hospital" and any(d >= father_maternity[0] for d in mother_maternity):
+                add("transfer.mother-after-event", "error", "Po trwałym przejęciu mama nie korzysta z tej części "
+                    "macierzyńskiego.", "KP art. 180 § 6–15")
+            if (takeover.reason == "death" and any(d > takeover.start for d in mother_maternity)):
+                add("transfer.mother-after-death", "error", "Okres mamy nie może przypadać po jej śmierci.",
+                    "KP art. 180 § 12")
+            if sickness_insured(f.mother) and not continuous:
+                add("transfer.gap", "error", "Wykorzystane okresy mamy i taty muszą tworzyć ciągły okres "
+                    "macierzyńskiego.", "KP art. 180 § 14")
+            if not sickness_insured(f.mother) and father_maternity[-1] >= birth + timedelta(days=pool_sizes(plan, p)[0]):
+                add("transfer.after-pool", "error", "Przejęcie obejmuje tylko pozostały okres od dnia porodu, "
+                    "nie rozpoczyna nowej puli macierzyńskiego.", "KP art. 180 § 15")
+        if len(after_birth) < minimum:
             add("transfer.before-14-weeks", "error", f"Tata może przejąć macierzyński dopiero po "
                 f"{p.maternity.mother_personal_weeks} tygodniach wykorzystanych przez mamę po porodzie (wyjątki: "
                 "orzeczenie o niezdolności, pobyt w szpitalu, zgon).", "KP art. 180 § 4–5, art. 29 ust. 3")
-        if mother_maternity and father_maternity[0] != mother_maternity[-1] + timedelta(days=1):
+        if mother_maternity and not takeover and father_maternity[0] != mother_maternity[-1] + timedelta(days=1):
             add("transfer.not-continuous", "error", "Tata przejmuje pozostałą część macierzyńskiego bezpośrednio po "
                 "rezygnacji mamy.", "KP art. 180 § 4")
+
+    for who, parent in parents.items():
+        own = sorted((b for b in plan.blocks if b.who == who and b.kind != "vacation"), key=lambda b: b.start)
+        for previous, current in pairwise(own):
+            gap_start = last_day(previous) + timedelta(days=1)
+            # A complete calendar month without benefits requires re-establishing the base (art. 43).
+            next_month = date(gap_start.year + (gap_start.month == 12), gap_start.month % 12 + 1, 1)
+            full_month_end = next_month if gap_start.day == 1 else date(
+                next_month.year + (next_month.month == 12), next_month.month % 12 + 1, 1)
+            if current.start >= full_month_end and current.base_monthly is None and parent.base_monthly is None:
+                add("base.recalculation-needed", "warning", f"{WHO[who]}: po pełnym miesiącu przerwy potwierdź "
+                    "podstawę osobno w szczegółach kolejnego okresu.", "art. 43")
+        if any((m.quarterly_bonus or m.annual_bonus or (m.worked_days is not None and m.required_days
+                and m.worked_days < m.required_days)) for m in parent.salary_history) and any(
+                b.base_monthly is None for b in own) and parent.base_monthly is None:
+            add("base.components-review", "warning", f"{WHO[who]}: premie i niepełne miesiące wymagają sprawdzenia "
+                "składników Z-3; potwierdzoną podstawę wpisz dla okresu.", "art. 37–42")
+        if any(b.kind == "rehab" and b.rehab_indexation_factor is None for b in own):
+            add("rehab.indexation-missing", "warning", "Podaj opublikowany wskaźnik waloryzacji dla kwartału "
+                "rozpoczęcia rehabilitacyjnego (1, jeśli nie podlega podwyższeniu).", "art. 19 ust. 2–3")
+        if (own and parent.employment == "self_employed" and parent.insured_since and parent.salary_history
+                and parent.base_monthly is None and any(b.base_monthly is None for b in own)
+                and parent.insured_since > plus_months(own[0].start.replace(day=1), -12)):
+            add("base.jdg-short-period", "warning", "JDG z krótkim okresem ubezpieczenia wymaga szczegółowej "
+                "reguły minimalnej i nadwyżkowej podstawy. Wpisz potwierdzoną podstawę dla okresu.", "art. 48a–49")
 
     # --- supplementary maternity leave (KP art. 180^2) ---
     supplementary = [b for b in plan.blocks if b.kind == "supplementary"]
@@ -350,13 +427,15 @@ def check(plan: Plan, result: PlanResult, p: Params) -> list[Issue]:
                 add("rehab.sick-not-exhausted", "warning", "Świadczenie rehabilitacyjne przysługuje po wyczerpaniu "
                     "zasiłku chorobowego; plan nie pokazuje pełnego okresu zasiłkowego.", "art. 18 ust. 1")
 
-    if (plan.rate_variant == "averaged" and plan.averaged_request_on
+    if (plan.rate_variant == "averaged" and not (f.child_died_on == birth and not f.surviving_children)
+            and plan.averaged_request_on
             and plan.averaged_request_on > birth + timedelta(days=p.deadlines.averaged_request_days_after_birth)):
         add("averaged.deadline", "error", f"Wniosek o 81,5% złożono lub zaplanowano po upływie "
             f"{p.deadlines.averaged_request_days_after_birth} dni od porodu albo przyjęcia i spełnienia przesłanek. "
             "Wybierz stawki standardowe.", "art. 30a ust. 1–2")
-    if any(b.kind in MATERNITY_BENEFIT - {"paternity"} and result.bases.get(b.who, 0) > 0
-           and result.bases[b.who] * p.rates.parental < p.parental_benefit_floor for b in plan.blocks):
+    if any(b.kind in MATERNITY_BENEFIT - {"paternity"} and (b.base_monthly or result.bases.get(b.who, 0)) > 0
+           and (b.base_monthly or result.bases[b.who]) * p.rates.parental < p.parental_benefit_floor
+           and b.monthly_tax_advance is None for b in plan.blocks):
         add("floor.tax-not-modelled", "warning", "Przy niskiej podstawie kwotę podwyższenia do świadczenia "
             "rodzicielskiego ustala się po zaliczce na PIT. Kalkulator nie oblicza PIT, więc podwyższenie "
             "i dni łączenia z pracą wymagają weryfikacji u płatnika.", "art. 31 ust. 3a–3c, 4a")
@@ -383,7 +462,8 @@ def supplementary_weeks(plan: Plan, p: Params) -> int | None:
 def _deadlines(plan: Plan, birth: date, days, p: Params, add) -> None:
     """Application deadlines measured from `plan.today`; only for periods that haven't started yet."""
     today, d = plan.today, p.deadlines
-    if (plan.rate_variant == "averaged" and not plan.averaged_request_on
+    if (plan.rate_variant == "averaged" and not (plan.family.child_died_on == birth and not plan.family.surviving_children)
+            and not plan.averaged_request_on
             and today > birth + timedelta(days=d.averaged_request_days_after_birth)):
         add("averaged.deadline", "error", f"Wniosek o 81,5% można złożyć najpóźniej "
             f"{d.averaged_request_days_after_birth} dni po porodzie.", "art. 30a ust. 1")
@@ -397,8 +477,10 @@ def _deadlines(plan: Plan, birth: date, days, p: Params, add) -> None:
             if b.start - timedelta(days=notice) < today:
                 add(code, "warning", f"{WHO[b.who]}: wniosek o {KIND[b.kind].lower()} od {b.start.isoformat()} trzeba "
                     f"złożyć co najmniej {notice} dni wcześniej; pracodawca może się zgodzić na krótszy termin.", rule)
-        if not plan.family.adoption and b.kind == "maternity" and b.who == "father" and b.start - timedelta(
-                days=d.maternity_takeover_notice_days) < today:
+        if (not plan.family.adoption and not (plan.family.maternity_takeover and
+                plan.family.maternity_takeover.reason != "incapacity") and b.kind == "maternity" and b.who == "father"
+                and b.start - timedelta(
+                days=d.maternity_takeover_notice_days) < today):
             add("transfer.notice", "warning", f"Wniosek taty o pozostałą część macierzyńskiego od {b.start.isoformat()} "
                 f"składa się co najmniej {d.maternity_takeover_notice_days} dni wcześniej, a rezygnację mamy co najmniej "
                 f"{d.maternity_resign_notice_days} dni przed jej powrotem do pracy.", "KP art. 180 § 8–9")

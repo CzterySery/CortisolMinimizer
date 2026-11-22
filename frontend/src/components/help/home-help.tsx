@@ -74,19 +74,26 @@ export function HelpChat() {
           </button>
         ))}
       </div>
-      <label className="field">
-        Twoje pytanie
-        <textarea
-          rows={3}
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Np. Ile trwa urlop ojcowski i kiedy złożyć wniosek?"
-        />
-      </label>
-      <div className="actions">
-        <button className="button button-primary" onClick={() => askQuestion(question)} disabled={!question.trim() || loading}>
-          {loading ? "Szukam w przepisach…" : "Wyślij pytanie"}
-        </button>
+      <div className="rag-question-wrap">
+        <label className="rag-question-label" htmlFor="rag-question-input">Twoje pytanie</label>
+        <div className="rag-input-row">
+          <textarea
+            id="rag-question-input"
+            rows={1}
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                if (question.trim() && !loading) void askQuestion(question);
+              }
+            }}
+            placeholder="Np. Ile trwa urlop ojcowski i kiedy złożyć wniosek?"
+          />
+          <button className="button button-primary rag-submit-btn" onClick={() => askQuestion(question)} disabled={!question.trim() || loading}>
+            {loading ? "Szukam w przepisach…" : "Wyślij pytanie"}
+          </button>
+        </div>
       </div>
       {reply.data && (
         <div className="notice rag-reply" role="status">

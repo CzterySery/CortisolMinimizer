@@ -2,6 +2,14 @@
 
 Data przeglądu: 2026-11-21. Zakres: formularz krokowy, standardowe stawki i pule, podstawa, termin 81,5%, opisy wyniku oraz ograniczenia istniejącego silnika. Porównano kod z dostarczonymi transkrypcjami i oficjalnymi objaśnieniami. Nie jest to potwierdzenie pełnej obsługi wszystkich wyjątków ustawy.
 
+Aktualizacja 2026-11-22: sprawy mają wynik trójstanowy (`true` / `false` / brak wystarczających danych), jawne braki podstaw i ukryte raporty finansowe przy błędach prawnych. Początek ubezpieczenia albo jawne potwierdzenie z dokumentów jest wymagane do pozytywnego wyniku sprawy; przy chorobowym nadal potrzebna jest data do wyczekiwania. Potwierdzenie nie znosi błędu dat ani nierozstrzygniętego wyjątku po końcu umowy. W dwóch przyznanych przykładach dodano potwierdzenie ubezpieczenia z dokumentacji bez wymyślania dat.
+
+Szczególne przejęcie macierzyńskiego przez tatę jest opcjonalną daną rodziny: śmierć, hospitalizacja uniemożliwiająca opiekę (daty od–do), porzucenie albo orzeczenie o niezdolności do samodzielnej egzystencji. KP art. 180 § 6–16: śmierć nie wymaga 8 tygodni, inne wskazane przypadki u ubezpieczonej mamy wymagają 8 wykorzystanych tygodni; hospitalizacja pozwala na przerwę i powrót mamy. Walidator kontroluje daty zdarzenia, nakładanie, ciągłość i pozostały wymiar; dokumenty nie żądają rezygnacji zmarłej mamy. W modelu nadal występuje tylko tata, bez innych członków rodziny.
+
+Przy śmierci dziecka można podać liczbę dzieci z tego porodu pozostałych przy życiu. Przy wieloraczkach brak tej liczby blokuje rozliczenie. Wymiar odpowiada żyjącym dzieciom, z gwarancją 7 dni po późniejszym zgonie; po utracie jedynego dziecka pozostałe okresy opieki są niedozwolone. Przy martwym urodzeniu bez żyjącego rodzeństwa stawka macierzyńskiego wynosi 100%, bez wniosku o 81,5% i późniejszego wyrównania.
+
+Bez zmiany wcześniejszych standardowych wyliczeń dodano opcjonalne dane płatnika w szczegółach okresu: `base_monthly` (podstawa tego okresu, przed waloryzacją rehabilitacyjnego), `rehab_indexation_factor` (opublikowany wskaźnik kwartału rozpoczęcia, stosowany raz), `monthly_tax_advance` (potwierdzona zaliczka dla pełnego miesięcznego zasiłku). Przy podanej zaliczce podwyższenie uwzględnia ją oraz proporcję pracy. To nadal symulacja według stawki dziennej, bez własnego kalkulatora PIT i bez rozliczenia wielu tytułów ubezpieczenia. Brak wskaźnika, złożone składniki, krótka historia JDG lub podstawa z historii wymagająca ponownego ustalenia powodują ostrzeżenie i nie pozwalają sprawie zwrócić bezwarunkowego „tak”. Potwierdzona podstawa rodzica nadal jest jawnym wejściem; dla innej podstawy kolejnego okresu należy użyć pola okresu. Parametry pozostają jedną wersją dla planu.
+
 Aktualizacja uproszczenia dochodów: `gross_monthly_estimate` przy umowie o pracę jest wyraźnie oznaczonym szacunkiem z jednej pensji brutto. Wykorzystuje wspólne odliczenia składek i próg minimalnej podstawy; nie tworzy fikcyjnych miesięcy historii i nie zmienia zadeklarowanej podstawy. Reguła `base.estimate` i komunikat nad tabelą oznaczają przybliżenie. Jedna wypłata nie zastępuje średniej z 12 pełnych miesięcy albo krótszego właściwego okresu — [objaśnienia ZUS](https://www.zus.pl/swiadczenia/zasilki/zasilek-macierzynski/podstawa-wymiaru/dla-pracownikow). Dla JDG/zlecenia nadal potrzebna jest podstawa zasiłku lub historia podstaw składek. Wykres pieniędzy usunięto z widoku wyników; backend nadal liczy dane miesięczne na potrzeby wspólnego silnika gry.
 
 ## Sprawdzone reguły
@@ -22,11 +30,11 @@ Aktualizacja uproszczenia dochodów: `gross_monthly_estimate` przy umowie o prac
 ## Ograniczenia, których nie należy przedstawiać jako pełnej zgodności
 
 - Budżet rodziny używa podstawy zasiłku jako przybliżenia wynagrodzenia i proporcji dni kalendarzowych. Nie jest listą płac ani kwotą netto do przelewu.
-- Plan stosuje jedną podstawę rodzica i jedną wersję parametrów przez cały okres. Ponowne ustalenie podstawy po odpowiedniej przerwie, zmiany parametrów w trakcie planu i waloryzacja rehabilitacyjnego wymagają dalszej implementacji.
+- Plan domyślnie stosuje wspólną podstawę rodzica i jedną wersję parametrów; można ją zastąpić potwierdzoną podstawą konkretnego okresu. Waloryzacja rehabilitacyjnego wymaga wpisania opublikowanego wskaźnika. Automatyczne ponowne ustalenie podstawy i zmiany parametrów w trakcie planu pozostają poza zakresem.
 - Podwyższenie do świadczenia rodzicielskiego powinno uwzględniać zaliczkę PIT. Uproszczony silnik jej nie liczy; reguła ostrzega dla niskich podstaw. Niepełny etat nie ma kompletnej obsługi tego podwyższenia.
 - Złożone premie i składniki niepodlegające uzupełnieniu, szczegółowe reguły JDG, historyczne dni choroby i przerwy między okresami nie są obsłużone w pełni.
 - Samo dodanie opiekuńczego lub rehabilitacyjnego nie dowodzi przesłanek medycznych i rodzinnych. Ręczny kalkulator nie zastępuje potwierdzenia tych faktów.
-- Pozostają odłożone szczególne sytuacje straty dziecka i przejęcia urlopu, wyjątki po ustaniu ubezpieczenia oraz pełna historia wykorzystania urlopów/części przy przejściu z pieczy do adopcji.
+- Obsługiwane są opisane wyżej sytuacje straty dziecka i przejęcia przez tatę; pozostają inni członkowie rodziny, wielokrotne zdarzenia w różnych datach, wyjątki po ustaniu ubezpieczenia oraz pełna historia wykorzystania urlopów/części przy przejściu z pieczy do adopcji.
 - Formularz nadal oczekuje kwalifikujących dni hospitalizacji. Nie wyznacza ich sam z poszczególnych dat pobytu.
 - Przy niepodanej liczbie ubezpieczonych backend przyjmuje domyślnie 0 i wskazuje ZUS jako płatnika. Wynik jawnie pokazuje to założenie i prosi o potwierdzenie liczby u pracodawcy/zleceniodawcy; ustawienie większej liczby zmienia odbiorców zgodnie z progiem parametrów.
 

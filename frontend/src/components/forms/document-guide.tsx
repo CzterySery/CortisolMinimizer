@@ -9,8 +9,9 @@ import { documentIssuer, officialForm, prefilledFields, knownPayer, leaveRule, t
 import { LegalBasis } from "@/components/legal-basis";
 import "./document-guide.css";
 
-export function DocumentGuide({ doc, plan, name, account, onClose }: {
+export function DocumentGuide({ doc, plan, name, account, onClose, fieldEdits, onFieldsChange }: {
   doc: GuideDoc; plan?: S["Plan-Input"]; name?: string; account?: S["ZusAccount"]; onClose: () => void;
+  fieldEdits?: Record<string, string>; onFieldsChange?: (fields: Record<string, string>) => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const title = useId();
@@ -24,7 +25,8 @@ export function DocumentGuide({ doc, plan, name, account, onClose }: {
       <button type="button" className="button" autoFocus onClick={onClose}>Zamknij podgląd</button>
     </header>
     {!form && <p className="muted">Podpowiedzi i próbne wpisy służą nauce. Nie zmieniają oryginalnego PDF-u ani nie są wysyłane do ZUS.</p>}
-    {form ? <OfficialGuide form={form} doc={doc} plan={plan} name={name} account={account} /> : documentIssuer(doc) === "doctor" ?
+    {form ? <OfficialGuide form={form} doc={doc} plan={plan} name={name} account={account}
+      fieldEdits={fieldEdits} onFieldsChange={onFieldsChange} /> : documentIssuer(doc) === "doctor" ?
       <section className="panel"><h3>Ten dokument wystawia lekarz</h3><p>e-ZLA trafia elektronicznie do ZUS i płatnika. Nie wypełniasz go samodzielnie. Sprawdź swoje dane oraz okres niezdolności; błąd zgłoś lekarzowi.</p><p>{doc.note}</p><LegalBasis rules={["sick-docs"]} /></section>
       : doc.recipient === "usc" ? <section className="panel"><h3>To wniosek do USC, nie formularz ZUS</h3>
         <p>Przygotuj imię i nazwisko dziecka, datę i miejsce urodzenia, wybór odpisu skróconego lub zupełnego oraz sposób odbioru. Dane wpisujesz w usłudze USC.</p>
@@ -33,13 +35,19 @@ export function DocumentGuide({ doc, plan, name, account, onClose }: {
   </dialog>;
 }
 
-function OfficialGuide({ form, doc, plan, name, account }: {
+function OfficialGuide({ form, doc, plan, name, account, fieldEdits, onFieldsChange }: {
   form: OfficialForm; doc: GuideDoc; plan?: S["Plan-Input"]; name?: string; account?: S["ZusAccount"];
+  fieldEdits?: Record<string, string>; onFieldsChange?: (fields: Record<string, string>) => void;
 }) {
   const [pageIndex, setPageIndex] = useState(0);
   const [fieldIndex, setFieldIndex] = useState(0);
   const [zoom, setZoom] = useState(100);
-  const [edits, setEdits] = useState<Record<string, string>>({});
+  const [localEdits, setLocalEdits] = useState<Record<string, string>>({});
+  const edits = fieldEdits ?? localEdits;
+  const setEdits = (next: Record<string, string> | ((previous: Record<string, string>) => Record<string, string>)) => {
+    const updated = typeof next === "function" ? next(edits) : next;
+    if (onFieldsChange) onFieldsChange(updated); else setLocalEdits(updated);
+  };
   const filled = prefilledFields(form, doc, plan, name, account);
   // Derive untouched values from new account data without overwriting corrections (including clearing).
   const valueOf = (id: string) => edits[id] ?? filled[id]?.value ?? "";
@@ -97,9 +105,6 @@ function OfficialGuide({ form, doc, plan, name, account }: {
         </p>}
         {form.issuer === "employer" && <p className="notice"><strong>Wypełnia płatnik składek — pracodawca lub zleceniodawca.</strong> Możesz sprawdzić, jakich danych potrzebuje, ale nie podpisujesz tego zaświadczenia za płatnika.</p>}
         {selected ? <>
-          <label className="field">Wybierz pole na tej stronie<select value={fieldIndex} onChange={(e) => selectField(Number(e.target.value), true)}>
-            {page.fields.map((field, index) => <option key={field.id} value={index}>{index + 1}. {field.label.slice(0, 110)}</option>)}
-          </select></label>
           <p className="eyebrow">Pole {fieldIndex + 1} · strona {page.number} · {selected.type === "CheckBox" ? "zaznaczenie" : "wpis"}</p>
           <h3>Co tutaj wpisać?</h3><p className="field-official-instruction">{selected.label}</p>
           <p className="muted">{selected.reviewed ? "Podpowiedź sprawdzona z podpisem na wydruku; oryginalny opis techniczny PDF-u wymagał korekty." : "Opis pola pochodzi z oryginalnego PDF-u ZUS."} Warunek „jeśli” oznacza, że pole nie dotyczy każdej sprawy.</p>
@@ -108,17 +113,16 @@ function OfficialGuide({ form, doc, plan, name, account }: {
             {!employerPart && selected.id in edits && <button type="button" className="button" onClick={() => setEdits((previous) => {
               const next = { ...previous }; delete next[selected.id]; return next;
             })}>Przywróć dane źródłowe</button>}</div>}
-          {employerPart ? (form.issuer !== "employer" && <p className="notice">To część dla płatnika. Dane i podpis uzupełnia pracodawca, zleceniodawca albo upoważniona osoba.</p>) : <>
+          {employerPart ? (form.issuer !== "employer" && <p className="notice">To część dla płatnika. Dane i podpis uzupełnia pracodawca, zleceniodawca albo upoważniona osoba.</p>) : (doc.rule !== "Oficjalny wzór ZUS" && <>
             {selected.type === "CheckBox" ? <label className="field-check"><input type="checkbox" checked={valueOf(selected.id) === "X"}
               onChange={(e) => setExample(e.target.checked ? "X" : "")} />Próbne zaznaczenie X</label>
               : <label className="field">Próbny wpis w tym polu<input value={valueOf(selected.id)} maxLength={220}
                 placeholder="Wpisz przykład, aby zobaczyć jego miejsce" autoComplete="off" onChange={(e) => setExample(e.target.value)} /></label>}
-            <p className="muted">Próbne wpisy zostają wyłącznie w otwartym podglądzie. Nie wpisuj tu danych, których nie znasz; PESEL, adres, dane dziecka i rachunek trzeba sprawdzić we własnych dokumentach.</p>
-          </>}
+            <p className="muted">{onFieldsChange ? "Wpisy zapisują się w tym szkicu i zostaną dołączone do wysyłanej symulacji. Oryginalny PDF pozostaje bez zmian." : "Próbne wpisy zostają wyłącznie w otwartym podglądzie."} Nie wpisuj danych, których nie znasz; PESEL, adres, dane dziecka i rachunek sprawdź we własnych dokumentach.</p>
+          </>)}
           <div className="actions"><button type="button" className="button" disabled={!fieldIndex} onClick={() => selectField(fieldIndex - 1, true)}>Poprzednie pole</button>
             <button type="button" className="button" disabled={fieldIndex === page.fields.length - 1} onClick={() => selectField(fieldIndex + 1, true)}>Następne pole</button></div>
         </> : <><h3>Pouczenie z oryginalnego formularza</h3><p>Ta strona nie ma pól do wypełnienia. Przeczytaj warunki i załączniki, a następnie wróć do właściwej części wniosku.</p></>}
-        <details><summary>Treść strony w wersji tekstowej</summary><pre className="form-page-text">{page.text}</pre></details>
       </aside>
     </div>
   </>;

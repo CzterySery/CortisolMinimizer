@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException
 
 from app import params, rag, repositories
 from app.calc.base import money
+from app.document_identity import document_id, validate_fields
 from app.params import Params
 from app.schemas import (
     ApplicationIn,
@@ -91,10 +92,8 @@ def account(persona: Me) -> ZusAccount:
     as_of = min([b.start for b in persona.plan.blocks if b.who == persona.who] + [birth])
     p = params.active(as_of)
     debt = parent.contribution_debt
-    filed = [FiledApplication(form=row["payload"]["form"], who=row["payload"]["who"],
-                              recipient=row["payload"]["recipient"], filed_on=row["created_at"].date(),
-                              status=row["status"])
-             for row in repositories.list_submissions(persona.id) if row["kind"] in ("application", "usc")]
+    filed = [_filed(row) for row in repositories.list_submissions(persona.id)
+             if row["kind"] in ("application", "usc")]
     return ZusAccount(
         persona=Persona.model_validate(persona.model_dump()), insurance=persona.insurance, ezla=persona.ezla,
         # same condition as rules.py debt.blocks-benefits (art. 2a)
@@ -103,9 +102,34 @@ def account(persona: Me) -> ZusAccount:
         applications=filed + persona.applications, plan=persona.plan)
 
 
+def _filed(row: dict) -> FiledApplication:
+    stored = row["payload"]
+    fields = stored.get("payload", {})
+    # Older receipts already stored exact period fields inside payload; recover only those dates, never guess.
+    def on(key: str, legacy: str):
+        raw = stored.get(key) or fields.get(legacy)
+        try:
+            return date.fromisoformat(raw) if raw else None
+        except (TypeError, ValueError):
+            return None
+
+    start, end = on("start", "okres_od"), on("end", "okres_do")
+    if (start is None) != (end is None) or (start and end < start):
+        start = end = None  # an incomplete legacy interval cannot mark a dated document done
+    return FiledApplication(form=stored["form"], who=stored["who"], recipient=stored["recipient"],
+                            filed_on=row["created_at"].date(), status=row["status"], start=start, end=end,
+                            document_id=document_id(stored["form"], stored["who"], stored["recipient"], start, end),
+                            payload=fields | {f"pdf:{k}": v for k, v in stored.get("official_fields", {}).items()})
+
+
 @router.post("/applications")
 def submit_application(app_in: ApplicationIn, persona: MaybeMe) -> ApplicationOut:
+    validate_fields(app_in)
+    identity = document_id(app_in.form, app_in.who, app_in.recipient, app_in.start, app_in.end)
+    if app_in.document_id is not None and app_in.document_id != identity:
+        raise HTTPException(422, "Identyfikator nie odpowiada dokumentowi i jego okresowi.")
     payload = app_in.model_dump(mode="json") | {"persona": persona.id if persona else None}
+    payload["document_id"] = identity
     return ApplicationOut(id=repositories.add_submission("application", payload, SENT), recipient=app_in.recipient,
                           status=SENT)
 
