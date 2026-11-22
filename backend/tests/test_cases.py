@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import pytest
 from fastapi.testclient import TestClient
 
-from app import params, repositories, vision
+from app import llm, params, repositories
 from app.api import cases
 from app.calc.plan import compute_plan
 from app.calc.rules import check
@@ -73,7 +73,7 @@ def test_samples_and_evaluate(client):
 
 
 def test_upload_is_recognized_by_hash_or_sent_to_manual_entry(client, monkeypatch):
-    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.setattr(llm, "provider", lambda: None)  # no model configured
     pdf = b"%PDF-1.4 sample bundle"
     known = SAMPLES["jdg-81-5"].model_copy(update={"sha256": [hashlib.sha256(pdf).hexdigest()]})
     monkeypatch.setattr(cases, "_samples", lambda: [known])
@@ -85,19 +85,18 @@ def test_upload_is_recognized_by_hash_or_sent_to_manual_entry(client, monkeypatc
 
 
 def test_unknown_upload_is_read_by_the_vision_model(client, monkeypatch):
-    monkeypatch.setenv("GEMINI_API_KEY", "test")
     case = SAMPLES["jdg-81-5"]
     sent = {}
 
-    async def generate_content(*, model, contents, config):
-        sent.update(pdf=contents[0].inline_data.data, schema=json.dumps(config.response_json_schema))
-        return SimpleNamespace(text=CaseInput(plan=case.plan, title=case.title).model_dump_json())
+    async def json_from_pdf(pdf, instructions, schema):
+        sent.update(pdf=pdf, schema=json.dumps(schema))
+        return CaseInput(plan=case.plan, title=case.title).model_dump_json()
 
-    fake = SimpleNamespace(aio=SimpleNamespace(models=SimpleNamespace(generate_content=generate_content)))
-    monkeypatch.setattr(vision, "_client", lambda: fake)
+    fake = SimpleNamespace(label="fake model", json_from_pdf=json_from_pdf)
+    monkeypatch.setattr(llm, "provider", lambda: fake)
     read = client.post("/api/v1/cases/parse", files={"file": ("x.pdf", b"%PDF-1.4 scan", "application/pdf")}).json()
     assert sent["pdf"] == b"%PDF-1.4 scan" and '"pattern"' not in sent["schema"] and "salary_history" in sent["schema"]
-    assert read["sample"] is None and not read["needs_manual_entry"] and "model AI" in read["message"]
+    assert read["sample"] is None and not read["needs_manual_entry"] and "model AI (fake model)" in read["message"]
     assert CaseInput.model_validate(read["extracted"]).plan == case.plan
     assert read["sha256"] == hashlib.sha256(b"%PDF-1.4 scan").hexdigest()
     assert client.post("/api/v1/cases/evaluate", json={"plan": read["extracted"]["plan"]}).json()["entitled"]
@@ -107,10 +106,10 @@ def test_unknown_upload_is_read_by_the_vision_model(client, monkeypatch):
     assert checked["result"]["bases"]["mother"] == "5000.00"
     assert client.post("/api/v1/cases/evaluate?upload=not-a-hash", json=fixed).status_code == 422
 
-    async def broken(**_):
-        return SimpleNamespace(text='{"plan": {"family": {}}}')  # schema-valid JSON is not enough: Pydantic rejects it
+    async def broken(*_):
+        return '{"plan": {"family": {}}}'  # schema-valid JSON is not enough: Pydantic rejects it
 
-    fake.aio.models.generate_content = broken
+    fake.json_from_pdf = broken
     again = client.post("/api/v1/cases/parse", files={"file": ("x.pdf", b"%PDF-1.4 scan", "application/pdf")}).json()
     assert again["extracted"]["title"] == fixed["title"] and "już wgrany" in again["message"]  # model not called
     assert again["extracted"]["plan"]["family"]["mother"]["base_monthly"] == "5000.00"  # the user's correction
