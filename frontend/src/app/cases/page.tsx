@@ -58,8 +58,8 @@ export default function Cases() {
 
   return (
     <main className="page">
-      <PageHeader eyebrow="Sprawdź sprawę" title="Masz już dokumenty?" accent="Sprawdźmy je.">
-        Wybierz przykładową sprawę ZUS albo wgraj PDF sprawy. Skan odczyta model AI, a odczytane dane sprawdzisz i poprawisz w formularzu. Prawo do zasiłku i kwoty liczy kalkulator, nie model.
+      <PageHeader title="Sprawdź sprawę">
+        Weryfikacja prawa do zasiłku i wyliczonych kwot na podstawie przykładowych spraw lub wgranego pliku PDF.
       </PageHeader>
       <div className="stack">
         <section className="choice-grid case-samples" aria-label="Przykładowe sprawy ZUS">

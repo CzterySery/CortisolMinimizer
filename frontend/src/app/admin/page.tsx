@@ -121,8 +121,8 @@ export default function AdminParams() {
 
   return (
     <>
-      <PageHeader eyebrow="Panel administracyjny" title="Parametry prawne">
-        Formularz pokazuje wersję obowiązującą dziś. Zapis tworzy nową wersję od daty „Obowiązuje od”; starsze wersje zostają.
+      <PageHeader title="Parametry prawne">
+        Edycja obowiązujących stawek zasiłków i wymiarów urlopów z zapisem nowych wersji według daty wejścia w życie.
       </PageHeader>
       <div className="actions">
         <button className="button" onClick={load}>Wczytaj</button>

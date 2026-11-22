@@ -21,8 +21,8 @@ export default function AdminSubmissions() {
 
   return (
     <>
-      <PageHeader eyebrow="Panel administracyjny" title="Złożone wnioski">
-        Symulacja: nic nie trafia do pracodawcy, ZUS ani USC. Najnowsze na górze.
+      <PageHeader title="Złożone wnioski">
+        Rejestr symulowanych zgłoszeń wysłanych do ZUS, pracodawcy i USC (najnowsze na górze).
       </PageHeader>
       <button className="button" onClick={load}>Odśwież</button>
       {error ? <ApiResult error={error} /> : null}

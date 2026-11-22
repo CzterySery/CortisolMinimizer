@@ -26,8 +26,8 @@ export default function Login() {
 
   return (
     <main className="page">
-      <PageHeader eyebrow="mObywatel · symulacja" title="Zaloguj się," accent="a resztę pobierzemy z ZUS.">
-        To demonstracja: wybierz przykładową osobę zamiast prawdziwego logowania.
+      <PageHeader title="mObywatel">
+        Symulacja logowania — wybierz przykładowy profil rodzica, aby pobrać dane o ubezpieczeniu i wnioskach.
       </PageHeader>
       <div className="choice-grid">
         {personas?.map((p) => (
