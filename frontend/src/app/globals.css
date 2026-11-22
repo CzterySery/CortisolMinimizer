@@ -381,6 +381,7 @@ dialog::backdrop { background: #18312788; }
 .landing-title { font-family: Georgia, serif; font-size: clamp(24px, 4.4vw, 54px); font-weight: 400; line-height: 1.15; letter-spacing: -1.5px; color: var(--ink); margin: 0 0 16px; white-space: nowrap; }
 .landing-title em { font-style: italic; color: #527561; }
 .landing-subtitle { font-size: clamp(15px, 1.8vw, 17px); color: var(--muted); line-height: 1.65; max-width: 720px; margin: 0 auto; }
+.landing-plan-line { display: block; white-space: nowrap; font-size: clamp(12px, 1.8vw, 17px); }
 
 .landing-animation-band { position: relative; width: 100%; margin: 0 auto 30px; background: #f5f7f2; border: 0; border-radius: 18px; padding: 20px 18px 16px; box-shadow: none; overflow: hidden; }
 .landing-animation-viewport { position: relative; width: 100%; aspect-ratio: 1480 / 640; max-height: 440px; display: flex; align-items: center; justify-content: center; }

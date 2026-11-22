@@ -127,8 +127,9 @@ export function LandingHero() {
           Witaj w <em>Otwartych Kartach</em>.
         </h1>
         <p className="landing-subtitle">
-          Przewodnik po urlopach i zasiłkach rodzicielskich ZUS. Ułóż plan dla Waszej rodziny
-          w 5 krokach, porównaj strategie i sprawdź dokładne wyliczenia w kalkulatorze.
+          Przewodnik po urlopach i zasiłkach rodzicielskich ZUS.
+          <span className="landing-plan-line">Ułóż plan dla Waszej rodziny w 5 krokach</span>
+          Porównaj strategie i sprawdź dokładne wyliczenia w kalkulatorze.
         </p>
       </div>
 

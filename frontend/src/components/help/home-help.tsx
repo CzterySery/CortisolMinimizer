@@ -110,7 +110,7 @@ export function HelpChat() {
               <ul className="rag-source-list">
                 {reply.data.sources.map((s) => (
                   <li key={`${s.url}-${s.locator}`} className="rag-source-card">
-                    <a href={s.url} {...(s.url.startsWith("http") ? { target: "_blank", rel: "noreferrer" } : {})}>
+                    <a href={s.url} target="_blank" rel="noreferrer">
                       <strong>{s.title}</strong>
                       {s.locator ? <span className="rag-locator"> · {s.locator}</span> : null}
                     </a>
