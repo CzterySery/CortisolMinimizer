@@ -16,7 +16,7 @@ Pomaga ona rodzicom zrozumieć przysługujące świadczenia, podzielić opiekę 
 
 - **Od konta do nowych wniosków:** w „Moje dane” wybierasz logowanie przez mObywatela i jeden z trzech fikcyjnych profili. Aplikacja symuluje pobranie z ZUS informacji o ubezpieczeniu, składkach, zadłużeniu, zwolnieniach lekarskich i wcześniej złożonych wnioskach. Następnie w kalkulatorze przygotowujesz nowy plan rodziny i przechodzisz do dokumentów wynikających z tego planu.
 - **Od razu do kalkulatora:** wpisujesz sytuację rodziny, dochody i planowane okresy opieki. Sprawdzasz podział urlopów między rodziców, wysokość świadczeń oraz skutki łączenia pracy z urlopem rodzicielskim. Gotowy plan prowadzi do listy dokumentów w „Moje dane”, gdzie możesz podejrzeć formularze, uzupełnić dostępne pola i zasymulować wysłanie wniosku do właściwego odbiorcy.
-- **Od gry do własnego planu:** w pięciu rundach wybierasz karty przedstawiające sytuacje i decyzje rodziców. Poznajesz ich wpływ na budżet i czas opieki, korzystając ze strategii „Kortyzol Minimizer”, „Zasiłki Maxxing” lub „Aura Farming”. Wynik przenosisz do kalkulatora, dopasowujesz do swojej rodziny, a następnie przechodzisz do wniosków.
+- **Od gry do własnego planu:** w pięciu rundach wybierasz karty przedstawiające sytuacje i decyzje rodziców. Poznajesz ich wpływ na budżet i czas opieki, korzystając ze strategii „Kortyzol Minimizer”, „Zasiłki Maxxing” lub „Balans Farming”. Wynik przenosisz do kalkulatora, dopasowujesz do swojej rodziny, a następnie przechodzisz do wniosków.
 
 ### Sprawdzenie sprawy ZUS
 
